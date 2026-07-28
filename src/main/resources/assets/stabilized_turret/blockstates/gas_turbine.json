@@ -1,0 +1,49 @@
+{
+  "variants": {
+    "facing=east,part=negative": {
+      "model": "stabilized_turret:block/gas_turbine/negative"
+    },
+    "facing=south,part=negative": {
+      "model": "stabilized_turret:block/gas_turbine/negative",
+      "y": 90
+    },
+    "facing=west,part=negative": {
+      "model": "stabilized_turret:block/gas_turbine/negative",
+      "y": 180
+    },
+    "facing=north,part=negative": {
+      "model": "stabilized_turret:block/gas_turbine/negative",
+      "y": 270
+    },
+    "facing=east,part=center": {
+      "model": "stabilized_turret:block/gas_turbine/center"
+    },
+    "facing=south,part=center": {
+      "model": "stabilized_turret:block/gas_turbine/center",
+      "y": 90
+    },
+    "facing=west,part=center": {
+      "model": "stabilized_turret:block/gas_turbine/center",
+      "y": 180
+    },
+    "facing=north,part=center": {
+      "model": "stabilized_turret:block/gas_turbine/center",
+      "y": 270
+    },
+    "facing=east,part=positive": {
+      "model": "stabilized_turret:block/gas_turbine/positive"
+    },
+    "facing=south,part=positive": {
+      "model": "stabilized_turret:block/gas_turbine/positive",
+      "y": 90
+    },
+    "facing=west,part=positive": {
+      "model": "stabilized_turret:block/gas_turbine/positive",
+      "y": 180
+    },
+    "facing=north,part=positive": {
+      "model": "stabilized_turret:block/gas_turbine/positive",
+      "y": 270
+    }
+  }
+}

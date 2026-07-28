@@ -1,0 +1,12 @@
+﻿{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "stabilized_turret:block/connected_display_front_single",
+    "north": "stabilized_turret:block/connected_display_front_single",
+    "south": "stabilized_turret:block/connected_display_casing_standalone",
+    "east": "stabilized_turret:block/connected_display_casing_standalone",
+    "west": "stabilized_turret:block/connected_display_casing_standalone",
+    "up": "stabilized_turret:block/connected_display_casing_standalone",
+    "down": "stabilized_turret:block/connected_display_casing_standalone"
+  }
+}

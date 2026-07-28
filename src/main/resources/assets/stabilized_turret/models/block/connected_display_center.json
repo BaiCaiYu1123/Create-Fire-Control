@@ -1,0 +1,16 @@
+﻿{
+  "parent": "minecraft:block/cube",
+  "elements": [
+    { "from": [0,0,0], "to": [16,16,16],
+      "faces": {
+        "north": {"texture": "#north", "cullface": "north"},
+        "south": {"texture": "#south", "cullface": "south"}
+      }
+    }
+  ],
+  "textures": {
+    "particle": "stabilized_turret:block/connected_display_front_single",
+    "north": "stabilized_turret:block/connected_display_front_center",
+    "south": "stabilized_turret:block/connected_display_casing_back"
+  }
+}

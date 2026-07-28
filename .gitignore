@@ -1,0 +1,34 @@
+# Gradle/IDE outputs
+.gradle/
+build/
+out/
+*.iml
+.idea/
+
+# Local Minecraft run directories, profiling data and crash material
+/run*/
+/.diagnostics/
+/.tools/
+/backups/
+/sound_preview*/
+/logs/
+/*.zip
+
+# Local dependency cache and reverse-engineering/reference material.
+# Dependencies are intentionally not redistributed with this source project.
+/libs/
+/reference/
+/com/
+/net/
+/rbasamoyai/
+/assets/
+/data/
+/META-INF/
+
+# Local binary artifacts and extracted runtime files
+/*.jar
+/*.dll
+/cbc_at.mixins.json
+/createbigcannons.mixins.json
+/icon.png
+/pack.mcmeta

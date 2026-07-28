@@ -1,0 +1,9 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "stabilized_turret:block/yuushya_medium_cannon_barrel"
+      }
+    }
+  ]
+}

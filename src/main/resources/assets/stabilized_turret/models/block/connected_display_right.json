@@ -1,0 +1,23 @@
+﻿{
+  "parent": "minecraft:block/cube",
+  "elements": [
+    { "from": [0,0,0], "to": [16,16,16],
+      "faces": {
+        "north": {"texture": "#north", "cullface": "north"},
+        "south": {"texture": "#south", "cullface": "south"},
+        "up": {"texture": "#up", "cullface": "up", "rotation": 90},
+        "down": {"texture": "#down", "cullface": "down", "rotation": 270},
+        "east": {"texture": "#east", "cullface": "east"}
+      }
+    }
+  ],
+  "textures": {
+    "particle": "stabilized_turret:block/connected_display_front_single",
+    "north": "stabilized_turret:block/connected_display_front_left",
+    "south": "stabilized_turret:block/connected_display_casing_right",
+    "east": "stabilized_turret:block/connected_display_casing_side_mid",
+    "up": "stabilized_turret:block/connected_display_casing_side_bottom",
+    "down": "stabilized_turret:block/connected_display_casing_side_bottom"
+  }
+}
+

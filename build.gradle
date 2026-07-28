@@ -1,0 +1,119 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.gradle.userdev' version '7.1.38'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = 'create-fire-control'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    mavenCentral()
+}
+
+runs {
+    configureEach {
+        systemProperty 'forge.logging.console.level', 'info'
+        workingDirectory project.layout.projectDirectory
+                .dir(providers.gradleProperty('runRoot').getOrElse('run'))
+                .dir(name)
+        modSource project.sourceSets.main
+    }
+
+    client {}
+    server { argument '--nogui' }
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+def latestCompat = providers.gradleProperty('compatLatest')
+        .map { it.toBoolean() }
+        .getOrElse(false)
+def cbcRuntime = providers.gradleProperty('cbcRuntime')
+        .map { it.toBoolean() }
+        .getOrElse(true)
+def sableJar = latestCompat
+        ? 'libs/compat-latest/sable-neoforge-1.21.1-2.0.3.jar'
+        : 'libs/sable-neoforge-1.21.1-1.2.2.jar'
+def aeronauticsJar = latestCompat
+        ? 'libs/compat-latest/create-aeronautics-bundled-1.21.1-1.3.0.jar'
+        : 'libs/create-aeronautics-bundled-1.21.1-1.2.1.jar'
+def simulatedJar = latestCompat
+        ? 'libs/compat-latest/simulated-neoforge-1.21.1-1.3.0.jar'
+        : 'libs/simulated-neoforge-1.21.1-1.2.1-compile.jar'
+def sableRapierJar = latestCompat
+        ? 'libs/compat-latest/sable-rapier-1.21.1-2.0.3.jar'
+        : null
+
+dependencies {
+    implementation "net.neoforged:neoforge:${neo_version}"
+
+    implementation files('libs/create-1.21.1-6.0.10.jar')
+    implementation files(sableJar)
+    implementation files(aeronauticsJar)
+    compileOnly files(simulatedJar)
+    if (sableRapierJar != null) {
+        compileOnly files(sableRapierJar)
+    }
+    compileOnly files('libs/sable-companion-common-1.21.1-1.6.0-compile.jar')
+    compileOnly files('libs/ponder-neoforge-1.0.82-mc1.21.1-compile.jar')
+    compileOnly files('libs/registrate-MC1.21-1.3.0+67-compile.jar')
+    compileOnly files('libs/flywheel-neoforge-1.21.1-1.0.6-compile.jar')
+    compileOnly files('libs/interiors-1.21.1-neoforge-0.6.1.jar')
+    compileOnly files('libs/sable-schematic-api-0.4.0.jar')
+    compileOnly files('libs/createbigcannons-5.11.7-mc1.21.1-compile.jar')
+    compileOnly files('libs/cbcmodernwarfare-0.0.6v+mc.1.21.1-neoforge.jar')
+    compileOnly files('libs/yuushya_modelling-1.21.1-2.4.1.jar')
+
+    localRuntime files('libs/create-1.21.1-6.0.10.jar')
+    localRuntime files(sableJar)
+    localRuntime files(aeronauticsJar)
+    localRuntime files('libs/interiors-1.21.1-neoforge-0.6.1.jar')
+    if (cbcRuntime) {
+        localRuntime files('libs/createbigcannons-5.11.7-mc1.21.1-compile.jar')
+        localRuntime files('libs/cbcmodernwarfare-0.0.6v+mc.1.21.1-neoforge.jar')
+        localRuntime files('libs/ritchiesprojectilelib-2.1.2+mc.1.21.1-neoforge.jar')
+        localRuntime files('libs/yuushya_modelling-1.21.1-2.4.1.jar')
+    }
+}
+
+tasks.withType(ProcessResources).configureEach {
+    def replaceProperties = [
+            minecraft_version_range: minecraft_version_range,
+            neo_version: neo_version,
+            loader_version_range: loader_version_range,
+            mod_id: mod_id,
+            mod_name: mod_name,
+            mod_license: mod_license,
+            mod_version: mod_version
+    ]
+    inputs.properties replaceProperties
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand replaceProperties
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('test').configure {
+    failOnNoDiscoveredTests = false
+}
+
+tasks.register('testOpenControllerPayload', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.network.OpenControllerPayloadRoundTrip'
+}
+
+tasks.named('check').configure {
+    dependsOn tasks.named('testOpenControllerPayload')
+}

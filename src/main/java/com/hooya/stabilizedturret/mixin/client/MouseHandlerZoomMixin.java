@@ -12,11 +12,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * Extends only the bound operator's Sable orbit-camera near zoom. This wraps
- * the same post-vanilla scroll value used by Sable and consumes it before
- * Sable's normal 0..4 setter can clamp away the negative extension.
+ * Replaces Sable's limited scroll handler in both contraption camera modes
+ * while the player is seated on a physical structure. The higher priority
+ * makes this wrapper run before Sable's own wrapper, so its 0..4 setter is
+ * never reached for these views.
  */
-@Mixin(value = MouseHandler.class, priority = 900)
+@Mixin(value = MouseHandler.class, priority = 2000)
 public abstract class MouseHandlerZoomMixin {
     @Shadow
     @Final

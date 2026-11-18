@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "create_fire_control:apfsds_medium_shell",
+    "create_fire_control:annihilation_medium_shell"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "create_fire_control:tiger_i_engine",
+    "create_fire_control:camouflaged_polyhedral_armor"
+  ]
+}

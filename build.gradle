@@ -1,7 +1,59 @@
 plugins {
     id 'java-library'
     id 'net.neoforged.gradle.userdev' version '7.1.38'
+    id 'com.gradleup.shadow' version '9.2.2'
 }
+
+tasks.register('testInactiveSessionSync', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.network.InactiveSessionSyncChecks'
+}
+
+tasks.register('testStructurePreview', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.StructurePreviewChecks'
+}
+tasks.named('check') { dependsOn tasks.named('testStructurePreview') }
+tasks.named('check') { dependsOn tasks.named('testInactiveSessionSync') }
+
+tasks.register('testCannonReflection', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.CannonReflectionChecks'
+}
+tasks.named('check') { dependsOn tasks.named('testCannonReflection') }
+
+tasks.register('testVirtualScopeGeometry', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.VirtualScopeGeometryChecks'
+}
+tasks.named('check') { dependsOn tasks.named('testVirtualScopeGeometry') }
+
+tasks.register('testScopeOrientation', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.ScopeOrientationChecks'
+    systemProperty 'java.awt.headless', 'true'
+}
+tasks.named('check') { dependsOn tasks.named('testScopeOrientation') }
+
+tasks.register('testScopeAmmo', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.loader.ScopeAmmoChecks'
+}
+tasks.named('check') { dependsOn tasks.named('testScopeAmmo') }
+
+// 额外改动（2026-11-06）：虚拟炸弹快照不能打断帧间插值。
+tasks.register('bombRenderInterpolationChecks', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.BombRenderInterpolationChecks'
+}
+tasks.named('check') { dependsOn tasks.named('bombRenderInterpolationChecks') }
 
 version = mod_version
 group = mod_group_id
@@ -14,6 +66,76 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 repositories {
     mavenCentral()
+    maven {
+        name = 'GeckoLib'
+        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content { includeGroup('software.bernie.geckolib') }
+    }
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup('maven.modrinth') }
+    }
+}
+
+// Opt-in server integration checks; these classes never enter the shipped mod JAR.
+sourceSets {
+    weaponViewIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    infraredIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    missileIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    bombIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    rocketIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    dieselIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    apfsdsIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    annihilationIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    gunfireIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    recoilIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    ticketIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    nativeBearing {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    bearingIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    controllerIntegration {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
 }
 
 runs {
@@ -25,62 +147,407 @@ runs {
         modSource project.sourceSets.main
     }
 
-    client {}
-    server { argument '--nogui' }
+    client {
+        if (providers.gradleProperty('weaponViewClientChecks').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.weaponViewIntegration
+            systemProperty 'create_fire_control.weaponViewClientChecks', 'true'
+            argument '--width'
+            argument '1280'
+            argument '--height'
+            argument '720'
+        }
+        if (providers.gradleProperty('infraredClientChecks').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.infraredIntegration
+            systemProperty 'create_fire_control.infraredClientChecks', 'true'
+            argument '--width'
+            argument '2560'
+            argument '--height'
+            argument '1440'
+        }
+        if (providers.gradleProperty('missileClientChecks').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.missileIntegration
+            systemProperty 'create_fire_control.missileClientChecks', 'true'
+            argument '--width'
+            argument '1280'
+            argument '--height'
+            argument '720'
+        }
+        if (providers.gradleProperty('bombClientChecks').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.bombIntegration
+            systemProperty 'create_fire_control.bombClientChecks', 'true'
+        }
+        if (providers.gradleProperty('dieselClientChecks').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.dieselIntegration
+            systemProperty 'create_fire_control.dieselClientChecks', 'true'
+        }
+        if (providers.gradleProperty('engineBehaviorClientChecks').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.dieselIntegration
+            systemProperty 'create_fire_control.engineBehaviorClientChecks', 'true'
+        }
+    }
+    server {
+        argument '--nogui'
+        if (providers.gradleProperty('weaponViewServerChecks').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.weaponViewIntegration
+            systemProperty 'create_fire_control.weaponViewServerChecks', 'true'
+        }
+        if (providers.gradleProperty('infraredIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.infraredIntegration
+        }
+        if (providers.gradleProperty('missileIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.missileIntegration
+        }
+        if (providers.gradleProperty('bombIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.bombIntegration
+            systemProperty 'create_fire_control.virtualBombChecks', providers.gradleProperty('virtualBombChecks').getOrElse('false')
+        }
+        if (providers.gradleProperty('rocketIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.rocketIntegration
+            systemProperty 'create_fire_control.countermeasureChecks',
+                    providers.gradleProperty('countermeasureIntegration').getOrElse('false')
+        }
+        if (providers.gradleProperty('controllerIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.controllerIntegration
+            systemProperty 'create_fire_control.controllerApiOnly', providers.gradleProperty('controllerApiOnly').getOrElse('false')
+        }
+        if (providers.gradleProperty('dieselIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.dieselIntegration
+        }
+        if (providers.gradleProperty('apfsdsIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.apfsdsIntegration
+        }
+        if (providers.gradleProperty('annihilationIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.annihilationIntegration
+        }
+        if (providers.gradleProperty('gunfireIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.gunfireIntegration
+        }
+        if (providers.gradleProperty('recoilIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.recoilIntegration
+        }
+        if (providers.gradleProperty('ticketIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.ticketIntegration
+        }
+        if (providers.gradleProperty('bearingIntegration').getOrElse('false').toBoolean()) {
+            modSource project.sourceSets.bearingIntegration
+            systemProperty 'create_fire_control.characterizeCarrierHold',
+                    providers.gradleProperty('characterizeCarrierHold').getOrElse('false')
+            systemProperty 'create_fire_control.isolatedCarrierStaff',
+                    providers.gradleProperty('isolatedCarrierStaff').getOrElse('false')
+            systemProperty 'create_fire_control.finiteCarrierAim',
+                    providers.gradleProperty('finiteCarrierAim').getOrElse('false')
+            systemProperty 'create_fire_control.finiteSupportBeforeHinges',
+                    providers.gradleProperty('finiteSupportBeforeHinges').getOrElse('false')
+            systemProperty 'create_fire_control.finiteAimTransitions',
+                    providers.gradleProperty('finiteAimTransitions').getOrElse('false')
+            systemProperty 'create_fire_control.finiteLimitTransitions',
+                    providers.gradleProperty('finiteLimitTransitions').getOrElse('false')
+            systemProperty 'create_fire_control.aimEdgeCases',
+                    providers.gradleProperty('aimEdgeCases').getOrElse('false')
+            systemProperty 'create_fire_control.finiteUserOffsets',
+                    providers.gradleProperty('finiteUserOffsets').getOrElse('false')
+            systemProperty 'create_fire_control.finiteMediumCannon',
+                    providers.gradleProperty('finiteMediumCannon').getOrElse('false')
+            systemProperty 'create_fire_control.finiteGroundTarget',
+                    providers.gradleProperty('finiteGroundTarget').getOrElse('false')
+            systemProperty 'create_fire_control.finiteRebaseSupport',
+                    providers.gradleProperty('finiteRebaseSupport').getOrElse('false')
+            systemProperty 'create_fire_control.finiteTranslation',
+                    providers.gradleProperty('finiteTranslation').getOrElse('false')
+            systemProperty 'create_fire_control.finiteCombinedMotion',
+                    providers.gradleProperty('finiteCombinedMotion').getOrElse('false')
+            systemProperty 'create_fire_control.finiteProductionInput',
+                    providers.gradleProperty('finiteProductionInput').getOrElse('false')
+            systemProperty 'create_fire_control.finiteWeldedCarrier',
+                    providers.gradleProperty('finiteWeldedCarrier').getOrElse('false')
+            systemProperty 'create_fire_control.finiteWeldedTurret',
+                    providers.gradleProperty('finiteWeldedTurret').getOrElse('false')
+            systemProperty 'create_fire_control.legacyBearingSources',
+                    providers.gradleProperty('legacyBearingSources').getOrElse('false')
+        }
+    }
+}
+
+// Apply after the standard runs exist; CopyPoly stays in its own MIT source tree.
+apply from: 'gradle/copypoly.gradle'
+
+if (providers.gradleProperty('controllerClientChecks').getOrElse('false').toBoolean()) {
+    runs.client {
+        modSource project.sourceSets.controllerIntegration
+        systemProperty 'create_fire_control.controllerClientChecks', 'true'
+        systemProperty 'create_fire_control.controllerKeyboardChecks',
+                providers.gradleProperty('controllerKeyboardChecks').getOrElse('false')
+        argument '--width'
+        argument '1280'
+        argument '--height'
+        argument '720'
+    }
+}
+
+if (providers.gradleProperty('weaponViewServerChecks').getOrElse('false').toBoolean()) {
+    def viewServerResult = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file('server/weapon-view-server-result.txt').asFile
+    tasks.matching { it.name == 'runServer' }.configureEach {
+        doFirst { viewServerResult.parentFile.mkdirs(); viewServerResult.text = 'RUNNING' }
+        doLast {
+            if (!viewServerResult.isFile() || viewServerResult.text.trim() != 'PASS')
+                throw new GradleException('Weapon view server checks failed: ' + viewServerResult.text)
+        }
+    }
+}
+
+if (providers.gradleProperty('weaponViewClientChecks').getOrElse('false').toBoolean()) {
+    def viewResult = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file('client/weapon-view-client-result.txt').asFile
+    tasks.matching { it.name == 'runClient' }.configureEach {
+        doFirst { viewResult.parentFile.mkdirs(); viewResult.text = 'RUNNING' }
+        doLast {
+            if (!viewResult.isFile() || viewResult.text.trim() != 'PASS') {
+                throw new GradleException('Weapon view client checks failed: ' +
+                        (viewResult.isFile() ? viewResult.text : 'missing result'))
+            }
+        }
+    }
+}
+
+if (providers.gradleProperty('rocketIntegration').getOrElse('false').toBoolean()) {
+    def countermeasureChecks = providers.gradleProperty('countermeasureIntegration').getOrElse('false').toBoolean()
+    def rocketResult = layout.projectDirectory
+            .dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file(countermeasureChecks ? 'server/countermeasure-integration-result.txt'
+                    : 'server/virtual-rocket-integration-result.txt').asFile
+    tasks.matching { it.name == 'runServer' }.configureEach {
+        doFirst { rocketResult.parentFile.mkdirs(); rocketResult.text = 'RUNNING' }
+        doLast {
+            if (!rocketResult.isFile() || rocketResult.text.trim() != 'PASS') {
+                throw new GradleException('Virtual rocket integration failed: ' +
+                        (rocketResult.isFile() ? rocketResult.text : 'missing result'))
+            }
+        }
+    }
+}
+
+if (providers.gradleProperty('missileIntegration').getOrElse('false').toBoolean()) {
+    def result = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file('server/mathematical-missile-integration-result.txt').asFile
+    tasks.matching { it.name == 'runServer' }.configureEach {
+        doFirst { result.parentFile.mkdirs(); result.text = 'RUNNING' }
+        doLast {
+            if (!result.isFile() || result.text.trim() != 'PASS') {
+                throw new GradleException('Mathematical missile integration failed: ' +
+                        (result.isFile() ? result.text : 'missing result'))
+            }
+        }
+    }
+}
+
+if (providers.gradleProperty('recoilIntegration').getOrElse('false').toBoolean()) {
+    def recoilResult = layout.projectDirectory
+            .dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file('server/recoil-integration-result.txt').asFile
+    tasks.matching { it.name == 'runServer' }.configureEach {
+        doFirst {
+            recoilResult.parentFile.mkdirs()
+            recoilResult.text = 'RUNNING'
+        }
+        doLast {
+            if (!recoilResult.isFile() || recoilResult.text.trim() != 'PASS') {
+                throw new GradleException('Cannon recoil integration failed: ' +
+                        (recoilResult.isFile() ? recoilResult.text : 'missing result'))
+            }
+        }
+    }
+}
+
+if (providers.gradleProperty('bearingIntegration').getOrElse('false').toBoolean()) {
+    def bearingResult = layout.projectDirectory
+            .dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file('server/bearing-integration-result.txt').asFile
+    tasks.matching { it.name == 'runServer' }.configureEach {
+        doFirst {
+            bearingResult.parentFile.mkdirs()
+            bearingResult.text = 'RUNNING'
+        }
+        doLast {
+            if (!bearingResult.isFile() || bearingResult.text.trim() != 'PASS') {
+                throw new GradleException('Bearing integration failed: ' +
+                        (bearingResult.isFile() ? bearingResult.text : 'missing result'))
+            }
+        }
+    }
 }
 
 configurations {
     runtimeClasspath.extendsFrom localRuntime
+    embeddedLibraries
 }
 
-def latestCompat = providers.gradleProperty('compatLatest')
-        .map { it.toBoolean() }
-        .getOrElse(false)
+tasks.register('testWirelessControllerInputs', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.remote.ControllerInputRoutingChecks'
+}
+tasks.named('check').configure { dependsOn 'testWirelessControllerInputs' }
+
+tasks.register('testRemoteInputRoute', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.RemoteInputRouteChecks'
+}
+tasks.named('check').configure { dependsOn 'testRemoteInputRoute' }
+
+tasks.register('testMianbaoBombBallistics', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.MianbaoBombBallisticsChecks'
+    if (providers.gradleProperty('mianbaoJar').isPresent()) args file(providers.gradleProperty('mianbaoJar').get()).absolutePath
+}
+tasks.named('check').configure { dependsOn 'testMianbaoBombBallistics' }
+
+if (providers.gradleProperty('bombClientChecks').getOrElse('false').toBoolean()) {
+    def bombClientResult = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file('client/bomb-client-result.txt').asFile
+    tasks.matching { it.name == 'runClient' }.configureEach {
+        doFirst { bombClientResult.parentFile.mkdirs(); bombClientResult.text = 'RUNNING' }
+        doLast {
+            if (!bombClientResult.isFile() || bombClientResult.text.trim() != 'PASS') {
+                throw new GradleException('Bomb client checks incomplete: ' + (bombClientResult.isFile() ? bombClientResult.text : 'missing result'))
+            }
+        }
+    }
+}
+
+if (providers.gradleProperty('bombIntegration').getOrElse('false').toBoolean()) {
+    def bombResult = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file(providers.gradleProperty('virtualBombChecks').getOrElse('false').toBoolean() ?
+                    'server/virtual-bomb-integration-result.txt' : 'server/bomb-integration-result.txt').asFile
+    tasks.matching { it.name == 'runServer' }.configureEach {
+        doFirst { bombResult.parentFile.mkdirs(); bombResult.text = 'RUNNING' }
+        doLast {
+            if (!bombResult.isFile() || bombResult.text.trim() != 'PASS') {
+                throw new GradleException('Bomb integration failed: ' + (bombResult.isFile() ? bombResult.text : 'missing result'))
+            }
+        }
+    }
+}
+
+if (providers.gradleProperty('ticketIntegration').getOrElse('false').toBoolean()) {
+    def ticketResult = layout.projectDirectory
+            .dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file('server/ticket-integration-result.txt').asFile
+    tasks.matching { it.name == 'runServer' }.configureEach {
+        doFirst {
+            ticketResult.parentFile.mkdirs()
+            ticketResult.text = 'RUNNING'
+        }
+        doLast {
+            if (!ticketResult.isFile() || ticketResult.text.trim() != 'PASS') {
+                throw new GradleException('Missile ticket integration failed: ' +
+                        (ticketResult.isFile() ? ticketResult.text : 'missing result'))
+            }
+        }
+    }
+}
+
 def cbcRuntime = providers.gradleProperty('cbcRuntime')
         .map { it.toBoolean() }
-        .getOrElse(true)
-def sableJar = latestCompat
-        ? 'libs/compat-latest/sable-neoforge-1.21.1-2.0.3.jar'
-        : 'libs/sable-neoforge-1.21.1-1.2.2.jar'
-def aeronauticsJar = latestCompat
-        ? 'libs/compat-latest/create-aeronautics-bundled-1.21.1-1.3.0.jar'
-        : 'libs/create-aeronautics-bundled-1.21.1-1.2.1.jar'
-def simulatedJar = latestCompat
-        ? 'libs/compat-latest/simulated-neoforge-1.21.1-1.3.0.jar'
-        : 'libs/simulated-neoforge-1.21.1-1.2.1-compile.jar'
-def sableRapierJar = latestCompat
-        ? 'libs/compat-latest/sable-rapier-1.21.1-2.0.3.jar'
-        : null
+        .getOrElse(false)
+def touhouMaidRuntime = providers.gradleProperty('touhouMaidRuntime')
+        .map { it.toBoolean() }
+        .getOrElse(false)
+def mianbaoJar = providers.gradleProperty('mianbaoJar')
+        .map { file(it) }
+        .orNull
+def touhouMaidJar = providers.gradleProperty('touhouMaidJar')
+        .map { file(it) }
+        .orNull
+def sableJar = 'libs/compat-latest/sable-neoforge-1.21.1-2.0.6.jar'
+def aeronauticsJar = 'libs/compat-latest/create-aeronautics-bundled-1.21.1-1.3.2.jar'
+def simulatedJar = 'libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar'
+def sableRapierJar = 'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar'
 
 dependencies {
+    if (providers.gradleProperty('annihilationIntegration').getOrElse('false').toBoolean()
+            || providers.gradleProperty('dieselIntegration').getOrElse('false').toBoolean()
+            || providers.gradleProperty('rocketIntegration').getOrElse('false').toBoolean()
+            || providers.gradleProperty('missileIntegration').getOrElse('false').toBoolean()
+            || providers.gradleProperty('missileClientChecks').getOrElse('false').toBoolean()
+            || providers.gradleProperty('dieselClientChecks').getOrElse('false').toBoolean()) {
+        localRuntime files(simulatedJar, sableRapierJar)
+    }
     implementation "net.neoforged:neoforge:${neo_version}"
+    implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    implementation "org.jcodec:jcodec:0.2.5"
+    implementation "org.jcodec:jcodec-javase:0.2.5"
+    nativeBearingImplementation 'org.lz4:lz4-java:1.8.0'
+    nativeBearingRuntimeOnly files(sableRapierJar)
+    embeddedLibraries "org.jcodec:jcodec:0.2.5"
+    embeddedLibraries "org.jcodec:jcodec-javase:0.2.5"
 
     implementation files('libs/create-1.21.1-6.0.10.jar')
     implementation files(sableJar)
     implementation files(aeronauticsJar)
     compileOnly files(simulatedJar)
-    if (sableRapierJar != null) {
-        compileOnly files(sableRapierJar)
-    }
+    compileOnly files('libs/compat-latest/drivebywire-0.3.0.jar')
+    compileOnly files(sableRapierJar)
     compileOnly files('libs/sable-companion-common-1.21.1-1.6.0-compile.jar')
+    testImplementation files('libs/sable-companion-common-1.21.1-1.6.0-compile.jar')
+    testImplementation files('libs/ritchiesprojectilelib-2.1.2+mc.1.21.1-neoforge.jar')
     compileOnly files('libs/ponder-neoforge-1.0.82-mc1.21.1-compile.jar')
     compileOnly files('libs/registrate-MC1.21-1.3.0+67-compile.jar')
     compileOnly files('libs/flywheel-neoforge-1.21.1-1.0.6-compile.jar')
     compileOnly files('libs/interiors-1.21.1-neoforge-0.6.1.jar')
     compileOnly files('libs/sable-schematic-api-0.4.0.jar')
     compileOnly files('libs/createbigcannons-5.11.7-mc1.21.1-compile.jar')
+    compileOnly files('libs/ritchiesprojectilelib-2.1.2+mc.1.21.1-neoforge.jar')
     compileOnly files('libs/cbcmodernwarfare-0.0.6v+mc.1.21.1-neoforge.jar')
     compileOnly files('libs/yuushya_modelling-1.21.1-2.4.1.jar')
+    testCompileOnly files('libs/yuushya_modelling-1.21.1-2.4.1.jar')
+    if (touhouMaidJar != null) {
+        compileOnly files(touhouMaidJar)
+    } else {
+        compileOnly 'maven.modrinth:touhou-little-maid:1.5.3-neoforge+mc1.21.1'
+    }
+    if (mianbaoJar != null) {
+        compileOnly files(mianbaoJar)
+    }
 
+    if (providers.gradleProperty('controllerBlueprintChecks').getOrElse('false').toBoolean()) {
+        localRuntime files(providers.gradleProperty('controllerBlueprintJar')
+                .getOrElse('libs/sable-schematic-api-0.4.0.jar'))
+        if (providers.gradleProperty('blueprintLibraryJar').isPresent()) localRuntime files(file(providers.gradleProperty('blueprintLibraryJar').get()))
+    }
     localRuntime files('libs/create-1.21.1-6.0.10.jar')
     localRuntime files(sableJar)
     localRuntime files(aeronauticsJar)
+    if (providers.gradleProperty('wirelessControllerWireRuntime').getOrElse('false').toBoolean()) {
+        localRuntime files('libs/compat-latest/drivebywire-0.3.0.jar')
+    }
+    if (providers.gradleProperty('controllerModelJar').isPresent()) {
+        localRuntime files(file(providers.gradleProperty('controllerModelJar').get()))
+    }
+    if (providers.gradleProperty('lightspeedJar').isPresent()) {
+        localRuntime files(file(providers.gradleProperty('lightspeedJar').get()))
+    }
+    if (providers.gradleProperty('flightControlJar').isPresent()) {
+        localRuntime files(file(providers.gradleProperty('flightControlJar').get()))
+    }
     localRuntime files('libs/interiors-1.21.1-neoforge-0.6.1.jar')
     if (cbcRuntime) {
         localRuntime files('libs/createbigcannons-5.11.7-mc1.21.1-compile.jar')
         localRuntime files('libs/cbcmodernwarfare-0.0.6v+mc.1.21.1-neoforge.jar')
         localRuntime files('libs/ritchiesprojectilelib-2.1.2+mc.1.21.1-neoforge.jar')
         localRuntime files('libs/yuushya_modelling-1.21.1-2.4.1.jar')
+    }
+    if (touhouMaidRuntime) {
+        if (touhouMaidJar != null) {
+            localRuntime files(touhouMaidJar)
+        } else {
+            localRuntime 'maven.modrinth:touhou-little-maid:1.5.3-neoforge+mc1.21.1'
+        }
+    }
+    if (mianbaoJar != null) {
+        localRuntime files(mianbaoJar)
     }
 }
 
@@ -104,6 +571,62 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
+// JCodec is pure Java and is shaded into the mod so video playback does not
+// require FFmpeg, VLC, or another native program on the player's computer.
+// Relocate it because other mods (notably Citadel) may also shade JCodec; two
+// automatic modules exporting org.jcodec.* cannot coexist in ModLaunch's layer.
+tasks.named('jar').configure {
+    archiveClassifier = 'slim'
+}
+
+tasks.named('shadowJar').configure {
+    archiveClassifier = ''
+    configurations = [project.configurations.embeddedLibraries]
+    exclude 'org/jcodec/testing/**'
+    relocate 'org.jcodec', "${mod_group_id}.internal.jcodec"
+    relocate 'net.sourceforge.jaad', "${mod_group_id}.internal.jaad"
+    exclude 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/*.DSA'
+}
+
+def verifyShadedJar = tasks.register('verifyShadedJar') {
+    dependsOn tasks.named('shadowJar')
+    def shadedArchive = tasks.named('shadowJar').flatMap { it.archiveFile }
+    def relocatedJcodecPrefix = mod_group_id.replace('.', '/') + '/internal/jcodec/'
+    inputs.file(shadedArchive)
+
+    doLast {
+        def archive = inputs.files.singleFile
+        def zip = new java.util.zip.ZipFile(archive)
+        try {
+            def entries = zip.entries().collect { it.name }
+            def leakedPackage = entries.find {
+                it.startsWith('org/jcodec/') || it.startsWith('net/sourceforge/jaad/')
+            }
+            if (leakedPackage != null) {
+                throw new GradleException("Unrelocated JCodec class ${leakedPackage} found in " +
+                        "${archive.name}; this causes a Java module split-package crash with Citadel.")
+            }
+
+            if (!entries.any { it.startsWith(relocatedJcodecPrefix) }) {
+                throw new GradleException("Relocated JCodec classes are missing from ${archive.name}.")
+            }
+        } finally {
+            zip.close()
+        }
+    }
+}
+
+tasks.named('assemble').configure {
+    dependsOn verifyShadedJar
+}
+
+tasks.register('controllerApiSourcesJar', Jar) {
+    archiveClassifier = 'controller-api-sources'
+    from('src/main/java') { include 'com/hooya/stabilizedturret/api/remote/**' }
+    from('docs') { include 'REMOTE_CONTROLLER_API.md' }
+}
+tasks.named('assemble').configure { dependsOn tasks.named('controllerApiSourcesJar') }
+
 tasks.named('test').configure {
     failOnNoDiscoveredTests = false
 }
@@ -112,8 +635,846 @@ tasks.register('testOpenControllerPayload', JavaExec) {
     dependsOn tasks.named('testClasses')
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.hooya.stabilizedturret.network.OpenControllerPayloadRoundTrip'
+    def runDir = layout.buildDirectory.dir('test-runs/network').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testFireControlWeaponInputs', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.FireControlWeaponInputChecks'
+}
+tasks.named('check').configure { dependsOn 'testFireControlWeaponInputs' }
+tasks.register('testWeaponViewSelection', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.WeaponViewSelectionChecks'
+}
+tasks.named('check').configure { dependsOn 'testWeaponViewSelection' }
+tasks.register('testWeaponViewMotion', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.WeaponViewMotionChecks'
+}
+tasks.named('check').configure { dependsOn 'testWeaponViewMotion' }
+
+tasks.register('testAntiRadiation', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.AntiRadiationChecks'
+}
+tasks.named('check').configure { dependsOn 'testAntiRadiation' }
+
+tasks.register('testTargetLockHud', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.TargetLockHudChecks'
+}
+
+tasks.register('testSafetyRegressions', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.SafetyRegressionChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/safety').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testBearingAssemblyPivot', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.BearingAssemblyPivotChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/bearing-assembly-pivot').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testMzLoaderPersistence', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.loader.MzLoaderPersistenceChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/mz-loader').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testAzLoaderState', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.loader.AzLoaderStateChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/az-loader').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testType10LoaderState', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.loader.Type10LoaderStateChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/type-10-loader').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.named('check').configure { dependsOn 'testType10LoaderState' }
+
+tasks.register('testMouseWheelBinding', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.MouseWheelBindingMathChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/mouse-wheel-binding').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testThermalPipeline', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.ThermalPipelineChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/thermal-pipeline').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testQModelingThermal', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.QModelingThermalChecks'
+    args providers.gradleProperty('qModelingJar').getOrElse('')
+    def runDir = layout.buildDirectory.dir('test-runs/qmodeling-thermal').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testThermalModelBatchGl', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.ThermalModelBatchGlChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/thermal-model-batch').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testThermalModelMeshGl', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.compat.ThermalModelMeshGlChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/thermal-model-mesh').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+// Explicit opt-in: opens an invisible OpenGL context to verify Photon/Voxy routing.
+tasks.register('testPhotonThermalGl', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.PhotonThermalGlChecks'
+}
+
+// Explicit opt-in: verifies the display's emitted geometry in an invisible GPU context.
+tasks.register('testConnectedDisplayDepthGl', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.ConnectedDisplayDepthGlChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/display-depth').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testPhotonVoxyHooks', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.PhotonVoxyHookChecks'
+    args providers.gradleProperty('photonVoxyJar').getOrElse(''),
+            providers.gradleProperty('photonIrisJar').getOrElse('')
+}
+
+tasks.register('testYuushyaItemRenderPlan', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.compat.YuushyaItemRenderPlanChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/yuushya-item-render-plan').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testYuushyaShowBlockSnapshot', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath + files('libs/yuushya_modelling-1.21.1-2.4.1.jar')
+    mainClass = 'com.hooya.stabilizedturret.client.compat.YuushyaShowBlockSnapshotChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/yuushya-show-block-snapshot').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testSynaxisWeldGraph', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.compat.synaxis.SynaxisWeldGraphChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/synaxis-weld-graph').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testRegistryMigration', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.registry.RegistryMigrationChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/registry-migration').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testCannonMovingIntercept', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.CannonMovingInterceptChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/cannon-moving-intercept').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testRemoteWeaponStationRate', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.RemoteWeaponStationRateChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/remote-weapon-station-rate').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testCannonTurretPodBallistics', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.CannonTurretPodBallisticsChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/cannon-turret-pod-ballistics').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testBlueprintBearingSettings', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.compat.schematic.BearingSettingsBlueprintCodecChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/blueprint-bearing-settings').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testAutocannonLifetime', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.AutocannonLifetimeChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/autocannon-lifetime').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testTurretAimConvergence', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.TurretAimConvergenceChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/turret-aim-convergence').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testOpticalLockAim', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.OpticalLockAimChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/optical-lock-aim').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+tasks.named('check').configure { dependsOn 'testOpticalLockAim' }
+
+tasks.register('testLockTrackingSmooth', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.LockTrackingSmoothChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/lock-tracking-smooth').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+tasks.named('check').configure { dependsOn 'testLockTrackingSmooth' }
+
+tasks.register('testMissileCameraPose', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.missile.client.MissileCameraPoseChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/missile-camera').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testAircraftExplosionParticles', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.AircraftExplosionParticleChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/aircraft-explosion').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testBallisticTrajectory', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.display.BallisticTrajectoryChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/ballistic-trajectory').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testMianbaoRocketBallistics', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.MianbaoRocketBallisticsChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/mianbao-rocket-ballistics').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testVirtualRockets', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.VirtualRocketChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/virtual-rockets').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testMathematicalMissiles', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.MathematicalMissileChecks'
+}
+tasks.named('check').configure { dependsOn 'testMathematicalMissiles' }
+
+tasks.register('testRocketParticleBudget', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.RocketParticleBudgetChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/rocket-particle-budget').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testCountermeasureSalvo', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.CountermeasureSalvoChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/countermeasure-salvo').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
 }
 
 tasks.named('check').configure {
-    dependsOn tasks.named('testOpenControllerPayload')
+    dependsOn 'testMianbaoRocketBallistics'
+    dependsOn 'testVirtualRockets'
+    dependsOn 'testRocketParticleBudget'
+    dependsOn 'testCountermeasureSalvo'
+    dependsOn 'testMianbaoSiloAmmo'
+    dependsOn 'testCannonImpactPrediction', 'testAimGroupPayload', 'testCannonRenderFrame', 'testSableSnapshotMotionHook'
+    dependsOn 'testFiniteMuzzleVelocity', 'testFiniteAimTarget', 'testArticulatedDynamicRay', 'testStableMuzzleVelocity', 'testSableServoConstraintFrames'
+    dependsOn 'testNativeBearing'
+    dependsOn 'testNativeStaffForecast', 'testNativeArticulatedPrediction',
+            'testNativeArticulatedTurns', 'testNativeArticulatedSubset', 'testNativeGyroForecast'
+    dependsOn 'testNativeArticulatedSharedYaw'
+    dependsOn 'testRwrMissileApproach', 'testAirDefenseIntercept'
+    dependsOn tasks.named('testLowAltitudeCruise')
+    dependsOn tasks.named('testYuushyaItemRenderPlan')
+    dependsOn tasks.named('testYuushyaShowBlockSnapshot')
+    dependsOn tasks.named('testMissileCameraPose')
+    dependsOn tasks.named('testAircraftExplosionParticles')
+    dependsOn tasks.named('testBallisticTrajectory')
+    dependsOn tasks.named('testOpenControllerPayload'), tasks.named('testSafetyRegressions'),
+            tasks.named('testBearingAssemblyPivot'),
+            tasks.named('testMzLoaderPersistence'), tasks.named('testAzLoaderState'),
+            tasks.named('testMouseWheelBinding'), tasks.named('testThermalPipeline'),
+            tasks.named('testSynaxisWeldGraph'), tasks.named('testRegistryMigration'),
+            tasks.named('testCannonMovingIntercept'), tasks.named('testRemoteWeaponStationRate'),
+            tasks.named('testCannonTurretPodBallistics'), tasks.named('testAutocannonLifetime'),
+            tasks.named('testTurretAimConvergence')
+}
+
+tasks.register('testFiniteMuzzleVelocity', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.FiniteMuzzleVelocityChecks'
+}
+
+tasks.register('testStableMuzzleVelocity', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.StableMuzzleVelocityChecks'
+}
+
+tasks.register('testSableServoConstraintFrames', JavaExec) {
+    group = 'verification'
+    description = 'Checks mutable external motor frames and preserves the existing free-joint forecast.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.SableServoConstraintFrameChecks'
+}
+
+tasks.register('testFiniteAimTarget', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.FiniteAimTargetChecks'
+}
+
+tasks.register('testLegacyFiniteAim', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.LegacyFiniteAimChecks'
+}
+
+tasks.register('testNativeYawLimits', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeYawLimitChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/native-yaw-limits').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testYawLimits', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.YawLimitChecks'
+}
+tasks.register('testAimCameraBinding', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.network.AimCameraBindingChecks'
+}
+
+tasks.named('check').configure { dependsOn 'testYawLimits', 'testNativeYawLimits', 'testBlueprintBearingSettings' }
+
+tasks.register('testStabilizerDisabled', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.StabilizerDisabledChecks'
+}
+
+tasks.register('testStabilizedHeadSpeed', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.StabilizedHeadSpeedChecks'
+}
+
+tasks.register('testArticulatedDynamicRay', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.ArticulatedDynamicRayChecks'
+}
+
+tasks.register('testNativeFiniteCompensation', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath + sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeFiniteCompensationChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/native-finite-compensation').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testCannonImpactPrediction', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.CannonImpactPredictionChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/cannon-impact').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testAimGroupPayload', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.network.AimGroupPayloadChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/aim-groups').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testCannonRenderFrame', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.CannonRenderFrameChecks'
+}
+
+tasks.register('testSableSnapshotMotionHook', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.SableSnapshotMotionHookChecks'
+}
+
+tasks.register('testNativeBearing', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeBearingChecks'
+    systemProperty 'create_fire_control.characterizeCarrierHold',
+            providers.gradleProperty('characterizeCarrierHold').getOrElse('false')
+    def runDir = layout.buildDirectory.dir('test-runs/native-bearing').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testPitchCollision', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.PitchCollisionChecks'
+}
+
+tasks.register('testNativePitchCollision', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativePitchCollisionChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/native-pitch-collision').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.named('check').configure { dependsOn 'testPitchCollision', 'testNativePitchCollision' }
+
+// Opt-in motor timing characterization; never replaces the strict native checks.
+tasks.register('testBearingMotorTiming', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeMotorTimingExperiment'
+    def runDir = layout.buildDirectory.dir('test-runs/bearing-motor-timing').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testNativeSupportedTurns', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeSupportedTurnChecks'
+    systemProperty 'create_fire_control.characterizeCarrierHold',
+            providers.gradleProperty('characterizeCarrierHold').getOrElse('false')
+    def runDir = layout.buildDirectory.dir('test-runs/native-supported-turns').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+// Strict direct-carrier staff model checks supplement the real-server fixtures.
+tasks.register('testNativeStaffForecast', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeStaffForecastChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/native-staff-forecast').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testNativeArticulatedPrediction', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeArticulatedServoPredictionChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/native-articulated-prediction').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testNativeWeldedStartup', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeWeldedStartupChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/native-welded-startup').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testNativeArticulatedTurns', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeArticulatedTurnChecks'
+    systemProperty 'supportBeforeHinges',
+            providers.gradleProperty('supportBeforeHinges').getOrElse('false')
+    def runDir = layout.buildDirectory.dir('test-runs/native-articulated-turns').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testNativeArticulatedSubset', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeArticulatedServoSubsetChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/native-articulated-subset').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testNativeGyroForecast', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeGyroForecastChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/native-gyro-forecast').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testNativeArticulatedSharedYaw', JavaExec) {
+    dependsOn tasks.named('nativeBearingClasses')
+    classpath = sourceSets.nativeBearing.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.bearing.NativeArticulatedSharedYawChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/native-articulated-shared-yaw').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testRwrMissileApproach', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.RwrMissileApproachChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/rwr-missile-approach').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testAirDefenseIntercept', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.AirDefenseInterceptChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/air-defense-intercept').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testInfraredMissiles', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.InfraredMissileChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/infrared-missiles').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testLowAltitudeCruise', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.display.LowAltitudeCruiseFlightChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/low-altitude-cruise').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+// Optional reproduction of persisted resource-list caching in an isolated client.
+if (providers.gradleProperty('dieselLightspeedJar').isPresent()) {
+    dependencies { localRuntime files(providers.gradleProperty('dieselLightspeedJar')) }
+}
+
+tasks.register('testZtz99aDieselResources', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.Ztz99aDieselResourceChecks'
+}
+tasks.register('testEngineBehaviors', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath + files(
+            'libs/ponder-neoforge-1.0.82-mc1.21.1-compile.jar',
+            'libs/flywheel-neoforge-1.21.1-1.0.6-compile.jar',
+            'libs/registrate-MC1.21-1.3.0+67-compile.jar')
+    mainClass = 'com.hooya.stabilizedturret.content.turbine.EngineBehaviorChecks'
+}
+tasks.named('check').configure { dependsOn 'testEngineBehaviors' }
+tasks.register('testEngineSoundRamp', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = tasks.named('testEngineBehaviors').get().classpath
+    if (providers.gradleProperty('engineSoundRampJar').isPresent()) {
+        def packagedJar = file(providers.gradleProperty('engineSoundRampJar').get())
+        classpath = sourceSets.test.output + files(packagedJar) +
+                (tasks.named('testEngineBehaviors').get().classpath - sourceSets.main.output)
+        systemProperty 'create_fire_control.engineSoundRamp.jar', packagedJar.absolutePath
+    }
+    mainClass = 'com.hooya.stabilizedturret.client.EngineSoundRampChecks'
+}
+
+tasks.register('testZtz99aPackagedResources', JavaExec) {
+    dependsOn tasks.named('testClasses'), tasks.named('shadowJar')
+    classpath = sourceSets.test.output + files(tasks.named('shadowJar').flatMap { it.archiveFile }) +
+            configurations.testRuntimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.Ztz99aDieselResourceChecks'
+}
+tasks.named('check').configure { dependsOn 'testZtz99aDieselResources' }
+
+['dieselIntegration': ['runServer', 'server/diesel-integration-result.txt'],
+ 'dieselClientChecks': ['runClient', 'client/diesel-client-result.txt'],
+ 'engineBehaviorClientChecks': ['runClient', 'client/engine-behavior-client-result.txt']].each { propertyName, fixture ->
+    if (providers.gradleProperty(propertyName).getOrElse('false').toBoolean()) {
+        def result = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run'))
+                .file(fixture[1]).asFile
+        tasks.matching { it.name == fixture[0] }.configureEach {
+            doFirst { result.parentFile.mkdirs(); result.text = 'RUNNING' }
+            doLast {
+                if (!result.isFile() || result.text.trim() != 'PASS')
+                    throw new GradleException('99A integration failed: ' + (result.isFile() ? result.text : 'missing result'))
+            }
+        }
+    }
+}
+
+tasks.register('testAimRaycastGeometry', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.AimRaycastGeometryChecks'
+}
+
+tasks.register('testPodAimController', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.PodAimControllerChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/pod-aim').get().asFile
+    workingDir runDir
+    doFirst { runDir.mkdirs() }
+}
+tasks.named('check').configure { dependsOn 'testPodAimController' }
+
+tasks.register('testPodRenderVisibility', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.PodRenderVisibilityChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/pod-render-visibility').get().asFile
+    workingDir runDir
+    doFirst { runDir.mkdirs() }
+}
+tasks.named('check').configure { dependsOn 'testPodRenderVisibility' }
+
+if (providers.gradleProperty('gunfireIntegration').getOrElse('false').toBoolean()) {
+    def gunfireResult = layout.projectDirectory
+            .dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file('server/gunfire-integration-result.txt').asFile
+    tasks.matching { it.name == 'runServer' }.configureEach {
+        doFirst {
+            gunfireResult.parentFile.mkdirs()
+            gunfireResult.text = 'RUNNING'
+        }
+        doLast {
+            if (!gunfireResult.isFile() || gunfireResult.text.trim() != 'PASS') {
+                throw new GradleException('Native gunfire integration failed: ' +
+                        (gunfireResult.isFile() ? gunfireResult.text : 'missing result'))
+            }
+        }
+    }
+}
+
+tasks.register('testMianbaoSiloAmmo', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.MianbaoSiloAmmoChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/mianbao-silo-ammo').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.register('testMianbaoLauncherAmmo', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.MianbaoLauncherAmmoChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/mianbao-launcher-ammo').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+
+tasks.named('check').configure { dependsOn 'testMianbaoLauncherAmmo' }
+
+tasks.register('testOrdinaryAirDefense', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.OrdinaryAirDefenseChecks'
+}
+tasks.named('check').configure { dependsOn 'testOrdinaryAirDefense' }
+
+tasks.register('testLaserRangeCompensation', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.controller.LaserRangeCompensationChecks'
+    def runDir = layout.buildDirectory.dir('test-runs/laser-range-compensation').get().asFile
+    doFirst { runDir.mkdirs() }
+    workingDir runDir
+}
+tasks.named('check').configure { dependsOn 'testLaserRangeCompensation' }
+
+tasks.register('testVoxyLodRaycast', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.client.compat.VoxyLodRaycasterChecks'
+}
+tasks.named('check').configure { dependsOn 'testVoxyLodRaycast', 'testAimRaycastGeometry' }
+
+tasks.register('testApfsdsMotionSync', JavaExec) {
+    dependsOn tasks.named('testClasses'), tasks.named('processResources')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.hooya.stabilizedturret.content.cannon.munition.ApfsdsMotionSyncChecks'
+    args providers.gradleProperty('apfsdsResourcePack')
+            .map { file(it).absolutePath }
+            .getOrElse(sourceSets.main.output.resourcesDir.absolutePath),
+            file('libs/createbigcannons-5.11.7-mc1.21.1-compile.jar').absolutePath
+}
+tasks.named('check').configure { dependsOn 'testApfsdsMotionSync' }
+
+if (providers.gradleProperty('apfsdsIntegration').getOrElse('false').toBoolean()) {
+    def apfsdsResult = layout.projectDirectory
+            .dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file('server/apfsds-integration-result.txt').asFile
+    tasks.matching { it.name == 'runServer' }.configureEach {
+        doFirst {
+            apfsdsResult.parentFile.mkdirs()
+            apfsdsResult.text = 'RUNNING'
+        }
+        doLast {
+            if (!apfsdsResult.isFile() || apfsdsResult.text.trim() != 'PASS') {
+                throw new GradleException('Sable APFSDS integration failed: ' +
+                        (apfsdsResult.isFile() ? apfsdsResult.text : 'missing result'))
+            }
+        }
+    }
+}
+
+if (providers.gradleProperty('annihilationIntegration').getOrElse('false').toBoolean()) {
+    def annihilationResult = layout.projectDirectory
+            .dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file('server/annihilation-integration-result.txt').asFile
+    tasks.matching { it.name == 'runServer' }.configureEach {
+        doFirst {
+            annihilationResult.parentFile.mkdirs()
+            annihilationResult.text = 'RUNNING'
+        }
+        doLast {
+            if (!annihilationResult.isFile() || annihilationResult.text.trim() != 'PASS') {
+                throw new GradleException('Annihilation integration failed: ' +
+                        (annihilationResult.isFile() ? annihilationResult.text : 'missing result'))
+            }
+        }
+    }
+}
+
+// Tiger I fixtures are opt-in and excluded from shipped mod sources.
+sourceSets {
+    tigerIntegration {
+        java.srcDirs = ['src/tigerIntegration/java', 'src/dieselIntegration/java']
+        java.include 'com/hooya/stabilizedturret/content/tiger/**', 'com/hooya/stabilizedturret/client/Tiger*',
+                'edn/stratodonut/drivebywire/compat/**', 'com/getitemfromblock/create_tweaked_controllers/controller/**'
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+if (providers.gradleProperty('tigerIntegration').getOrElse('false').toBoolean()) {
+    runs.configureEach {
+        modSource project.sourceSets.tigerIntegration
+        systemProperty 'create_fire_control.tigerAudioChecks', 'true'
+        systemProperty 'create_fire_control.tigerResourceChecksOnly',
+                providers.gradleProperty('tigerResourceChecksOnly').getOrElse('false')
+    }
+    ['runServer': 'server/tiger-integration-result.txt', 'runClient': 'client/tiger-audio-client-result.txt'].each { taskName, path ->
+        def result = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run')).file(path).asFile
+        tasks.matching { it.name == taskName }.configureEach {
+            doFirst { result.parentFile.mkdirs(); result.text = 'RUNNING' }
+            doLast {
+                if (!result.isFile() || result.text.trim() != 'PASS') throw new GradleException('Tiger I fixture failed: ' + (result.isFile() ? result.text : 'missing result'))
+            }
+        }
+    }
 }

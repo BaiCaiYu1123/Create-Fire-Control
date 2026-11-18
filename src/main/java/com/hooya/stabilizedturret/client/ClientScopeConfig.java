@@ -4,40 +4,53 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public final class ClientScopeConfig {
     public static final ModConfigSpec SPEC;
-    private static final ModConfigSpec.DoubleValue SCOPE_ZOOM;
-    private static final ModConfigSpec.DoubleValue POD_ZOOM;
+    private static final ModConfigSpec.IntValue SCOPE_MIN_ZOOM, SCOPE_MAX_ZOOM;
+    private static final ModConfigSpec.IntValue POD_MIN_ZOOM, POD_MAX_ZOOM;
+    // Current wheel selections are session state, separate from the configured range.
+    private static double scopeZoom = Double.NaN, podZoom = Double.NaN;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
         builder.comment("Client-only fire-control sight settings").push("scope");
-        SCOPE_ZOOM = builder
-                .comment("Last selected optical magnification. Mouse wheel changes this while scoped.")
-                .defineInRange("zoom", 4.0, 1.0, 16.0);
-        POD_ZOOM = builder
-                .comment("Last selected electro-optical pod magnification.")
-                .defineInRange("podZoom", 4.0, 1.0, 16.0);
+        SCOPE_MIN_ZOOM = builder.comment("Minimum sight magnification. If greater than the maximum, the maximum takes precedence.")
+                .defineInRange("minZoom", 1, 1, 100);
+        SCOPE_MAX_ZOOM = builder.comment("Maximum sight magnification available with the mouse wheel.")
+                .defineInRange("maxZoom", 32, 1, 100);
+        POD_MIN_ZOOM = builder.comment("Minimum optical pod magnification. If greater than the maximum, the maximum takes precedence.")
+                .defineInRange("podMinZoom", 1, 1, 100);
+        POD_MAX_ZOOM = builder.comment("Maximum optical pod magnification available with the mouse wheel.")
+                .defineInRange("podMaxZoom", 32, 1, 100);
         builder.pop();
         SPEC = builder.build();
     }
 
     public static double getZoom() {
-        return SCOPE_ZOOM.get();
+        return scopeZoom = clamp(scopeZoom, getMinZoom(), getMaxZoom());
     }
 
     public static void setZoom(double zoom) {
-        double rounded = Math.rint(Math.max(1.0, Math.min(16.0, zoom)));
-        SCOPE_ZOOM.set(rounded);
-        SPEC.save();
+        if (Double.isFinite(zoom)) scopeZoom = clamp(Math.rint(zoom), getMinZoom(), getMaxZoom());
     }
 
     public static double getPodZoom() {
-        return POD_ZOOM.get();
+        return podZoom = clamp(podZoom, getPodMinZoom(), getPodMaxZoom());
     }
 
     public static void setPodZoom(double zoom) {
-        double rounded = Math.rint(Math.max(1.0, Math.min(16.0, zoom)));
-        POD_ZOOM.set(rounded);
-        SPEC.save();
+        if (Double.isFinite(zoom)) podZoom = clamp(Math.rint(zoom), getPodMinZoom(), getPodMaxZoom());
+    }
+
+    public static int getMinZoom() { return Math.min(value(SCOPE_MIN_ZOOM), getMaxZoom()); }
+    public static int getMaxZoom() { return value(SCOPE_MAX_ZOOM); }
+    public static int getPodMinZoom() { return Math.min(value(POD_MIN_ZOOM), getPodMaxZoom()); }
+    public static int getPodMaxZoom() { return value(POD_MAX_ZOOM); }
+
+    private static int value(ModConfigSpec.IntValue value) {
+        return SPEC.isLoaded() ? value.get() : value.getDefault();
+    }
+
+    private static double clamp(double zoom, int min, int max) {
+        return Double.isFinite(zoom) ? Math.max(min, Math.min(max, zoom)) : min;
     }
 
     private ClientScopeConfig() {

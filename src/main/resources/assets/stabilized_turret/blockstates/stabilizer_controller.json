@@ -1,8 +1,0 @@
-{
-  "variants": {
-    "facing=north": { "model": "stabilized_turret:block/stabilizer_controller" },
-    "facing=east":  { "model": "stabilized_turret:block/stabilizer_controller", "y": 90 },
-    "facing=south": { "model": "stabilized_turret:block/stabilizer_controller", "y": 180 },
-    "facing=west":  { "model": "stabilized_turret:block/stabilizer_controller", "y": 270 }
-  }
-}

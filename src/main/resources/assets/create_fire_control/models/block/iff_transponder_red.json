@@ -1,0 +1,7 @@
+{
+  "parent": "create_fire_control:block/iff_transponder_base",
+  "textures": {
+    "red_lamp": "create_fire_control:block/iff_transponder/red_on",
+    "green_lamp": "create_fire_control:block/iff_transponder/green_off"
+  }
+}

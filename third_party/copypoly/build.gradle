@@ -1,0 +1,138 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+version = mod_version
+group = mod_group_id
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
+    maven { url = 'https://maven.createmod.net'; content { includeGroup 'net.createmod.ponder'; includeGroup 'dev.engine-room.flywheel' } }
+}
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.withSourcesJar()
+
+sourceSets {
+    gametest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+configurations {
+    gametestImplementation.extendsFrom implementation
+    gametestCompileOnly.extendsFrom compileOnly
+    gametestRuntimeOnly.extendsFrom runtimeOnly
+}
+
+neoForge {
+    version = project.neo_version
+    runs {
+        client {
+            client()
+            gameDirectory = project.file(providers.gradleProperty('clientRunDir').getOrElse('run/client'))
+            programArguments.addAll '--width', '1280', '--height', '800'
+            systemProperty 'copypoly.clientSmoke', providers.gradleProperty('clientSmoke').getOrElse('false')
+            systemProperty 'copypoly.editorSmoke', providers.gradleProperty('editorSmoke').getOrElse('false')
+            systemProperty 'copypoly.collisionSmoke', providers.gradleProperty('collisionSmoke').getOrElse('false')
+            systemProperty 'copypoly.collisionControl', providers.gradleProperty('collisionControl').getOrElse('false')
+            systemProperty 'copypoly.sableEditorSmoke', providers.gradleProperty('sableEditorSmoke').getOrElse('false')
+            systemProperty 'copypoly.vertexClipboardSmoke', providers.gradleProperty('vertexClipboardSmoke').getOrElse('false')
+            systemProperty 'copypoly.freeformSmoke', providers.gradleProperty('freeformSmoke').getOrElse('false')
+            systemProperty 'copypoly.customVertexSmoke', providers.gradleProperty('customVertexSmoke').getOrElse('false')
+            systemProperty 'copypoly.topologySmoke', providers.gradleProperty('topologySmoke').getOrElse('false')
+            systemProperty 'copypoly.lineSmoke', providers.gradleProperty('lineSmoke').getOrElse('false')
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+        gameTestServer {
+            type = "gameTestServer"
+            sourceSet = sourceSets.gametest
+            gameDirectory = project.file(providers.gradleProperty('sableTest').getOrElse('false').toBoolean() ? 'run/sable-gametest' : 'run/gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            systemProperty 'copypoly.persistencePhase', providers.gradleProperty('persistencePhase').getOrElse('')
+        }
+
+        data {
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.INFO
+        }
+    }
+
+    addModdingDependenciesTo sourceSets.test
+    addModdingDependenciesTo sourceSets.gametest
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+            sourceSet(sourceSets.gametest)
+        }
+    }
+}
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+configurations { createBundle }
+// Supply the reference distribution at build time; never bundle Sable into CopyPoly.
+def sableJar = providers.gradleProperty('sableJar').map { file(it) }
+        .getOrElse(file('libs/sable-neoforge-1.21.1-2.0.6.jar'))
+def extractSableLibraries = tasks.register('extractSableLibraries', Sync) {
+    from(provider { zipTree(sableJar) })
+    include 'META-INF/jarjar/*sable_rapier*.jar', 'META-INF/jarjar/sable-companion*.jar'
+    into layout.buildDirectory.dir('sableLibraries')
+}
+// Compile against Create's bundled libraries, matching the selected Create version.
+def extractCreateLibraries = tasks.register('extractCreateLibraries', Sync) {
+    from(configurations.createBundle.elements.map { elements -> elements.collect { zipTree(it.asFile) } })
+    include 'META-INF/jarjar/*.jar'
+    into layout.buildDirectory.dir('createLibraries')
+}
+dependencies {
+    compileOnly files(sableJar)
+    compileOnly files(fileTree(layout.buildDirectory.dir('sableLibraries')) { include '**/*.jar' }).builtBy(extractSableLibraries)
+    if (providers.gradleProperty('sableTest').getOrElse('false').toBoolean()) runtimeOnly files(sableJar)
+    createBundle("maven.modrinth:create:${create_version}") { transitive = false }
+    implementation("maven.modrinth:create:${create_version}") { transitive = false }
+    compileOnly files(fileTree(layout.buildDirectory.dir('createLibraries')) { include '**/*.jar' }).builtBy(extractCreateLibraries)
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [minecraft_version      : minecraft_version,
+                             minecraft_version_range: minecraft_version_range,
+                             neo_version            : neo_version,
+                             neo_version_range      : neo_version_range,
+                             loader_version_range   : loader_version_range,
+                             create_version_range   : create_version_range,
+                             mod_id                 : mod_id,
+                             mod_name               : mod_name,
+                             mod_license            : mod_license,
+                             mod_version            : mod_version,
+                             mod_authors            : mod_authors,
+                             mod_description        : mod_description]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.named('test', Test) { useJUnitPlatform() }
+tasks.withType(Jar).configureEach { from('LICENSE') }

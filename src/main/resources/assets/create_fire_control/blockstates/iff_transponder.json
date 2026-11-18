@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=north,indicator=off": { "model": "create_fire_control:block/iff_transponder_off" },
+    "facing=east,indicator=off": { "model": "create_fire_control:block/iff_transponder_off", "y": 90 },
+    "facing=south,indicator=off": { "model": "create_fire_control:block/iff_transponder_off", "y": 180 },
+    "facing=west,indicator=off": { "model": "create_fire_control:block/iff_transponder_off", "y": 270 },
+    "facing=north,indicator=red": { "model": "create_fire_control:block/iff_transponder_red" },
+    "facing=east,indicator=red": { "model": "create_fire_control:block/iff_transponder_red", "y": 90 },
+    "facing=south,indicator=red": { "model": "create_fire_control:block/iff_transponder_red", "y": 180 },
+    "facing=west,indicator=red": { "model": "create_fire_control:block/iff_transponder_red", "y": 270 },
+    "facing=north,indicator=green": { "model": "create_fire_control:block/iff_transponder_green" },
+    "facing=east,indicator=green": { "model": "create_fire_control:block/iff_transponder_green", "y": 90 },
+    "facing=south,indicator=green": { "model": "create_fire_control:block/iff_transponder_green", "y": 180 },
+    "facing=west,indicator=green": { "model": "create_fire_control:block/iff_transponder_green", "y": 270 }
+  }
+}

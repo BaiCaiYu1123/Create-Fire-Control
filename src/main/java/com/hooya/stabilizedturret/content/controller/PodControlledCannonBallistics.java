@@ -1,5 +1,7 @@
 package com.hooya.stabilizedturret.content.controller;
 
+import com.hooya.stabilizedturret.StabilizedTurret;
+import com.hooya.stabilizedturret.registry.RegistryMigration;
 import java.util.Locale;
 
 /**
@@ -88,7 +90,8 @@ public final class PodControlledCannonBallistics {
             CannonBallisticsCompat.ShotProfile source
     ) {
         String path = id.substring(id.indexOf(':') + 1);
-        if (id.startsWith("cbcmodernwarfare:")) {
+        if (id.startsWith(StabilizedTurret.MOD_ID + ":")
+                || id.startsWith(RegistryMigration.LEGACY_MOD_ID + ":")) {
             return modernWarfare(path, source);
         }
         if (id.startsWith("createbigcannons:")) {

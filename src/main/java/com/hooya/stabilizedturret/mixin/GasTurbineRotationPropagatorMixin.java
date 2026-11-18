@@ -35,6 +35,10 @@ public abstract class GasTurbineRotationPropagatorMixin {
             KineticBlockEntity to,
             CallbackInfoReturnable<Float> callback
     ) {
+        if (from instanceof com.hooya.stabilizedturret.content.tiger.TigerIEngineBlockEntity
+                || to instanceof com.hooya.stabilizedturret.content.tiger.TigerIEngineBlockEntity) return;
+        if (from instanceof com.hooya.stabilizedturret.content.diesel.Ztz99aDieselEngineBlockEntity
+                || to instanceof com.hooya.stabilizedturret.content.diesel.Ztz99aDieselEngineBlockEntity) return;
         if (from instanceof GasTurbineBlockEntity turbine) {
             Direction output = directOutputDirection(turbine, to);
             if (output != null) {

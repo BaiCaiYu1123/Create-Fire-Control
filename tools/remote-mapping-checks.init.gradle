@@ -1,0 +1,20 @@
+allprojects {
+    afterEvaluate {
+        layout.buildDirectory = layout.projectDirectory.dir('build/remote-mapping-checks')
+        def mappingOnly = providers.gradleProperty('remoteMappingProbe').getOrElse('true').toBoolean()
+        runs.server.systemProperty 'create_fire_control.remoteMappingProbe', mappingOnly.toString()
+        dependencies {
+            localRuntime files('libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+                    'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar')
+        }
+        def result = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run'))
+                .file(mappingOnly ? 'server/controller-mapping-result.txt' : 'server/controller-integration-result.txt').asFile
+        tasks.matching { it.name == 'runServer' }.configureEach {
+            doFirst { result.parentFile.mkdirs(); result.text = 'RUNNING' }
+            doLast {
+                if (!result.isFile() || !result.text.startsWith('PASS'))
+                    throw new GradleException('Remote mapping probe did not complete: ' + (result.isFile() ? result.text : 'missing result'))
+            }
+        }
+    }
+}

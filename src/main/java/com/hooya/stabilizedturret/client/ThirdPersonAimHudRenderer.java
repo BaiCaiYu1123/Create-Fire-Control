@@ -1,7 +1,9 @@
 package com.hooya.stabilizedturret.client;
 
 import com.hooya.stabilizedturret.StabilizedTurret;
+import com.hooya.stabilizedturret.content.controller.ScopePreset;
 import com.hooya.stabilizedturret.mixin.client.GameRendererAccessor;
+import dev.ryanhcode.sable.mixinhelpers.camera.new_camera_types.SableCameraTypes;
 import net.minecraft.client.Camera;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
@@ -18,17 +20,27 @@ import org.joml.Vector3f;
 /** Independent third-person and gun-sight aiming marks. */
 @EventBusSubscriber(modid = StabilizedTurret.MOD_ID, value = Dist.CLIENT)
 public final class ThirdPersonAimHudRenderer {
-    private static final int VIEW_RETICLE = 0xEEE0A83D;
-    private static final int CANNON_RETICLE = 0xEE8FE8F3;
+    /** Reference outer ring: pale white with the dark inner anti-alias edge. */
+    private static final int VIEW_RETICLE = 0xE8E8ECEF;
+    /** Reference inner ring: the barrel's pale yellow actual aim point. */
+    private static final int CANNON_RETICLE = 0xEEF2DF9E;
+    private static final int RETICLE_SHADOW_OUTER = 0x5C111820;
+    private static final int RETICLE_SHADOW_INNER = 0x82111820;
+    private static final float HEAD_AIM_REFERENCE_HEIGHT = 1440.0F;
     private static final int SCOPE_RETICLE_BLACK = 0xEE000000;
     private static final int SCOPE_RETICLE_RING = 0xEED8D8D8;
     private static final int OPTICAL_LOCK = 0xEE5DFF78;
+    private static final int LOCK_FRAME_GREEN = 0xFF00FF00;
+    private static final int ROCKET_IMPACT = 0xFF58FF72;
+    private static final float ROCKET_REFERENCE_HEIGHT = 1440.0F;
 
     @SubscribeEvent
     public static void render(RenderGuiEvent.Post event) {
+        if (ClientWeaponViewState.isActive()) return;
         Minecraft minecraft = Minecraft.getInstance();
-        if (!ClientAimState.isActive()
+        if (InfraredHudRenderer.selected() || !ClientAimState.isActive()
                 || ClientAimState.isOpticalView()
+                || ClientTelevisionGuidanceState.isActive()
                 || minecraft.options.hideGui
                 || minecraft.screen != null) {
             return;
@@ -37,7 +49,9 @@ public final class ThirdPersonAimHudRenderer {
         GuiGraphics graphics = event.getGuiGraphics();
         int width = graphics.guiWidth();
         int height = graphics.guiHeight();
-        float partialTick = event.getPartialTick().getGameTimeDeltaTicks();
+        // Use the same pose fraction as Camera.setup and the rendered cannon.
+        // Frame duration is almost constant at steady FPS and freezes pose interpolation.
+        float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
         if (minecraft.options.getCameraType() == CameraType.FIRST_PERSON) {
             // First person keeps optical-lock feedback only. The large
             // War-Thunder sight belongs exclusively to the gun sight.
@@ -47,6 +61,10 @@ public final class ThirdPersonAimHudRenderer {
             );
         } else {
             renderAimMarkers(graphics, minecraft, width, height, partialTick, false);
+            if (minecraft.options.getCameraType() == SableCameraTypes.SUB_LEVEL_VIEW_UNLOCKED) {
+                renderRocketImpactMarker(
+                        graphics, minecraft, width, height, partialTick);
+            }
         }
     }
 
@@ -64,33 +82,65 @@ public final class ThirdPersonAimHudRenderer {
         int viewY = scoped
                 ? height / 2
                 : height / 2 + (int) Math.round(height * ClientAimState.getViewAimOffsetY() / 100.0);
-
-        ScreenPoint cannon = null;
-        if (ClientAimState.hasCannonAimPoint()) {
-            cannon = projectToScreen(
+        if (!scoped && ClientAimState.shouldUseHeadAimThirdPersonFollow()) {
+            Camera camera = minecraft.gameRenderer.getMainCamera();
+            ScreenPoint mouseTarget = projectToScreen(
                     minecraft,
-                    ClientAimState.getCannonAimPoint(partialTick),
+                    camera.getPosition().add(
+                            ClientAimState.getHeadAimTargetDirection().scale(4096.0)),
                     width,
                     height,
                     partialTick
             );
+            if (mouseTarget != null) {
+                viewX = mouseTarget.x;
+                viewY = mouseTarget.y;
+            }
         }
-        boolean cannonVisible = cannon != null
-                && cannon.x >= 4 && cannon.x < width - 4
-                && cannon.y >= 4 && cannon.y < height - 4;
+
+        java.util.List<ScreenPoint> cannons = new java.util.ArrayList<>();
+        java.util.List<Vec3> groupPoints = ClientAimState.getCannonAimGroupPoints(partialTick);
+        if (!groupPoints.isEmpty()) {
+            for (Vec3 point : groupPoints) {
+                ScreenPoint projected = projectToScreen(minecraft, point, width, height, partialTick);
+                if (projected != null && projected.x >= 4 && projected.x < width - 4
+                        && projected.y >= 4 && projected.y < height - 4) {
+                    cannons.add(projected);
+                }
+            }
+        } else if (!ClientAimState.hasAimGroups() && ClientAimState.hasCannonAimPoint()) {
+            ScreenPoint projected = projectToScreen(
+                    minecraft, ClientAimState.getCannonAimPoint(partialTick), width, height, partialTick);
+            if (projected != null && projected.x >= 4 && projected.x < width - 4
+                    && projected.y >= 4 && projected.y < height - 4) {
+                cannons.add(projected);
+            }
+        }
 
         if (scoped) {
-            // The cannon scale is underneath the view ring in the reference.
-            if (cannonVisible) {
-                drawScopeCannonReticle(graphics, cannon.x, cannon.y, width, height);
+            if (ClientAimState.getScopePreset() == ScopePreset.DEFAULT) {
+                // The original preset keeps its independent cannon convergence
+                // scale, fixed corner frame, and view-centre ring.
+                for (ScreenPoint cannon : cannons) {
+                    drawScopeCannonReticle(graphics, cannon.x, cannon.y, width, height);
+                }
+                drawScopePlayerReticle(graphics, viewX, viewY, width, height);
+            } else {
+                for (ScreenPoint cannon : cannons) {
+                    ScopeHudRenderer.drawPresetReticle(
+                            graphics, width, height, ClientAimState.getScopePreset(),
+                            cannon.x, cannon.y
+                    );
+                }
+                drawScopePlayerRing(graphics, viewX, viewY, height);
             }
-            drawScopePlayerReticle(graphics, viewX, viewY, width, height);
         } else {
             // Aircraft installations use radar symbology and do not show the tank head-aim ring.
-            if (!ClientAimState.hasAircraftEquipment()) {
+            if (!ClientAimState.hasAircraftEquipment()
+                    && ClientAimState.isHeadAimEnabled()) {
                 drawViewReticle(graphics, viewX, viewY);
             }
-            if (cannonVisible) {
+            for (ScreenPoint cannon : cannons) {
                 drawCannonReticle(graphics, cannon.x, cannon.y);
             }
         }
@@ -107,26 +157,91 @@ public final class ThirdPersonAimHudRenderer {
             int height,
             float partialTick
     ) {
-        final int green = 0xFF58FF72;
         if (ClientAimState.isAirToGroundLockSearching()) {
             int cx = width / 2;
             int cy = height / 2;
-            drawCornerFrame(graphics, cx - 42, cy - 32, cx + 42, cy + 32);
+            int half = TargetLockFrame.halfSide(height);
+            drawCornerFrame(graphics, cx - half, cy - half, cx + half, cy + half);
         }
         if (!ClientAimState.isAirToGroundLockActive()) return;
         AABB bounds = ClientAimState.getAirToGroundLockBounds(partialTick);
         if (bounds == null) return;
         ScreenPoint center = projectToScreen(
                 minecraft, bounds.getCenter(), width, height, partialTick);
-        ScreenSize size = projectBoundsSize(minecraft, bounds, height, partialTick);
-        if (center == null || size == null) return;
-        int half = Math.max(5, Math.max(size.width, size.height) / 2 + 2);
-        drawConnectedSquare(graphics, center.x, center.y, half, green);
-        // The centre cross makes the locked air-to-ground marker the requested
-        // connected "田" symbol without changing the acquisition frame.
-        int arm = Math.max(2, half / 2);
-        graphics.fill(center.x - 1, center.y - arm, center.x + 1, center.y + arm + 1, green);
-        graphics.fill(center.x - arm, center.y - 1, center.x + arm + 1, center.y + 1, green);
+        if (center == null) return;
+        TargetLockFrame.render(graphics, minecraft, center.x, center.y, height,
+                TargetLockFrame.Style.AIR_TO_GROUND, LOCK_FRAME_GREEN, bounds.getCenter(),
+                ClientAimState.getAirToGroundLockTelemetry());
+    }
+
+    private static void renderRocketImpactMarker(
+            GuiGraphics graphics,
+            Minecraft minecraft,
+            int width,
+            int height,
+            float partialTick
+    ) {
+        if (!ClientVisualConfig.showRocketImpact() || !ClientAimState.hasRocketImpactPoint()) return;
+        ScreenPoint impact = projectToScreen(
+                minecraft,
+                ClientAimState.getRocketImpactPoint(partialTick),
+                width,
+                height,
+                partialTick);
+        int margin = Math.max(4, Mth.ceil(18.0F * height / ROCKET_REFERENCE_HEIGHT));
+        if (impact == null || impact.x < margin || impact.x >= width - margin
+                || impact.y < margin || impact.y >= height - margin) return;
+        drawRocketImpactReticle(graphics, impact.x, impact.y, height);
+    }
+
+    /** Four fluorescent diagonal arms and a centre dot, matched to 3440x1440. */
+    private static void drawRocketImpactReticle(
+            GuiGraphics graphics, int centreX, int centreY, int guiHeight
+    ) {
+        // Coordinates below are framebuffer-pixel measurements from the
+        // 3440x1440 reference. Scaling against GUI height automatically also
+        // compensates for Minecraft's GUI scale factor.
+        float scale = Math.max(0.15F, guiHeight / ROCKET_REFERENCE_HEIGHT);
+        graphics.pose().pushPose();
+        graphics.pose().translate(centreX, centreY, 0.0F);
+        graphics.pose().scale(scale, scale, 1.0F);
+        drawThickLine(graphics, -16, -16, -7, -7, 3, ROCKET_IMPACT);
+        drawThickLine(graphics, 7, -7, 16, -16, 3, ROCKET_IMPACT);
+        drawThickLine(graphics, -7, 7, -16, 16, 3, ROCKET_IMPACT);
+        drawThickLine(graphics, 7, 7, 16, 16, 3, ROCKET_IMPACT);
+        graphics.fill(-2, -2, 3, 3, ROCKET_IMPACT);
+        graphics.pose().popPose();
+    }
+
+    private static void drawThickLine(
+            GuiGraphics graphics,
+            int x0,
+            int y0,
+            int x1,
+            int y1,
+            int thickness,
+            int color
+    ) {
+        int dx = Math.abs(x1 - x0);
+        int sx = x0 < x1 ? 1 : -1;
+        int dy = -Math.abs(y1 - y0);
+        int sy = y0 < y1 ? 1 : -1;
+        int error = dx + dy;
+        int radius = Math.max(0, thickness / 2);
+        while (true) {
+            graphics.fill(x0 - radius, y0 - radius,
+                    x0 + radius + 1, y0 + radius + 1, color);
+            if (x0 == x1 && y0 == y1) break;
+            int twiceError = error * 2;
+            if (twiceError >= dy) {
+                error += dy;
+                x0 += sx;
+            }
+            if (twiceError <= dx) {
+                error += dx;
+                y0 += sy;
+            }
+        }
     }
 
     private static void renderOpticalMarkers(
@@ -139,10 +254,8 @@ public final class ThirdPersonAimHudRenderer {
             int aimY
     ) {
         if (ClientAimState.isOpticalLockSearching()) {
-            // Represent the acquisition area as a nominal tank-sized volume
-            // at the cannon convergence point. Its angular size is calculated
-            // with the unmagnified projection, so mouse-wheel zoom cannot
-            // enlarge the green frame.
+            // Acquisition follows the aim point, with the same fixed screen
+            // dimensions as the locked frame.
             ScreenPoint cannon = ClientAimState.hasCannonAimPoint()
                     ? projectToScreen(
                     minecraft,
@@ -154,119 +267,36 @@ public final class ThirdPersonAimHudRenderer {
                     : null;
             int centreX = cannon == null ? aimX : cannon.x;
             int centreY = cannon == null ? aimY : cannon.y;
-            AABB searchBounds = null;
-            if (ClientAimState.hasCannonAimPoint()) {
-                Vec3 centre = ClientAimState.getCannonAimPoint(partialTick);
-                searchBounds = new AABB(
-                        centre.x - 1.2, centre.y - 1.0, centre.z - 1.2,
-                        centre.x + 1.2, centre.y + 1.0, centre.z + 1.2
-                );
-            }
-            ScreenSize size = searchBounds == null
-                    ? null
-                    : projectBoundsSize(minecraft, searchBounds, height, partialTick);
-            int halfWidth = size == null ? 38 : Math.max(9, size.width / 2 + 2);
-            int halfHeight = size == null ? 28 : Math.max(9, size.height / 2 + 2);
+            int half = TargetLockFrame.halfSide(height);
             drawCornerFrame(
                     graphics,
-                    centreX - halfWidth,
-                    centreY - halfHeight,
-                    centreX + halfWidth,
-                    centreY + halfHeight
+                    centreX - half,
+                    centreY - half,
+                    centreX + half,
+                    centreY + half
             );
             return;
         }
         if (!ClientAimState.isOpticalLockActive()) {
             return;
         }
+        Vec3 targetPosition = ClientAimState.getOpticalLockDisplayPoint(partialTick);
         ScreenPoint target = projectToScreen(
                 minecraft,
-                ClientAimState.getOpticalLockDisplayPoint(partialTick),
+                targetPosition,
                 width,
                 height,
                 partialTick
         );
         if (target != null) {
-            ScreenSize size = projectBoundsSize(
-                    minecraft,
-                    ClientAimState.getOpticalLockBounds(partialTick),
-                    height,
-                    partialTick
-            );
-            // One unbroken, one-pixel square. Its side is the larger projected
-            // target dimension, so the complete target fits without turning
-            // the marker into a zoom-dependent rectangle or thick bracket.
-            int halfSide = size == null
-                    ? 14
-                    : Math.max(7, (Math.max(size.width, size.height) + 1) / 2 + 2);
-            int lockColor = multiplyAlpha(OPTICAL_LOCK, ClientAimState.getOpticalLockFrameAlpha());
-            drawConnectedSquare(graphics, target.x, target.y, halfSide, lockColor);
+            int lockColor = multiplyAlpha(LOCK_FRAME_GREEN, ClientAimState.getOpticalLockFrameAlpha());
+            CannonLeadHud.render(graphics, minecraft, target.x, target.y,
+                    ClientCannonLockLead.opticalAimPoint(targetPosition, partialTick),
+                    ClientCannonLockLead.opticalStatus(), partialTick, lockColor);
+            TargetLockFrame.render(graphics, minecraft, target.x, target.y, height,
+                    TargetLockFrame.Style.OPTICAL, lockColor, targetPosition,
+                    ClientAimState.getOpticalLockTelemetry());
         }
-    }
-
-    /**
-     * Returns the target's on-screen size using the normal, unzoomed FOV.
-     * Position is still projected by {@link #projectToScreen} with the current
-     * optic FOV, while size remains tied to the target's physical bounds.
-     */
-    private static ScreenSize projectBoundsSize(
-            Minecraft minecraft,
-            AABB bounds,
-            int height,
-            float partialTick
-    ) {
-        if (bounds == null) {
-            return null;
-        }
-        Camera camera = minecraft.gameRenderer.getMainCamera();
-        Vector3f forwardVector = camera.getLookVector();
-        Vector3f leftVector = camera.getLeftVector();
-        Vector3f upVector = camera.getUpVector();
-        Vec3 forward = new Vec3(forwardVector.x, forwardVector.y, forwardVector.z);
-        Vec3 left = new Vec3(leftVector.x, leftVector.y, leftVector.z);
-        Vec3 up = new Vec3(upVector.x, upVector.y, upVector.z);
-        double fov = ((GameRendererAccessor) (Object) minecraft.gameRenderer)
-                .stabilizedTurret$getFov(camera, partialTick, true);
-        if (ClientAimState.isScoped()) {
-            fov = Math.toDegrees(2.0 * Math.atan(
-                    Math.tan(Math.toRadians(fov) * 0.5) * ClientAimState.getScopeZoom()
-            ));
-        }
-        double focal = height * 0.5 / Math.tan(Mth.DEG_TO_RAD * fov * 0.5);
-        double minX = Double.POSITIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY;
-        double maxX = Double.NEGATIVE_INFINITY;
-        double maxY = Double.NEGATIVE_INFINITY;
-        int visibleCorners = 0;
-        for (int ix = 0; ix < 2; ix++) {
-            for (int iy = 0; iy < 2; iy++) {
-                for (int iz = 0; iz < 2; iz++) {
-                    Vec3 corner = new Vec3(
-                            ix == 0 ? bounds.minX : bounds.maxX,
-                            iy == 0 ? bounds.minY : bounds.maxY,
-                            iz == 0 ? bounds.minZ : bounds.maxZ
-                    );
-                    Vec3 relative = corner.subtract(camera.getPosition());
-                    double depth = relative.dot(forward);
-                    if (depth <= 0.05) {
-                        continue;
-                    }
-                    double x = -relative.dot(left) * focal / depth;
-                    double y = -relative.dot(up) * focal / depth;
-                    minX = Math.min(minX, x);
-                    minY = Math.min(minY, y);
-                    maxX = Math.max(maxX, x);
-                    maxY = Math.max(maxY, y);
-                    visibleCorners++;
-                }
-            }
-        }
-        if (visibleCorners == 0) {
-            return null;
-        }
-        int width = Mth.clamp((int) Math.ceil(maxX - minX), 1, 4096);
-        int projectedHeight = Mth.clamp((int) Math.ceil(maxY - minY), 1, 4096);
-        return new ScreenSize(width, projectedHeight);
     }
 
     private static ScreenPoint projectToScreen(Minecraft minecraft, Vec3 world, int width, int height, float partialTick) {
@@ -285,8 +315,8 @@ public final class ThirdPersonAimHudRenderer {
         double fov = ((GameRendererAccessor) (Object) minecraft.gameRenderer)
                 .stabilizedTurret$getFov(camera, partialTick, true);
         double focal = height * 0.5 / Math.tan(Mth.DEG_TO_RAD * fov * 0.5);
-        int x = (int) Math.round(width * 0.5 - relative.dot(left) * focal / depth);
-        int y = (int) Math.round(height * 0.5 - relative.dot(up) * focal / depth);
+        int x = width / 2 + (int) Math.round(-relative.dot(left) * focal / depth);
+        int y = height / 2 + (int) Math.round(-relative.dot(up) * focal / depth);
         return new ScreenPoint(x, y);
     }
 
@@ -313,6 +343,12 @@ public final class ThirdPersonAimHudRenderer {
         drawScopeCorner(graphics, minX, maxY, arm, 1, -1);
         drawScopeCorner(graphics, maxX, maxY, arm, -1, -1);
 
+        drawScopePlayerRing(graphics, x, y, screenHeight);
+    }
+
+    private static void drawScopePlayerRing(
+            GuiGraphics graphics, int x, int y, int screenHeight
+    ) {
         int radius = Math.max(4, (int) Math.round(screenHeight * (30.0 / 1440.0)));
         drawCircle(graphics, x, y, radius, SCOPE_RETICLE_RING);
     }
@@ -324,9 +360,10 @@ public final class ThirdPersonAimHudRenderer {
             int screenWidth,
             int screenHeight
     ) {
+        int color = ScopeHudRenderer.sightLineColor(SCOPE_RETICLE_BLACK);
         int crossHalf = Math.max(5, (int) Math.round(screenHeight * (26.0 / 1440.0)));
-        graphics.fill(x - crossHalf, y, x + crossHalf + 1, y + 1, SCOPE_RETICLE_BLACK);
-        graphics.fill(x, y - crossHalf, x + 1, y + crossHalf + 1, SCOPE_RETICLE_BLACK);
+        graphics.fill(x - crossHalf, y, x + crossHalf + 1, y + 1, color);
+        graphics.fill(x, y - crossHalf, x + 1, y + crossHalf + 1, color);
 
         int viewRingRadius = Math.max(4, (int) Math.round(screenHeight * (30.0 / 1440.0)));
         int dotSpacing = Math.max(3, (int) Math.round(screenHeight * (12.0 / 1440.0)));
@@ -336,9 +373,9 @@ public final class ThirdPersonAimHudRenderer {
         for (int offset = viewRingRadius + dotSpacing; offset <= dottedHalf; offset += dotSpacing) {
             int halfDot = dotSize / 2;
             graphics.fill(x - offset - halfDot, y - halfDot,
-                    x - offset - halfDot + dotSize, y - halfDot + dotSize, SCOPE_RETICLE_BLACK);
+                    x - offset - halfDot + dotSize, y - halfDot + dotSize, color);
             graphics.fill(x + offset - halfDot, y - halfDot,
-                    x + offset - halfDot + dotSize, y - halfDot + dotSize, SCOPE_RETICLE_BLACK);
+                    x + offset - halfDot + dotSize, y - halfDot + dotSize, color);
         }
 
         int innerChevron = Math.max(dottedHalf + 4,
@@ -368,23 +405,33 @@ public final class ThirdPersonAimHudRenderer {
         );
     }
 
-    /** Exact third-person view marker used before the gun-sight redesign. */
+    /**
+     * White 58 px view/mouse ring from the 3440x1440 reference. Drawing in
+     * reference pixels and scaling by GUI height also cancels Minecraft GUI
+     * scale, so its physical screen proportion stays constant at every
+     * resolution and aspect ratio.
+     */
     static void drawViewReticle(GuiGraphics graphics, int x, int y) {
-        graphics.fill(x, y - 7, x + 1, y - 5, VIEW_RETICLE);
-        graphics.fill(x - 4, y - 5, x + 5, y - 4, VIEW_RETICLE);
-        graphics.fill(x - 6, y - 3, x - 5, y + 4, VIEW_RETICLE);
-        graphics.fill(x + 6, y - 3, x + 7, y + 4, VIEW_RETICLE);
-        graphics.fill(x - 4, y + 5, x + 5, y + 6, VIEW_RETICLE);
-        graphics.fill(x, y + 6, x + 1, y + 8, VIEW_RETICLE);
+        graphics.pose().pushPose();
+        graphics.pose().translate(x, y, 0.0F);
+        float scale = Math.max(0.1F, graphics.guiHeight() / HEAD_AIM_REFERENCE_HEIGHT);
+        graphics.pose().scale(scale, scale, 1.0F);
+        drawCircle(graphics, 0, 0, 27, RETICLE_SHADOW_OUTER);
+        drawCircle(graphics, 0, 0, 28, RETICLE_SHADOW_INNER);
+        drawCircle(graphics, 0, 0, 29, VIEW_RETICLE);
+        graphics.pose().popPose();
     }
 
-    /** Exact third-person cannon marker used before the gun-sight redesign. */
+    /** Yellow 26 px ring marking the barrel's actual aim point. */
     static void drawCannonReticle(GuiGraphics graphics, int x, int y) {
-        graphics.fill(x - 5, y, x - 2, y + 1, CANNON_RETICLE);
-        graphics.fill(x + 3, y, x + 6, y + 1, CANNON_RETICLE);
-        graphics.fill(x, y - 5, x + 1, y - 2, CANNON_RETICLE);
-        graphics.fill(x, y + 3, x + 1, y + 6, CANNON_RETICLE);
-        graphics.fill(x, y, x + 1, y + 1, CANNON_RETICLE);
+        graphics.pose().pushPose();
+        graphics.pose().translate(x, y, 0.0F);
+        float scale = Math.max(0.1F, graphics.guiHeight() / HEAD_AIM_REFERENCE_HEIGHT);
+        graphics.pose().scale(scale, scale, 1.0F);
+        drawCircle(graphics, 0, 0, 11, RETICLE_SHADOW_OUTER);
+        drawCircle(graphics, 0, 0, 12, RETICLE_SHADOW_INNER);
+        drawCircle(graphics, 0, 0, 13, CANNON_RETICLE);
+        graphics.pose().popPose();
     }
 
     private static void drawScopeCorner(
@@ -395,10 +442,11 @@ public final class ThirdPersonAimHudRenderer {
             int horizontalDirection,
             int verticalDirection
     ) {
+        int color = ScopeHudRenderer.sightLineColor(SCOPE_RETICLE_BLACK);
         int horizontalEnd = x + horizontalDirection * arm;
         int verticalEnd = y + verticalDirection * arm;
-        graphics.fill(Math.min(x, horizontalEnd), y, Math.max(x, horizontalEnd) + 1, y + 1, SCOPE_RETICLE_BLACK);
-        graphics.fill(x, Math.min(y, verticalEnd), x + 1, Math.max(y, verticalEnd) + 1, SCOPE_RETICLE_BLACK);
+        graphics.fill(Math.min(x, horizontalEnd), y, Math.max(x, horizontalEnd) + 1, y + 1, color);
+        graphics.fill(x, Math.min(y, verticalEnd), x + 1, Math.max(y, verticalEnd) + 1, color);
     }
 
     private static void drawScopeChevron(
@@ -408,9 +456,10 @@ public final class ThirdPersonAimHudRenderer {
             int direction,
             int halfHeight
     ) {
+        int color = ScopeHudRenderer.sightLineColor(SCOPE_RETICLE_BLACK);
         for (int dy = -halfHeight; dy <= halfHeight; dy++) {
             int px = tipX - direction * Math.abs(dy);
-            plot(graphics, px, centreY + dy, SCOPE_RETICLE_BLACK);
+            plot(graphics, px, centreY + dy, color);
         }
     }
 
@@ -428,6 +477,7 @@ public final class ThirdPersonAimHudRenderer {
             int zeroX,
             int zeroY
     ) {
+        int color = ScopeHudRenderer.sightLineColor(SCOPE_RETICLE_BLACK);
         graphics.pose().pushPose();
         graphics.pose().scale(0.5F, 0.5F, 1.0F);
         for (int row = 0; row < labels.length; row++) {
@@ -444,7 +494,7 @@ public final class ThirdPersonAimHudRenderer {
                     rowY * 2,
                     (ladderX + tickLength) * 2,
                     rowY * 2 + 1,
-                    SCOPE_RETICLE_BLACK
+                    color
             );
         }
         drawThinSevenSegmentZero(graphics, zeroX * 2, zeroY * 2);
@@ -468,6 +518,7 @@ public final class ThirdPersonAimHudRenderer {
     }
 
     private static void drawThinDigit(GuiGraphics graphics, int digit, int x, int y) {
+        int color = ScopeHudRenderer.sightLineColor(SCOPE_RETICLE_BLACK);
         // Seven connected strokes instead of a separated dot matrix. The
         // surrounding 0.5 scale keeps every stroke thin while the joins make
         // the tiny range numerals readable at normal GUI scale.
@@ -485,39 +536,40 @@ public final class ThirdPersonAimHudRenderer {
             default -> 0;
         };
         if ((segments & 0b0000001) != 0) {
-            graphics.fill(x, y, x + 5, y + 1, SCOPE_RETICLE_BLACK);
+            graphics.fill(x, y, x + 5, y + 1, color);
         }
         if ((segments & 0b0000010) != 0) {
-            graphics.fill(x + 4, y, x + 5, y + 5, SCOPE_RETICLE_BLACK);
+            graphics.fill(x + 4, y, x + 5, y + 5, color);
         }
         if ((segments & 0b0000100) != 0) {
-            graphics.fill(x + 4, y + 4, x + 5, y + 9, SCOPE_RETICLE_BLACK);
+            graphics.fill(x + 4, y + 4, x + 5, y + 9, color);
         }
         if ((segments & 0b0001000) != 0) {
-            graphics.fill(x, y + 8, x + 5, y + 9, SCOPE_RETICLE_BLACK);
+            graphics.fill(x, y + 8, x + 5, y + 9, color);
         }
         if ((segments & 0b0010000) != 0) {
-            graphics.fill(x, y + 4, x + 1, y + 9, SCOPE_RETICLE_BLACK);
+            graphics.fill(x, y + 4, x + 1, y + 9, color);
         }
         if ((segments & 0b0100000) != 0) {
-            graphics.fill(x, y, x + 1, y + 5, SCOPE_RETICLE_BLACK);
+            graphics.fill(x, y, x + 1, y + 5, color);
         }
         if ((segments & 0b1000000) != 0) {
-            graphics.fill(x, y + 4, x + 5, y + 5, SCOPE_RETICLE_BLACK);
+            graphics.fill(x, y + 4, x + 5, y + 5, color);
         }
     }
 
     private static void drawThinSevenSegmentZero(GuiGraphics graphics, int centreX, int centreY) {
+        int color = ScopeHudRenderer.sightLineColor(SCOPE_RETICLE_BLACK);
         int halfWidth = 6;
         int halfHeight = 12;
         graphics.fill(centreX - halfWidth + 1, centreY - halfHeight,
-                centreX + halfWidth - 1, centreY - halfHeight + 1, SCOPE_RETICLE_BLACK);
+                centreX + halfWidth - 1, centreY - halfHeight + 1, color);
         graphics.fill(centreX - halfWidth + 1, centreY + halfHeight - 1,
-                centreX + halfWidth - 1, centreY + halfHeight, SCOPE_RETICLE_BLACK);
+                centreX + halfWidth - 1, centreY + halfHeight, color);
         graphics.fill(centreX - halfWidth, centreY - halfHeight + 1,
-                centreX - halfWidth + 1, centreY + halfHeight - 1, SCOPE_RETICLE_BLACK);
+                centreX - halfWidth + 1, centreY + halfHeight - 1, color);
         graphics.fill(centreX + halfWidth - 1, centreY - halfHeight + 1,
-                centreX + halfWidth, centreY + halfHeight - 1, SCOPE_RETICLE_BLACK);
+                centreX + halfWidth, centreY + halfHeight - 1, color);
     }
 
     private static void drawCircle(GuiGraphics graphics, int centreX, int centreY, int radius, int color) {
@@ -563,23 +615,6 @@ public final class ThirdPersonAimHudRenderer {
         return (color & 0x00FFFFFF) | (alpha << 24);
     }
 
-    private static void drawConnectedSquare(
-            GuiGraphics graphics,
-            int centreX,
-            int centreY,
-            int halfSide,
-            int color
-    ) {
-        int minX = centreX - halfSide;
-        int minY = centreY - halfSide;
-        int maxX = centreX + halfSide;
-        int maxY = centreY + halfSide;
-        graphics.fill(minX, minY, maxX + 1, minY + 1, color);
-        graphics.fill(minX, maxY, maxX + 1, maxY + 1, color);
-        graphics.fill(minX, minY + 1, minX + 1, maxY, color);
-        graphics.fill(maxX, minY + 1, maxX + 1, maxY, color);
-    }
-
     /** Search/acquisition remains the War-Thunder-style separated corner box. */
     private static void drawCornerFrame(
             GuiGraphics graphics,
@@ -600,9 +635,6 @@ public final class ThirdPersonAimHudRenderer {
     }
 
     private record ScreenPoint(int x, int y) {
-    }
-
-    private record ScreenSize(int width, int height) {
     }
 
     private ThirdPersonAimHudRenderer() {

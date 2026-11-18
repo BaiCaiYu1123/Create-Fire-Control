@@ -1,0 +1,86 @@
+{
+  "hashes": {
+    ".tools\\fmodstudio\\fmodstudio.dll": "fa9c1325db3bf67cee5a59d2c052030468504bcce879403e5c0bfbbf411ed699",
+    "masterbank.bank": "225546a72da895b4f1f141f90092b2b9334b65346b985efdb6e0aafb9363de32",
+    "masterbank.assets.bank": "6b7c45b58475c0574e4f048e98a6edbf9c0e93c94979bdd27cc77a9843eb96f3",
+    "tanks_engines.bank": "d5d55f1bc0ebdf91f972b680cf6cb2452b2e7ff39ccf934b8f8c42ee3a527e3b",
+    "tanks_engines.assets.bank": "bb41a40c93b7a33a0705e6a2184cca9f7a11ef597c91198ed43e732394257697"
+  },
+  "rows": [
+    {
+      "distance": 3,
+      "audibility": 0.3113633692264557,
+      "gain": 1.0
+    },
+    {
+      "distance": 5,
+      "audibility": 0.3086625039577484,
+      "gain": 0.9913256807458847
+    },
+    {
+      "distance": 10,
+      "audibility": 0.3022463321685791,
+      "gain": 0.9707189799476837
+    },
+    {
+      "distance": 16,
+      "audibility": 0.29513463377952576,
+      "gain": 0.9478784691749442
+    },
+    {
+      "distance": 32,
+      "audibility": 0.2788648307323456,
+      "gain": 0.8956250422943175
+    },
+    {
+      "distance": 64,
+      "audibility": 0.2551892101764679,
+      "gain": 0.8195864876798268
+    },
+    {
+      "distance": 100,
+      "audibility": 0.2378809154033661,
+      "gain": 0.7639977560441751
+    },
+    {
+      "distance": 128,
+      "audibility": 0.22875744104385376,
+      "gain": 0.7346960614287215
+    },
+    {
+      "distance": 150,
+      "audibility": 0.2234046906232834,
+      "gain": 0.717504731459918
+    },
+    {
+      "distance": 175,
+      "audibility": 0.18965376913547516,
+      "gain": 0.6091075183527427
+    },
+    {
+      "distance": 190,
+      "audibility": 0.15530163049697876,
+      "gain": 0.49877938719254844
+    },
+    {
+      "distance": 200,
+      "audibility": 0.126007542014122,
+      "gain": 0.4046961025864166
+    },
+    {
+      "distance": 210,
+      "audibility": 0.05164138600230217,
+      "gain": 0.16585568858211835
+    },
+    {
+      "distance": 214,
+      "audibility": 0.0021151925902813673,
+      "gain": 0.0067933250964501875
+    },
+    {
+      "distance": 215,
+      "audibility": 0.0,
+      "gain": 0.0
+    }
+  ]
+}

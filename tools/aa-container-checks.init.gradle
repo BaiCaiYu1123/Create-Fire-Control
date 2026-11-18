@@ -1,0 +1,4 @@
+// Keep this verification independent of other builds using the shared checkout.
+gradle.beforeProject { project ->
+    project.layout.buildDirectory.set(project.layout.projectDirectory.dir('build-aa-container-verify'))
+}

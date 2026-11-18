@@ -1,11 +1,13 @@
 package com.hooya.stabilizedturret.content.controller;
 
+import com.hooya.stabilizedturret.config.MissileSettings;
+
 import com.hooya.stabilizedturret.StabilizedTurret;
+import com.hooya.stabilizedturret.content.iff.FireControlMissileOwnership;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -14,7 +16,6 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.IdentityHashMap;
@@ -29,12 +30,15 @@ import java.util.UUID;
 @EventBusSubscriber(modid = StabilizedTurret.MOD_ID)
 public final class MianbaoMissileGuidanceHandler {
     private static final int MAX_LIFETIME_TICKS = 20 * 20;
-    private static final double CROSS_TRACK_GAIN = 0.08;
-    private static final double MAX_LATERAL_SPEED_RATIO = 0.22;
-    private static final double MAX_STEER_RADIANS_PER_TICK = Math.toRadians(4.0);
     private static final TicketType<UUID> MISSILE_TICKET = TicketType.<UUID>create(
             "create_fire_control_guided_missile", UUID::compareTo);
     private static final Map<Entity, GuidanceState> GUIDED = new IdentityHashMap<>();
+    private static final Map<Entity, PendingRecovery> RECOVERING = new IdentityHashMap<>();
+    private static final String CONTROLLER_POS_TAG = "CreateFireControlGuidedController";
+    private static final String CONTROLLER_SUBLEVEL_TAG = "CreateFireControlGuidedControllerSubLevel";
+    private static final String CONTROLLER_SUBLEVEL_KNOWN_TAG =
+            "CreateFireControlGuidedControllerSubLevelKnown";
+    private static final String AGE_TAG = "CreateFireControlGuidedAge";
 
     @SubscribeEvent
     public static void onEntityJoin(EntityJoinLevelEvent event) {
@@ -42,22 +46,83 @@ public final class MianbaoMissileGuidanceHandler {
                 || !MianbaoMissileCompat.isGuidedMissile(event.getEntity())) {
             return;
         }
-        StabilizerControllerBlockEntity controller =
-                ControllerTracker.findForMianbaoMissile(event.getEntity());
+        Entity missile = event.getEntity();
+        var data = missile.getPersistentData();
+        boolean restoring = data.getBoolean("CreateFireControlGuided")
+                && data.contains(CONTROLLER_POS_TAG);
+        StabilizerControllerBlockEntity controller = null;
+        if (restoring) {
+            boolean exact = data.getBoolean(CONTROLLER_SUBLEVEL_KNOWN_TAG);
+            UUID subLevelId = data.hasUUID(CONTROLLER_SUBLEVEL_TAG)
+                    ? data.getUUID(CONTROLLER_SUBLEVEL_TAG) : null;
+            controller = ControllerTracker.findLoadedForMissile(
+                    missile, BlockPos.of(data.getLong(CONTROLLER_POS_TAG)),
+                    subLevelId, exact);
+            if (controller == null) {
+                PendingRecovery recovery = new PendingRecovery(
+                        BlockPos.of(data.getLong(CONTROLLER_POS_TAG)), subLevelId,
+                        exact, Math.max(0, data.getInt(AGE_TAG)));
+                recovery.updateTickets(missile);
+                synchronized (RECOVERING) { RECOVERING.put(missile, recovery); }
+                return;
+            }
+        }
+        if (controller == null) controller = ControllerTracker.findForMianbaoMissile(missile);
         if (controller == null) {
             return;
         }
         GuidanceState state = new GuidanceState(controller);
-        state.updateTickets(event.getEntity());
+        state.ageTicks = Math.max(0, missile.getPersistentData().getInt(AGE_TAG));
+        state.updateTickets(missile);
         synchronized (GUIDED) {
-            GUIDED.put(event.getEntity(), state);
+            GUIDED.put(missile, state);
         }
-        event.getEntity().getPersistentData().putBoolean("CreateFireControlGuided", true);
+        missile.getPersistentData().putBoolean("CreateFireControlGuided", true);
+        missile.getPersistentData().putLong(CONTROLLER_POS_TAG,
+                controller.getBlockPos().asLong());
+        saveControllerOwner(missile, controller);
+        FireControlMissileOwnership.markController(missile, controller);
         StabilizedTurret.LOGGER.debug(
                 "Attached Mianbao missile {} to fire-control computer at {}",
                 event.getEntity().getUUID(),
                 controller.getBlockPos()
         );
+    }
+
+    /**
+     * Explicitly adopts a missile after a third-party launcher has completed
+     * its native spawn routine. Used by the heavy station because its native
+     * guidance registration happens after EntityJoinLevelEvent.
+     */
+    public static boolean adopt(
+            Entity missile, StabilizerControllerBlockEntity controller
+    ) {
+        if (missile == null || controller == null || missile.level().isClientSide()
+                || !MianbaoMissileCompat.isGuidedMissile(missile)) return false;
+
+        PendingRecovery recovery;
+        synchronized (RECOVERING) {
+            recovery = RECOVERING.remove(missile);
+        }
+        if (recovery != null) recovery.releaseTickets();
+
+        GuidanceState state = new GuidanceState(controller);
+        state.ageTicks = Math.max(0, missile.getPersistentData().getInt(AGE_TAG));
+        state.updateTickets(missile);
+        synchronized (GUIDED) {
+            GuidanceState previous = GUIDED.put(missile, state);
+            if (previous != null) previous.releaseTickets();
+        }
+
+        var data = missile.getPersistentData();
+        data.putBoolean("CreateFireControlGuided", true);
+        data.putLong(CONTROLLER_POS_TAG, controller.getBlockPos().asLong());
+        saveControllerOwner(missile, controller);
+        FireControlMissileOwnership.markController(missile, controller);
+        StabilizedTurret.LOGGER.debug(
+                "Explicitly adopted Mianbao missile {} for fire-control computer at {}",
+                missile.getUUID(), controller.getBlockPos());
+        return true;
     }
 
     /**
@@ -94,6 +159,8 @@ public final class MianbaoMissileGuidanceHandler {
      */
     @SubscribeEvent
     public static void onServerTickPost(ServerTickEvent.Post event) {
+        recoverPending();
+        if (GUIDED.isEmpty()) return;
         Map<StabilizerControllerBlockEntity, AimBeam> beamCache = new IdentityHashMap<>();
         synchronized (GUIDED) {
             Iterator<Map.Entry<Entity, GuidanceState>> iterator = GUIDED.entrySet().iterator();
@@ -118,12 +185,13 @@ public final class MianbaoMissileGuidanceHandler {
                 if (nativeAge > 100.0) {
                     missile.getPersistentData().putDouble("fadongji1", 100.0);
                 }
-                if (++state.ageTicks >= MAX_LIFETIME_TICKS) {
+                if (++state.ageTicks >= MissileSettings.lifetimeTicks(missile)) {
                     selfDestruct(missile);
                     state.releaseTickets();
                     iterator.remove();
                     continue;
                 }
+                missile.getPersistentData().putInt(AGE_TAG, state.ageTicks);
 
                 // A missile already launched remains loaded and expires safely
                 // even if its computer/reference is subsequently destroyed.
@@ -148,48 +216,24 @@ public final class MianbaoMissileGuidanceHandler {
                     continue;
                 }
 
+                // The first two ticks retain native launch clearance. Do not consume
+                // a configured speed multiplier until a velocity command is applied.
+                if (state.ageTicks < 3) continue;
                 Vec3 missileWorldPosition = MianbaoMissileCompat.getWorldPosition(missile);
                 Vec3 currentVelocity = MianbaoMissileCompat.getWorldVelocity(missile);
+                // Apply multiplier changes once, rather than compounding them every tick.
+                double multiplier = MissileSettings.speedScale(missile);
+                double oldMultiplier = missile.getPersistentData().contains("CreateFireControlSpeedScale")
+                        ? missile.getPersistentData().getDouble("CreateFireControlSpeedScale") : 1.0;
+                currentVelocity = currentVelocity.scale(multiplier / Math.max(.01, oldMultiplier));
+                missile.getPersistentData().putDouble("CreateFireControlSpeedScale", multiplier);
                 double speed = currentVelocity.length();
-                // Preserve the launcher's initial clearance and native launch
-                // animation for two ticks before engaging guidance.
-                if (state.ageTicks < 3) {
-                    continue;
-                }
                 if (speed < 1.0e-4) {
                     speed = 1.0;
                 }
 
-                // Beam-riding guidance: forward motion always dominates. A
-                // bounded lateral component closes cross-track error, while a
-                // per-tick steering limit prevents a large error from causing
-                // an instant side turn. No distant target point is pursued.
-                double alongBeam = Math.max(
-                        0.0,
-                        missileWorldPosition.subtract(beam.origin()).dot(beam.direction())
-                );
-                Vec3 closestOnBeam = beam.origin().add(beam.direction().scale(alongBeam));
-                Vec3 crossTrackCorrection = closestOnBeam.subtract(missileWorldPosition);
-                double crossTrackDistance = crossTrackCorrection.length();
-                double lateralSpeed = Math.min(
-                        speed * MAX_LATERAL_SPEED_RATIO,
-                        crossTrackDistance * CROSS_TRACK_GAIN
-                );
-                Vec3 desiredVelocity = beam.direction().scale(speed);
-                if (crossTrackDistance > 1.0e-6) {
-                    desiredVelocity = desiredVelocity.add(
-                            crossTrackCorrection.scale(lateralSpeed / crossTrackDistance)
-                    );
-                }
-                Vec3 desiredDirection = desiredVelocity.normalize();
-                Vec3 currentDirection = currentVelocity.lengthSqr() < 1.0e-8
-                        ? beam.direction()
-                        : currentVelocity.normalize();
-                Vec3 guidedVelocity = rotateTowards(
-                        currentDirection,
-                        desiredDirection,
-                        MAX_STEER_RADIANS_PER_TICK
-                ).scale(speed);
+                Vec3 guidedVelocity = BeamRidingGuidance.guide(missileWorldPosition, currentVelocity,
+                        beam.origin(), beam.direction(), speed);
                 missile.setNoGravity(true);
                 MianbaoMissileCompat.setWorldVelocity(missile, guidedVelocity);
             }
@@ -215,18 +259,76 @@ public final class MianbaoMissileGuidanceHandler {
         missile.discard();
     }
 
-    private static Vec3 rotateTowards(Vec3 current, Vec3 desired, double maxRadians) {
-        double dot = Math.max(-1.0, Math.min(1.0, current.dot(desired)));
-        double angle = Math.acos(dot);
-        if (angle <= maxRadians || angle < 1.0e-6) {
-            return desired;
-        }
-        double blend = maxRadians / angle;
-        Vec3 blended = current.scale(1.0 - blend).add(desired.scale(blend));
-        return blended.lengthSqr() < 1.0e-8 ? current : blended.normalize();
+    private record AimBeam(Vec3 origin, Vec3 direction) {
     }
 
-    private record AimBeam(Vec3 origin, Vec3 direction) {
+    private static void saveControllerOwner(
+            Entity missile, StabilizerControllerBlockEntity controller
+    ) {
+        UUID subLevelId = ControllerTracker.controllerSubLevelId(controller);
+        missile.getPersistentData().putBoolean(CONTROLLER_SUBLEVEL_KNOWN_TAG, true);
+        if (subLevelId != null) {
+            missile.getPersistentData().putUUID(CONTROLLER_SUBLEVEL_TAG, subLevelId);
+        } else {
+            missile.getPersistentData().remove(CONTROLLER_SUBLEVEL_TAG);
+        }
+    }
+
+    private static void recoverPending() {
+        synchronized (RECOVERING) {
+            Iterator<Map.Entry<Entity, PendingRecovery>> iterator =
+                    RECOVERING.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Entity, PendingRecovery> entry = iterator.next();
+                Entity missile = entry.getKey();
+                PendingRecovery recovery = entry.getValue();
+                if (missile == null || missile.isRemoved() || !missile.isAlive()) {
+                    recovery.releaseTickets();
+                    iterator.remove();
+                    continue;
+                }
+                MianbaoMissileCompat.advanceIfNativeTickMissed(missile);
+                recovery.updateTickets(missile);
+                missile.getPersistentData().putInt(AGE_TAG, ++recovery.ageTicks);
+                if (recovery.ageTicks >= MissileSettings.lifetimeTicks(missile)) {
+                    selfDestruct(missile);
+                    recovery.releaseTickets();
+                    iterator.remove();
+                    continue;
+                }
+                StabilizerControllerBlockEntity controller =
+                        ControllerTracker.findLoadedForMissile(
+                                missile, recovery.controllerPos,
+                                recovery.subLevelId, recovery.exactSubLevel);
+                if (controller == null) continue;
+                GuidanceState state = new GuidanceState(controller);
+                state.ageTicks = recovery.ageTicks;
+                state.updateTickets(missile);
+                recovery.releaseTickets();
+                synchronized (GUIDED) { GUIDED.put(missile, state); }
+                FireControlMissileOwnership.markController(missile, controller);
+                iterator.remove();
+            }
+        }
+    }
+
+    private static final class PendingRecovery {
+        final BlockPos controllerPos;
+        final UUID subLevelId;
+        final boolean exactSubLevel;
+        final MissileChunkTickets chunkTickets = new MissileChunkTickets(MISSILE_TICKET);
+        int ageTicks;
+
+        PendingRecovery(BlockPos controllerPos, UUID subLevelId,
+                        boolean exactSubLevel, int ageTicks) {
+            this.controllerPos = controllerPos;
+            this.subLevelId = subLevelId;
+            this.exactSubLevel = exactSubLevel;
+            this.ageTicks = ageTicks;
+        }
+
+        void updateTickets(Entity missile) { chunkTickets.update(missile, null); }
+        void releaseTickets() { chunkTickets.release(); }
     }
 
     private static final class GuidanceState {
@@ -249,6 +351,10 @@ public final class MianbaoMissileGuidanceHandler {
 
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
+        synchronized (RECOVERING) {
+            for (PendingRecovery state : RECOVERING.values()) state.releaseTickets();
+            RECOVERING.clear();
+        }
         synchronized (GUIDED) {
             for (GuidanceState state : GUIDED.values()) state.releaseTickets();
             GUIDED.clear();

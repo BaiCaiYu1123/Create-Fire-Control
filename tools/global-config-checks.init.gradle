@@ -1,0 +1,8 @@
+gradle.projectsEvaluated {
+    rootProject.tasks.register('testGlobalFireControlConfig', JavaExec) {
+        dependsOn rootProject.tasks.named('testClasses')
+        classpath = rootProject.sourceSets.test.runtimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.config.FireControlSettingsChecks'
+        args rootProject.layout.buildDirectory.dir('test-runs/global-config').get().asFile.absolutePath
+    }
+}

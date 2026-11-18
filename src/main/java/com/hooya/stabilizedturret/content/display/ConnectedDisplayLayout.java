@@ -21,27 +21,62 @@ public final class ConnectedDisplayLayout {
     public static final int CANVAS_H = 1001;
     public static final int RADAR_W = 1000;
     public static final int HEADER_H = 42;
+    public static final int GOD_MODE_X1 = 1480;
+    public static final int GOD_MODE_X2 = 1682;
+    public static final int GOD_MODE_Y1 = 5;
+    public static final int GOD_MODE_Y2 = 37;
+    /** The map starts one pixel behind the header so its center is integral. */
+    public static final int RADAR_MAP_Y1 = HEADER_H - 1;
+    public static final int RADAR_MAP_H = CANVAS_H - RADAR_MAP_Y1;
     public static final int RADAR_CX = 500;
-    public static final int RADAR_CY = 520;
+    public static final int RADAR_CY = RADAR_MAP_Y1 + RADAR_MAP_H / 2;
     public static final double SCREEN_INSET = 1.0 / 16.0;
 
     public static final int PANEL_LEFT = RADAR_W;
+    public static final int WEAPON_TAB_Y1 = 78;
+    public static final int WEAPON_TAB_Y2 = 142;
+    public static final int CANNON_TAB_X1 = 1035;
+    public static final int CANNON_TAB_X2 = 1180;
+    public static final int AA_TAB_X1 = 1195;
+    public static final int AA_TAB_X2 = 1340;
+    public static final int CRUISE_TAB_X1 = 1355;
+    public static final int CRUISE_TAB_X2 = 1500;
+    public static final int BALLISTIC_TAB_X1 = 1515;
+    public static final int BALLISTIC_TAB_X2 = 1662;
+    public static final int CRUISE_TYPE_X1 = 1035;
+    public static final int CRUISE_TYPE_X2 = 1662;
+    public static final int CRUISE_TYPE_Y1 = 162;
+    public static final int CRUISE_TYPE_Y2 = 222;
     public static final int SLIDER_X1 = 1065;
     public static final int SLIDER_X2 = 1635;
-    public static final int SLIDER_Y1 = 152;
-    public static final int SLIDER_Y2 = 210;
-    public static final int AUTO_X1 = 1065;
-    public static final int AUTO_X2 = 1635;
-    public static final int AUTO_Y1 = 260;
-    public static final int AUTO_Y2 = 342;
-    public static final int FIRE_X1 = 1065;
+    public static final int RADAR_SLIDER_Y1 = 291;
+    public static final int RADAR_SLIDER_Y2 = 311;
+    public static final int DEFENSE_SLIDER_Y1 = 367;
+    public static final int DEFENSE_SLIDER_Y2 = 387;
+    public static final int PROXIMITY_SLIDER_Y1 = 443;
+    public static final int PROXIMITY_SLIDER_Y2 = 463;
+    /** Legacy aliases for callers that treated the only slider as radar range. */
+    public static final int SLIDER_Y1 = RADAR_SLIDER_Y1;
+    public static final int SLIDER_Y2 = RADAR_SLIDER_Y2;
+    public static final int AUTO_X1 = 1035;
+    public static final int AUTO_X2 = 1338;
+    public static final int AUTO_DEFENSE_X1 = 1362;
+    public static final int AUTO_DEFENSE_X2 = 1662;
+    public static final int AUTO_Y1 = 480;
+    public static final int AUTO_Y2 = 534;
+    public static final int CRUISE_MULTI_X1 = 1432;
+    public static final int CRUISE_MULTI_X2 = 1635;
+    public static final int CRUISE_MULTI_Y1 = 564;
+    public static final int CRUISE_MULTI_Y2 = 616;
+    public static final int FIRE_X1 = 1035;
     public static final int FIRE_X2 = 1338;
-    public static final int FIRE_Y1 = 382;
-    public static final int FIRE_Y2 = 464;
+    public static final int FIRE_Y1 = 704;
+    public static final int FIRE_Y2 = 784;
     public static final int CLEAR_X1 = 1362;
-    public static final int CLEAR_X2 = 1635;
-    public static final int CLEAR_Y1 = 382;
-    public static final int CLEAR_Y2 = 464;
+    public static final int CLEAR_X2 = 1662;
+    public static final int CLEAR_Y1 = 704;
+    public static final int CLEAR_Y2 = 784;
+    // Legacy renderer coordinates retained for binary/source compatibility.
     public static final int MISSILE_X1 = 1065;
     public static final int MISSILE_X2 = 1635;
     public static final int MISSILE_Y1 = 760;
@@ -117,21 +152,10 @@ public final class ConnectedDisplayLayout {
     }
 
     public static RadarGeometry radarGeometry(int wallWidth, int wallHeight) {
-        double drawableWidth = Math.max(0.01, wallWidth - SCREEN_INSET * 2.0);
-        double drawableHeight = Math.max(0.01, wallHeight - SCREEN_INSET * 2.0);
-        double scaleX = drawableWidth / CANVAS_W;
-        double scaleY = drawableHeight / CANVAS_H;
-        double radiusX = 480.0;
-        double radiusY = radiusX * scaleX / scaleY;
-        double maximumY = Math.min(
-                RADAR_CY - HEADER_H - 8.0,
-                CANVAS_H - RADAR_CY - 30.0
-        );
-        if (radiusY > maximumY) {
-            radiusY = maximumY;
-            radiusX = radiusY * scaleY / scaleX;
-        }
-        return new RadarGeometry(radiusX, radiusY);
+        // Contacts, click coordinates, and the Xaero texture must use the
+        // same pixel-to-world scale. Keeping rings physically circular here
+        // made their world scale diverge from the stretched map texture.
+        return new RadarGeometry(RADAR_W / 2.0, RADAR_MAP_H / 2.0);
     }
 
     public static RadarPoint radarPoint(
@@ -144,6 +168,50 @@ public final class ConnectedDisplayLayout {
         return new RadarPoint(
                 RADAR_CX + (contact.x - origin.x) * geometry.radiusX / safeRange,
                 RADAR_CY + (contact.z - origin.z) * geometry.radiusY / safeRange
+        );
+    }
+
+    public static Vec3 radarWorldPoint(
+            double canvasX,
+            double canvasY,
+            Vec3 origin,
+            double range,
+            RadarGeometry geometry
+    ) {
+        return radarWorldPoint(canvasX, canvasY, origin, range, geometry, 0);
+    }
+
+    /**
+     * Converts a click to the center of the Xaero sample pixel it selects.
+     * The display texture is nearest-neighbour sampled, so using the raw
+     * canvas edge would put a target up to half a source pixel beyond the
+     * terrain that is actually visible at that location.
+     */
+    public static Vec3 radarWorldPoint(
+            double canvasX,
+            double canvasY,
+            Vec3 origin,
+            double range,
+            RadarGeometry geometry,
+            int mapResolution
+    ) {
+        if (mapResolution > 0) {
+            double pixelX = Math.floor(
+                    clamp(canvasX / RADAR_W, 0.0, 1.0 - 1.0 / mapResolution)
+                            * mapResolution);
+            double pixelY = Math.floor(
+                    clamp((canvasY - RADAR_MAP_Y1) / (double) RADAR_MAP_H,
+                            0.0, 1.0 - 1.0 / mapResolution) * mapResolution);
+            canvasX = (pixelX + 0.5) * RADAR_W / mapResolution;
+            canvasY = RADAR_MAP_Y1
+                    + (pixelY + 0.5) * RADAR_MAP_H / mapResolution;
+        }
+        double safeRadiusX = Math.max(1.0, geometry.radiusX());
+        double safeRadiusY = Math.max(1.0, geometry.radiusY());
+        return new Vec3(
+                origin.x + (canvasX - RADAR_CX) * Math.max(1.0, range) / safeRadiusX,
+                origin.y,
+                origin.z + (canvasY - RADAR_CY) * Math.max(1.0, range) / safeRadiusY
         );
     }
 
@@ -171,6 +239,18 @@ public final class ConnectedDisplayLayout {
         ) * 10.0;
     }
 
+    public static double defenseSliderRange(double canvasX) {
+        double progress = clamp(
+                (canvasX - SLIDER_X1) / (SLIDER_X2 - SLIDER_X1),
+                0.0, 1.0);
+        if (progress >= 0.999) {
+            return ConnectedDisplayBlockEntity.UNLIMITED_MISSILE_DEFENSE_RANGE;
+        }
+        return ConnectedDisplayBlockEntity.MIN_MISSILE_DEFENSE_RANGE
+                + Math.round(progress * (ConnectedDisplayBlockEntity.MAX_MISSILE_DEFENSE_RANGE
+                - ConnectedDisplayBlockEntity.MIN_MISSILE_DEFENSE_RANGE) / 10.0) * 10.0;
+    }
+
     public static double sliderX(double range) {
         double progress = (clamp(
                 range,
@@ -179,6 +259,37 @@ public final class ConnectedDisplayLayout {
         ) - ConnectedDisplayBlockEntity.MIN_RANGE)
                 / (ConnectedDisplayBlockEntity.MAX_RANGE
                 - ConnectedDisplayBlockEntity.MIN_RANGE);
+        return SLIDER_X1 + progress * (SLIDER_X2 - SLIDER_X1);
+    }
+
+    public static double defenseSliderX(double range) {
+        if (range <= ConnectedDisplayBlockEntity.UNLIMITED_MISSILE_DEFENSE_RANGE
+                || range >= ConnectedDisplayBlockEntity.MAX_MISSILE_DEFENSE_RANGE) {
+            return SLIDER_X2;
+        }
+        double progress = (Math.max(ConnectedDisplayBlockEntity.MIN_MISSILE_DEFENSE_RANGE,
+                Math.min(ConnectedDisplayBlockEntity.MAX_MISSILE_DEFENSE_RANGE, range))
+                - ConnectedDisplayBlockEntity.MIN_MISSILE_DEFENSE_RANGE)
+                / (ConnectedDisplayBlockEntity.MAX_MISSILE_DEFENSE_RANGE
+                - ConnectedDisplayBlockEntity.MIN_MISSILE_DEFENSE_RANGE);
+        return SLIDER_X1 + progress * (SLIDER_X2 - SLIDER_X1);
+    }
+
+    public static double proximitySliderRange(double canvasX) {
+        double progress = clamp(
+                (canvasX - SLIDER_X1) / (SLIDER_X2 - SLIDER_X1), 0.0, 1.0);
+        return Math.round((ConnectedDisplayBlockEntity.MIN_MISSILE_PROXIMITY_RANGE
+                + progress * (ConnectedDisplayBlockEntity.MAX_MISSILE_PROXIMITY_RANGE
+                - ConnectedDisplayBlockEntity.MIN_MISSILE_PROXIMITY_RANGE)) * 2.0) / 2.0;
+    }
+
+    public static double proximitySliderX(double range) {
+        double progress = (clamp(range,
+                ConnectedDisplayBlockEntity.MIN_MISSILE_PROXIMITY_RANGE,
+                ConnectedDisplayBlockEntity.MAX_MISSILE_PROXIMITY_RANGE)
+                - ConnectedDisplayBlockEntity.MIN_MISSILE_PROXIMITY_RANGE)
+                / (ConnectedDisplayBlockEntity.MAX_MISSILE_PROXIMITY_RANGE
+                - ConnectedDisplayBlockEntity.MIN_MISSILE_PROXIMITY_RANGE);
         return SLIDER_X1 + progress * (SLIDER_X2 - SLIDER_X1);
     }
 

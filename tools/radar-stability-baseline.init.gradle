@@ -1,0 +1,33 @@
+// Run the new regression against the installed baseline without changing source or the live game.
+gradle.projectsEvaluated {
+    rootProject.tasks.register('testRadarTerrainDecode', JavaExec) {
+        dependsOn rootProject.tasks.named('testClasses')
+        classpath = rootProject.sourceSets.test.runtimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.content.controller.RadarTerrainDecodeChecks'
+        args rootProject.layout.projectDirectory.dir('analysis/radar-live-20261114/nbt-fixtures').asFile.absolutePath
+    }
+    rootProject.tasks.register('patchRadarControllerPriority', JavaExec) {
+        dependsOn rootProject.tasks.named('testClasses')
+        classpath = rootProject.sourceSets.test.runtimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.content.controller.RadarControllerPriorityPatch'
+        args rootProject.providers.gradleProperty('radarBaselineJar').get(),
+                rootProject.layout.projectDirectory.file('analysis/radar-stability-20261114/controller-priority.class').asFile.absolutePath
+    }
+    rootProject.tasks.register('testRadarStabilityBaseline', JavaExec) {
+        dependsOn rootProject.tasks.named('testClasses')
+        classpath = rootProject.sourceSets.test.output +
+                rootProject.files(rootProject.providers.gradleProperty('radarBaselineJar').get()) +
+                (rootProject.sourceSets.test.runtimeClasspath - rootProject.sourceSets.main.output - rootProject.sourceSets.test.output)
+        mainClass = 'com.hooya.stabilizedturret.client.compat.VoxyLodRaycasterChecks'
+    }
+    if (rootProject.providers.gradleProperty('radarArtifactJar').isPresent()) {
+        rootProject.tasks.register('testRadarPackagedArtifact', JavaExec) {
+            dependsOn rootProject.tasks.named('testClasses')
+            classpath = rootProject.sourceSets.test.output +
+                    rootProject.files(rootProject.providers.gradleProperty('radarArtifactJar').get()) +
+                    (rootProject.sourceSets.test.runtimeClasspath - rootProject.sourceSets.main.output - rootProject.sourceSets.test.output) +
+                    rootProject.configurations.localRuntime + rootProject.sourceSets.main.compileClasspath
+            mainClass = 'com.hooya.stabilizedturret.content.controller.RadarPackagedArtifactChecks'
+        }
+    }
+}

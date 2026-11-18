@@ -1,0 +1,4 @@
+// Keep this verification independent of other chats compiling the shared checkout.
+gradle.beforeProject { project ->
+    project.layout.buildDirectory.set(project.layout.projectDirectory.dir('build-radar-long-range-verify'))
+}

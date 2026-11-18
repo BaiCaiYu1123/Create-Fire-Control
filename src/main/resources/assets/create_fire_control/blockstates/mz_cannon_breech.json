@@ -1,0 +1,10 @@
+{
+  "multipart": [
+    { "when": { "facing": "south" }, "apply": { "model": "create_fire_control:block/mz_cannon_breech/body", "y": 180 } },
+    { "when": { "facing": "north" }, "apply": { "model": "create_fire_control:block/mz_cannon_breech/body" } },
+    { "when": { "facing": "east" }, "apply": { "model": "create_fire_control:block/mz_cannon_breech/body", "y": 90 } },
+    { "when": { "facing": "west" }, "apply": { "model": "create_fire_control:block/mz_cannon_breech/body", "y": 270 } },
+    { "when": { "facing": "up" }, "apply": { "model": "create_fire_control:block/mz_cannon_breech/body", "x": 270, "y": 180 } },
+    { "when": { "facing": "down" }, "apply": { "model": "create_fire_control:block/mz_cannon_breech/body", "x": 90, "y": 180 } }
+  ]
+}

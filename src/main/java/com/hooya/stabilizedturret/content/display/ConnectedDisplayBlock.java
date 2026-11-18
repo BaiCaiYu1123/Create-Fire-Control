@@ -111,19 +111,44 @@ public final class ConnectedDisplayBlock extends BaseEntityBlock {
         Direction facing=rootState.getValue(FACING), left=screenLeft(facing);
         Direction[] directions={Direction.UP,Direction.DOWN,left,left.getOpposite()};
         Set<BlockPos> visited=new HashSet<>(); ArrayDeque<BlockPos> queue=new ArrayDeque<>();
-        visited.add(origin);queue.add(origin); ConnectedDisplayBlockEntity fallback=null;
+        visited.add(origin);queue.add(origin); ConnectedDisplayBlockEntity controller=null;
+        int controllerPriority=Integer.MIN_VALUE;
         while(!queue.isEmpty()&&visited.size()<=MAX_CONNECTED_DISPLAYS){
             BlockPos pos=queue.removeFirst();
             if(level.getBlockEntity(pos) instanceof ConnectedDisplayBlockEntity display){
-                if(fallback==null)fallback=display;
-                if(!display.getDevices().isEmpty()||display.isAutomaticAttack())return display;
+                int priority=controllerPriority(display);
+                if(controller==null||priority>controllerPriority
+                        ||priority==controllerPriority
+                        &&compareControllerPositions(pos,controller.getBlockPos(),facing)<0){
+                    controller=display;
+                    controllerPriority=priority;
+                }
             }
             for(Direction direction:directions){BlockPos next=pos.relative(direction);
                 BlockState state=level.getBlockState(next);
                 if(!visited.contains(next)&&state.getBlock() instanceof ConnectedDisplayBlock
                         &&state.getValue(FACING)==facing){visited.add(next);queue.add(next);}}
         }
-        return fallback;
+        return controller;
+    }
+
+    private static int controllerPriority(ConnectedDisplayBlockEntity display) {
+        if(display.hasBindings())return 3;
+        if(display.isAutomaticAttack()||display.getSelectedTarget()!=null)return 2;
+        if(display.hasConfiguredSettings())return 1;
+        return 0;
+    }
+
+    private static int compareControllerPositions(BlockPos first,BlockPos second,Direction facing){
+        int topFirst=Integer.compare(second.getY(),first.getY());
+        if(topFirst!=0)return topFirst;
+        Direction right=screenLeft(facing).getOpposite();
+        long firstProjection=(long)first.getX()*right.getStepX()+(long)first.getZ()*right.getStepZ();
+        long secondProjection=(long)second.getX()*right.getStepX()+(long)second.getZ()*right.getStepZ();
+        int leftFirst=Long.compare(firstProjection,secondProjection);
+        if(leftFirst!=0)return leftFirst;
+        int x=Integer.compare(first.getX(),second.getX());
+        return x!=0?x:Integer.compare(first.getZ(),second.getZ());
     }
 
     @Override

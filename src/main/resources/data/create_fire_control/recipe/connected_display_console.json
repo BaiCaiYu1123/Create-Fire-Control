@@ -1,0 +1,22 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": false,
+  "category": "misc",
+  "key": {
+    "D": {
+      "item": "create_fire_control:connected_display"
+    },
+    "T": {
+      "item": "simulated:linked_typewriter"
+    }
+  },
+  "pattern": [
+    " D ",
+    "   ",
+    " T "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_fire_control:connected_display_console"
+  }
+}

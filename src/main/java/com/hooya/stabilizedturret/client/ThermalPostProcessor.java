@@ -1,26 +1,27 @@
 package com.hooya.stabilizedturret.client;
 
 import com.hooya.stabilizedturret.StabilizedTurret;
+import com.hooya.stabilizedturret.client.compat.QModelingThermalRenderBridge;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 
 /**
- * Runs after Iris/Sodium have completed the world frame but before any HUD.
- * This deliberately does not use GameRenderer's single post-effect slot,
- * which Iris replaces on the following frame.
+ * Applies one native-resolution monochrome pass to the already completed world
+ * image. Geometry, alpha blending, cutout discard and depth remain entirely in
+ * the original renderer; this class never patches or re-renders world shaders.
  */
 @EventBusSubscriber(modid = StabilizedTurret.MOD_ID, value = Dist.CLIENT)
 public final class ThermalPostProcessor {
-    private static final ResourceLocation EFFECT = ResourceLocation.fromNamespaceAndPath(
+    private static final ResourceLocation NATIVE_EFFECT = ResourceLocation.fromNamespaceAndPath(
             StabilizedTurret.MOD_ID,
             "shaders/post/thermal.json"
     );
@@ -30,12 +31,11 @@ public final class ThermalPostProcessor {
     private static long retryAfterMillis;
     private static int consecutiveFailures;
 
+    /** Runs after Iris/Sodium/Voxy/Sable finish the world and before the HUD. */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void renderAfterIris(RenderGuiEvent.Pre event) {
-        if (!ClientAimState.isThermal()) {
-            return;
-        }
-        if (System.currentTimeMillis() < retryAfterMillis) {
+        if (!ClientAimState.isThermal()
+                || System.currentTimeMillis() < retryAfterMillis) {
             return;
         }
         Minecraft minecraft = Minecraft.getInstance();
@@ -48,23 +48,13 @@ public final class ThermalPostProcessor {
             RenderSystem.disableDepthTest();
             RenderSystem.resetTextureMatrix();
             chain.process(event.getPartialTick().getGameTimeDeltaTicks());
-            // PostChain unbinds its output. The GUI that follows expects the
-            // game's main target to be active again.
             minecraft.getMainRenderTarget().bindWrite(false);
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthMask(true);
+            consecutiveFailures = 0;
+            retryAfterMillis = 0L;
         } catch (Exception exception) {
-            consecutiveFailures++;
-            retryAfterMillis = System.currentTimeMillis()
-                    + Math.min(30_000L, 2_000L * consecutiveFailures);
-            if (consecutiveFailures == 1) {
-                StabilizedTurret.LOGGER.error("Unable to render stabilized turret thermal optic", exception);
-            } else if (consecutiveFailures == 2 || consecutiveFailures % 5 == 0) {
-                StabilizedTurret.LOGGER.warn(
-                        "Thermal optic post-process still unavailable; retry {} in {} ms",
-                        consecutiveFailures,
-                        Math.max(0L, retryAfterMillis - System.currentTimeMillis())
-                );
-            }
-            shutdown();
+            recordFailure(exception);
         }
     }
 
@@ -74,15 +64,13 @@ public final class ThermalPostProcessor {
                     minecraft.getTextureManager(),
                     minecraft.getResourceManager(),
                     minecraft.getMainRenderTarget(),
-                    EFFECT
+                    NATIVE_EFFECT
             );
             width = -1;
             height = -1;
-            consecutiveFailures = 0;
-            retryAfterMillis = 0L;
         }
-        int nextWidth = minecraft.getWindow().getWidth();
-        int nextHeight = minecraft.getWindow().getHeight();
+        int nextWidth = minecraft.getMainRenderTarget().viewWidth;
+        int nextHeight = minecraft.getMainRenderTarget().viewHeight;
         if (width != nextWidth || height != nextHeight) {
             chain.resize(nextWidth, nextHeight);
             width = nextWidth;
@@ -90,7 +78,24 @@ public final class ThermalPostProcessor {
         }
     }
 
+    private static void recordFailure(Exception exception) {
+        consecutiveFailures++;
+        retryAfterMillis = System.currentTimeMillis()
+                + Math.min(30_000L, 2_000L * consecutiveFailures);
+        if (consecutiveFailures == 1) {
+            StabilizedTurret.LOGGER.error("Unable to render fire-control thermal optic", exception);
+        } else if (consecutiveFailures == 2 || consecutiveFailures % 5 == 0) {
+            StabilizedTurret.LOGGER.warn(
+                    "Thermal optic still unavailable; retry {} in {} ms",
+                    consecutiveFailures,
+                    Math.max(0L, retryAfterMillis - System.currentTimeMillis())
+            );
+        }
+        shutdown();
+    }
+
     public static void shutdown() {
+        QModelingThermalRenderBridge.shutdown();
         if (chain != null) {
             chain.close();
             chain = null;
@@ -117,7 +122,9 @@ public final class ThermalPostProcessor {
     public static final class ReloadRegistration {
         @SubscribeEvent
         public static void registerReloadListener(RegisterClientReloadListenersEvent event) {
-            event.registerReloadListener((ResourceManagerReloadListener) resourceManager -> resourcesReloaded());
+            event.registerReloadListener(
+                    (ResourceManagerReloadListener) resourceManager -> resourcesReloaded()
+            );
         }
 
         private ReloadRegistration() {

@@ -1,25 +1,42 @@
 package com.hooya.stabilizedturret.client;
 
+import com.hooya.stabilizedturret.network.TargetLockTelemetry;
+
 import com.hooya.stabilizedturret.StabilizedTurret;
 import com.hooya.stabilizedturret.client.compat.VoxyLodRaycaster;
+import com.hooya.stabilizedturret.client.compat.VoxyLodView;
+import com.hooya.stabilizedturret.content.controller.AimRayLimits;
+import com.hooya.stabilizedturret.content.controller.ElectroOpticalPodCompat;
+import com.hooya.stabilizedturret.content.controller.CannonSightDirection;
+import com.hooya.stabilizedturret.content.controller.OpticalLockAimGeometry;
+import com.hooya.stabilizedturret.content.controller.MianbaoRocketPodCompat;
+import com.hooya.stabilizedturret.content.controller.ScopePreset;
 import com.hooya.stabilizedturret.mixin.client.GameRendererAccessor;
+import com.hooya.stabilizedturret.mixin.client.RenderChunkRegionAccessor;
 import com.hooya.stabilizedturret.network.AimDirectionPayload;
+import com.hooya.stabilizedturret.network.AimGroupSessionPayload;
 import com.hooya.stabilizedturret.network.AimSessionPayload;
+import com.hooya.stabilizedturret.network.RemoteInputStatePayload.RangeSample;
+import org.jetbrains.annotations.Nullable;
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
 import dev.ryanhcode.sable.mixinhelpers.camera.new_camera_types.SableCameraTypes;
-import dev.ryanhcode.sable.mixinterface.clip_overwrite.ClipContextExtension;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
+import net.minecraft.client.PrioritizeChunkUpdates;
+import net.minecraft.client.renderer.chunk.RenderRegionCache;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.AABB;
@@ -27,38 +44,49 @@ import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.WeakHashMap;
 
 @EventBusSubscriber(modid = StabilizedTurret.MOD_ID, value = Dist.CLIENT)
 public final class ClientAimState {
-    private static final double AIM_RAY_DISTANCE = 4096.0;
-    /** Matches Voxy's 16 * 3000 far projection instead of vanilla chunk range. */
-    private static final double VOXY_AIM_RAY_DISTANCE = 48_000.0;
-    private static final double SCOPED_CANNON_FALLBACK_DISTANCE_SQR = 64.0 * 64.0;
-    private static final String CBC_CANNON_ENTITY_CLASS =
-            "rbasamoyai.createbigcannons.cannon_control.contraption.PitchOrientedContraptionEntity";
-    private static final String CBC_CANNON_CONTRAPTION_CLASS =
-            "rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption";
+    private static final double AIM_RAY_DISTANCE = AimRayLimits.LOADED_DISTANCE;
+    /**
+     * A missed cannon ray represents a direction, not a finite impact point.
+     * Projecting its 4096-block endpoint leaves visible camera/muzzle
+     * parallax, so place only the display point effectively at infinity.
+     */
+    private static final double CANNON_DIRECTION_MARKER_DISTANCE = 1_000_000.0;
     private static final PodAimController POD_AIM = new PodAimController();
+    private static final PodRenderVisibility POD_RENDER_VISIBILITY = new PodRenderVisibility();
     private static boolean active;
     private static boolean remoteControl;
+    private static boolean seatedAtBoundController;
     private static boolean headAim;
+    private static boolean freeLookHeld;
     private static boolean aircraftEquipment;
     private static boolean scoped;
+    private static ScopePreset scopePreset = ScopePreset.DEFAULT;
     private static boolean podView;
     private static boolean thermal;
+    private static final RadarLockCameraTracker RADAR_CAMERA_TRACKER = new RadarLockCameraTracker();
+    private static final LockCameraAcquisitionMemory OPTICAL_CAMERA_ACQUISITIONS = new LockCameraAcquisitionMemory();
+    private static int opticalTrackingView = Integer.MIN_VALUE;
+    private static long lastLockTrackingFrameNanos;
     private static boolean opticalLockActive;
     private static boolean opticalLockSearching;
     private static boolean opticalLockObscured;
@@ -69,11 +97,16 @@ public final class ClientAimState {
     private static Vec3 previousOpticalCameraOrigin = Vec3.ZERO;
     private static AABB opticalLockBounds;
     private static AABB previousOpticalLockBounds;
+    private static TargetLockTelemetry opticalLockTelemetry = TargetLockTelemetry.UNAVAILABLE;
+    private static TargetLockTelemetry airToGroundLockTelemetry = TargetLockTelemetry.UNAVAILABLE;
     private static boolean opticalLockTargetKnown;
     private static boolean airToGroundLockSearching;
     private static boolean airToGroundLockActive;
     private static AABB airToGroundLockBounds;
     private static AABB previousAirToGroundLockBounds;
+    private static boolean rocketImpactAvailable;
+    private static Vec3 rocketImpactPoint = Vec3.ZERO;
+    private static Vec3 previousRocketImpactPoint = Vec3.ZERO;
     private static boolean wasLockingFirstPerson;
     private static boolean scopeCameraCaptured;
     private static CameraType cameraBeforeScope = CameraType.FIRST_PERSON;
@@ -82,20 +115,57 @@ public final class ClientAimState {
     private static double viewAimOffsetX;
     private static double viewAimOffsetY;
     private static boolean cannonAimAvailable;
+    private static boolean groupAimOwnsMarker;
+    private static boolean directionalGroupMarkers;
+    private static Vec3 cannonAimDirection = Vec3.ZERO;
+    private static Vec3 groupPrimaryAimPoint;
+    private static List<Integer> cannonAimGroupIndices = List.of();
+    private static List<Boolean> cannonAimGroupBallistics = List.of();
     private static Vec3 cannonAimPoint = Vec3.ZERO;
     private static Vec3 previousCannonAimPoint = Vec3.ZERO;
-    private static int cannonAimInterpolationTicks = 2;
-    private static int cannonEntityId = -1;
-    private static UUID cannonEntityUuid;
-    private static UUID cannonSubLevelId;
-    private static UUID pitchSubLevelId;
+    private static List<Vec3> cannonAimGroupPoints = List.of();
+    private static List<Vec3> previousCannonAimGroupPoints = List.of();
+    private static List<AimGroupSessionPayload.GroupAim> renderAimGroups = List.of();
+    private static long lastFiniteMarkerDiagnosticTick = Long.MIN_VALUE;
+    private record ThirdPersonCameraFrame(Level level, UUID playerId, CameraType cameraType,
+                                          UUID bodyId, Vec3 origin, Vec3 localOrigin,
+                                          Vec3 worldOffset, float partialTick, long tick) {}
+    private static ThirdPersonCameraFrame thirdPersonAimCamera;
+    private static final Map<UUID,List<AimGroupSessionPayload.BodyMotion>> renderMotionHistory=new java.util.LinkedHashMap<>();
+    private record MarkerProfile(double speed,boolean ballistic,double gravity,double drag,boolean quadratic,int ticks) {}
+    private record MarkerFace(CannonMarkerSurface surface, UUID bodyId) {
+        CannonMarkerSurface rendered(Level level, float partialTick) {
+            if (bodyId == null) return surface;
+            SubLevel body = SubLevelContainer.getContainer(level).getSubLevel(bodyId);
+            if (!(body instanceof ClientSubLevel client) || body.isRemoved()) return null;
+            var pose = client.renderPose(partialTick);
+            Vector3d normal = pose.transformNormal(new Vector3d(surface.normal().x, surface.normal().y, surface.normal().z));
+            return new CannonMarkerSurface(pose.transformPosition(surface.point()),
+                    new Vec3(normal.x, normal.y, normal.z).normalize());
+        }
+    }
+    private record MarkerContact(long tick,MarkerProfile profile,Vec3 point,MarkerFace face,
+                                 VoxyLodRaycaster.RayHit lodHit) {}
+    private static final Map<SightSource,MarkerContact> renderMarkerContacts=new java.util.LinkedHashMap<>();
+    // Local geometry at plot coordinates can jitter by a few floating-point bits.
+    // Keep display history per physical cannon rather than per exact vector sample.
+    private record SightSource(UUID bodyId,long x,long y,long z) {
+        static SightSource of(AimGroupSessionPayload.MuzzleFrame frame) {
+            Vec3 origin=frame.localOrigin();
+            return new SightSource(frame.bodyId(),Math.round(origin.x*16),
+                    Math.round(origin.y*16),Math.round(origin.z*16));
+        }
+    }
+    private static final Map<SightSource,CannonSightDirection.History> renderSightTracking=new java.util.LinkedHashMap<>();
+    private static long markerSweepCount,markerSweepNanos,markerSweepMaxNanos;
+    private static net.minecraft.world.level.Level ignoredStructureLevel;
+    private static long ignoredStructureTick=Long.MIN_VALUE;
+    private static UUID ignoredStructurePlayer;
+    private static Set<UUID> ignoredStructureIds=Set.of();
+    private static Set<SubLevel> ignoredStructureCache=Set.of();
     private static BlockPos cannonMountPos;
     private static UUID cannonMountSubLevelId;
-    private static final Set<UUID> SCOPE_CANNON_DIAGNOSTICS = new HashSet<>();
-    private static final Set<UUID> SCOPE_SUBLEVEL_DIAGNOSTICS = new HashSet<>();
-    private static final Map<net.minecraft.world.entity.Entity, Boolean> THERMAL_GLOW_STATES =
-            new WeakHashMap<>();
-
+    private static Set<UUID> cameraIgnoredSubLevelIds = Set.of();
     private static Vec3 scopePosition = Vec3.ZERO;
     private static Vec3 previousScopePosition = Vec3.ZERO;
     private static boolean scopePoseRelative;
@@ -114,55 +184,126 @@ public final class ClientAimState {
     private static float trackedRenderFromYaw;
     private static float trackedRenderFromPitch;
     private static boolean trackedRenderInterpolation;
+    /** Matches the proven mouse-flight camera response from thread 019feae4. */
+    private static final double THIRD_PERSON_CAMERA_FOLLOW_RESPONSE_PER_SECOND = 8.0;
+    private static float thirdPersonCameraYaw;
+    private static float thirdPersonCameraPitch;
+    private static long lastThirdPersonCameraFollowNanos;
+    private static boolean thirdPersonCameraFollowActive;
+    private static boolean thirdPersonCameraFollowInitialized;
+    private static boolean restoringThirdPersonScopeExit;
+    private static final Quaternionf freeLookCurrentRotation = new Quaternionf();
+    private static final Quaternionf freeLookTargetRotation = new Quaternionf();
+    private static final Quaternionf lastBaseCameraRotation = new Quaternionf();
+    private static boolean freeLookCameraActive;
+    private static boolean freeLookStartPending;
+    private static boolean lastBaseCameraRotationValid;
+    private static long lastFreeLookCameraNanos;
+    private static float freeLookCameraYaw;
+    private static float freeLookCameraPitch;
+    private static float freeLookCameraRoll;
+    private static Vec3 freeLookFrozenAimDirection;
     private static double lastAimDistance;
     private static double displayedScopeZoom = Double.NaN;
     private static double displayedPodZoom = Double.NaN;
     private static long lastZoomUpdateNanos;
+
+    @SubscribeEvent
+    public static void onClientLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
+        resetConnectionView();
+    }
+
+    @SubscribeEvent
+    public static void onClientLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        resetConnectionView();
+    }
+
+    private static void resetConnectionView() {
+        resetConnectionView(true);
+    }
+
+    private static void resetConnectionView(boolean resetAcquisitions) {
+        ClientScopeOrientation.clear();
+        ScopeAmmoHud.clear();
+        VirtualScopeVisibility.clear();
+        ClientBombSight.clear();
+        ClientCannonLockLead.clear();
+        if (resetAcquisitions) {
+            RADAR_CAMERA_TRACKER.reset();
+            OPTICAL_CAMERA_ACQUISITIONS.clear();
+        } else RADAR_CAMERA_TRACKER.suspend();
+        opticalTrackingView = Integer.MIN_VALUE;
+        lastLockTrackingFrameNanos = 0;
+        Minecraft minecraft = Minecraft.getInstance();
+        podView = false;
+        updatePodRenderVisibility(minecraft);
+        restoreCameraAfterPod(minecraft);
+        // Clear scope FOV before restoring an offset third-person camera.
+        scoped = false;
+        scopePreset = ScopePreset.DEFAULT;
+        restoreCameraAfterScope(minecraft);
+        active = false;
+        remoteControl = false;
+        seatedAtBoundController = false;
+        headAim = false;
+        freeLookHeld = false;
+        resetFreeLookCamera();
+        lastBaseCameraRotationValid = false;
+        aircraftEquipment = false;
+        cannonMountPos = null;
+        cannonMountSubLevelId = null;
+        cameraIgnoredSubLevelIds = Set.of();
+        cannonAimAvailable = false;
+        groupAimOwnsMarker = false;
+        directionalGroupMarkers = false;
+        cannonAimDirection = Vec3.ZERO;
+        groupPrimaryAimPoint = null;
+        cannonAimGroupIndices = List.of();
+        cannonAimGroupBallistics = List.of();
+        cannonAimGroupPoints = List.of();
+        previousCannonAimGroupPoints = List.of();
+        renderAimGroups = List.of();
+        lastFiniteMarkerDiagnosticTick = Long.MIN_VALUE;
+        thirdPersonAimCamera=null;
+        renderMotionHistory.clear();
+        renderMarkerContacts.clear();
+        renderSightTracking.clear();
+        markerSweepCount=markerSweepNanos=markerSweepMaxNanos=0;
+        ignoredStructureLevel=null;
+        ignoredStructureTick=Long.MIN_VALUE;
+        ignoredStructurePlayer=null;
+        ignoredStructureIds=Set.of();
+        ignoredStructureCache=Set.of();
+        ClientSableMotionHistory.clear();
+        scopePoseRelative = false;
+        pendingThirdPersonScopeExitTarget = null;
+        opticalLockActive = false;
+        opticalLockTelemetry = TargetLockTelemetry.UNAVAILABLE;
+        airToGroundLockTelemetry = TargetLockTelemetry.UNAVAILABLE;
+        opticalLockSearching = false;
+        opticalLockObscured = false;
+        opticalLockObscuredSinceNanos = Long.MIN_VALUE;
+        opticalLockBounds = null;
+        airToGroundLockSearching = false;
+        airToGroundLockActive = false;
+        airToGroundLockBounds = null;
+        previousAirToGroundLockBounds = null;
+        rocketImpactAvailable = false;
+        rocketImpactPoint = Vec3.ZERO;
+        previousRocketImpactPoint = Vec3.ZERO;
+        opticalLockTargetKnown = false;
+        wasLockingFirstPerson = false;
+        resetThirdPersonCameraFollow();
+        POD_AIM.end();
+        setThermal(false);
+    }
 
     public static void accept(AimSessionPayload payload) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
 
         if (!payload.active()) {
-            if (podView) {
-                podView = false;
-                restoreCameraAfterPod(minecraft);
-            }
-            // Scope FOV and the forced first-person camera must no longer be
-            // active while restoring an offset third-person view. Otherwise
-            // the inverse offset is solved with the magnified FOV and makes
-            // the raw screen centre, rather than the configured reticle, keep
-            // the last scoped aim point.
-            scoped = false;
-            restoreCameraAfterScope(minecraft);
-            active = false;
-            remoteControl = false;
-            headAim = false;
-            aircraftEquipment = false;
-            cannonEntityId = -1;
-            cannonEntityUuid = null;
-            cannonSubLevelId = null;
-            pitchSubLevelId = null;
-            cannonMountPos = null;
-            cannonMountSubLevelId = null;
-            cannonAimAvailable = false;
-            scopePoseRelative = false;
-            pendingThirdPersonScopeExitTarget = null;
-            opticalLockActive = false;
-            opticalLockSearching = false;
-            opticalLockObscured = false;
-            opticalLockObscuredSinceNanos = Long.MIN_VALUE;
-            opticalLockBounds = null;
-            airToGroundLockSearching = false;
-            airToGroundLockActive = false;
-            airToGroundLockBounds = null;
-            previousAirToGroundLockBounds = null;
-            opticalLockTargetKnown = false;
-            SCOPE_CANNON_DIAGNOSTICS.clear();
-            SCOPE_SUBLEVEL_DIAGNOSTICS.clear();
-            wasLockingFirstPerson = false;
-            POD_AIM.end();
-            setThermal(false);
+            resetConnectionView(false);
             return;
         }
 
@@ -173,31 +314,56 @@ public final class ClientAimState {
         }
         active = true;
         remoteControl = payload.remoteControl();
+        seatedAtBoundController = payload.seatedAtBoundController();
         headAim = payload.headAim();
+        boolean nextFreeLookHeld = payload.freeLookHeld();
+        if (!freeLookHeld && nextFreeLookHeld) {
+            freeLookStartPending = true;
+            captureFreeLookAimDirection(minecraft, player);
+        } else if (freeLookHeld && !nextFreeLookHeld) {
+            freeLookFrozenAimDirection = null;
+        }
+        freeLookHeld = nextFreeLookHeld;
         aircraftEquipment = payload.aircraftEquipment();
+        scopePreset = ScopePreset.fromNetworkId(payload.scopePreset());
+        if (!payload.scoped() || payload.podView()) {
+            ClientScopeOrientation.clear();
+            ScopeAmmoHud.clear();
+        }
         previousScopePosition = scopePosition;
         scopePosition = new Vec3(payload.scopeX(), payload.scopeY(), payload.scopeZ());
         scopePoseRelative = payload.scopePoseRelative();
-        cannonEntityId = payload.cannonEntityId();
-        cannonEntityUuid = payload.cannonEntityUuid();
-        cannonSubLevelId = payload.cannonSubLevelId();
-        pitchSubLevelId = payload.pitchSubLevelId();
         cannonMountPos = payload.cannonMountPos();
         cannonMountSubLevelId = payload.cannonMountSubLevelId();
-        cannonAimAvailable = payload.cannonAimAvailable();
-        previousCannonAimPoint = cannonAimPoint;
-        Vec3 rawCannonAimPoint = new Vec3(payload.cannonAimX(), payload.cannonAimY(), payload.cannonAimZ());
-        Vec3 cannonOrigin = new Vec3(payload.cannonOriginX(), payload.cannonOriginY(), payload.cannonOriginZ());
-        cannonAimPoint = cannonAimAvailable && player != null
-                ? clipCannonRay(minecraft, player, cannonOrigin, rawCannonAimPoint)
-                : rawCannonAimPoint;
-        cannonAimInterpolationTicks = 0;
+        cameraIgnoredSubLevelIds = Set.copyOf(payload.cameraIgnoredSubLevelIds());
+        VirtualScopeVisibility.update(payload.scoped() && !payload.podView(),
+                payload.virtualScopeHiddenSubLevels(), payload.virtualScopeHiddenEntities());
+        boolean virtualScope = payload.scoped() && !payload.podView()
+                && (!payload.virtualScopeHiddenSubLevels().isEmpty() || !payload.virtualScopeHiddenEntities().isEmpty());
+        if (!groupAimOwnsMarker) {
+            boolean hadCannonAimPoint = cannonAimAvailable;
+            cannonAimAvailable = payload.cannonAimAvailable();
+            Vec3 rawCannonAimPoint = new Vec3(payload.cannonAimX(), payload.cannonAimY(), payload.cannonAimZ());
+            Vec3 cannonOrigin = new Vec3(payload.cannonOriginX(), payload.cannonOriginY(), payload.cannonOriginZ());
+            cannonAimDirection = rawCannonAimPoint.subtract(cannonOrigin).normalize();
+            Vec3 nextCannonAimPoint = rawCannonAimPoint;
+            if (virtualScope && cannonAimAvailable) {
+                nextCannonAimPoint = directionalScopeMarker(cannonAimDirection, 1.0F);
+            } else if (cannonAimAvailable && player != null) {
+                nextCannonAimPoint = clipCannonRay(
+                        minecraft, player, cannonOrigin, rawCannonAimPoint);
+            }
+            previousCannonAimPoint = hadCannonAimPoint && cannonAimAvailable
+                    ? cannonAimPoint : nextCannonAimPoint;
+            cannonAimPoint = nextCannonAimPoint;
+        }
         boolean wasOpticalLockActive = opticalLockActive;
         previousOpticalLockDisplayTarget = opticalLockTarget;
-        previousOpticalLockTarget = opticalLockTarget;
         previousOpticalLockBounds = opticalLockBounds;
         boolean wasOpticalLockObscured = opticalLockObscured;
         opticalLockActive = payload.opticalLockActive();
+        opticalLockTelemetry = payload.opticalLockTelemetry();
+        airToGroundLockTelemetry = payload.airToGroundLockTelemetry();
         opticalLockSearching = payload.opticalLockSearching();
         opticalLockObscured = payload.opticalLockObscured();
         if (opticalLockActive && opticalLockObscured) {
@@ -235,13 +401,39 @@ public final class ClientAimState {
                 payload.airToGroundLockMaxZ()
         )
                 : null;
+        Vec3 nextRocketImpact = new Vec3(
+                payload.rocketImpactX(), payload.rocketImpactY(), payload.rocketImpactZ());
+        boolean nextRocketImpactAvailable = payload.rocketImpactAvailable();
+        if (!nextRocketImpactAvailable && payload.rocketTrajectoryAvailable()
+                && minecraft.level != null) {
+            Vec3 lodImpact = VoxyLodRaycaster.clipBallistic(
+                    minecraft.level,
+                    new Vec3(payload.rocketOriginX(), payload.rocketOriginY(),
+                            payload.rocketOriginZ()),
+                    new Vec3(payload.rocketVelocityX(), payload.rocketVelocityY(),
+                            payload.rocketVelocityZ()),
+                    MianbaoRocketPodCompat.LIFETIME_TICKS,
+                    0,
+                    payload.rocketFirstDrag(),
+                    payload.rocketFlightDrop(),
+                    payload.rocketFirstGravity()
+            );
+            if (lodImpact != null) {
+                nextRocketImpact = lodImpact;
+                nextRocketImpactAvailable = true;
+            }
+        }
+        previousRocketImpactPoint = rocketImpactAvailable
+                ? rocketImpactPoint : nextRocketImpact;
+        rocketImpactAvailable = nextRocketImpactAvailable;
+        rocketImpactPoint = rocketImpactAvailable ? nextRocketImpact : Vec3.ZERO;
+        if (!rocketImpactAvailable) previousRocketImpactPoint = Vec3.ZERO;
         if (opticalLockActive && !wasOpticalLockActive && player != null) {
-            aimReticleAt(minecraft, player, opticalLockTarget);
             previousOpticalLockTarget = opticalLockTarget;
             previousOpticalLockDisplayTarget = opticalLockTarget;
             previousOpticalLockBounds = opticalLockBounds;
             previousOpticalCameraOrigin = opticalTrackingOrigin(minecraft);
-            opticalLockTargetKnown = true;
+            opticalLockTargetKnown = false;
         } else if (!opticalLockActive) {
             opticalLockTargetKnown = false;
         }
@@ -266,8 +458,6 @@ public final class ClientAimState {
                         ? opticToImpact
                         : scopeEntryDirection(minecraft));
             }
-            SCOPE_CANNON_DIAGNOSTICS.clear();
-            SCOPE_SUBLEVEL_DIAGNOSTICS.clear();
         }
         if (scoped && !nextScoped) {
             if (player != null) {
@@ -293,20 +483,47 @@ public final class ClientAimState {
         }
         scoped = nextScoped;
         podView = nextPodView;
+        updatePodRenderVisibility(minecraft);
         setThermal(payload.thermal());
+    }
+
+    private static void updatePodRenderVisibility(Minecraft minecraft) {
+        POD_RENDER_VISIBILITY.update(isPodView() ? cannonMountPos : null, cannonMountSubLevelId,
+                pod -> refreshPodRenderData(minecraft, pod.pos(), pod.subLevelId()));
+    }
+
+    private static void refreshPodRenderData(Minecraft minecraft, BlockPos podPos, UUID subLevelId) {
+        if (minecraft.level == null || podPos == null) return;
+        if (subLevelId == null) {
+            // World-mounted pods use vanilla/Sodium sections rather than
+            // Sable render data. Include edge neighbors just like a block update.
+            minecraft.levelRenderer.setBlocksDirty(
+                    podPos.getX() - 1, podPos.getY() - 1, podPos.getZ() - 1,
+                    podPos.getX() + 1, podPos.getY() + 1, podPos.getZ() + 1);
+            return;
+        }
+        SubLevel subLevel = SubLevelContainer.getContainer(minecraft.level).getSubLevel(subLevelId);
+        if (!(subLevel instanceof ClientSubLevel clientSubLevel) || subLevel.isRemoved()) return;
+        SectionPos section = SectionPos.of(podPos);
+        clientSubLevel.getRenderData().setDirty(section.x(), section.y(), section.z(), true);
+        clientSubLevel.getRenderData().compileSections(
+                PrioritizeChunkUpdates.NEARBY,
+                new RenderRegionCache(),
+                minecraft.gameRenderer.getMainCamera()
+        );
     }
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
+        if (ClientWeaponViewState.isActive()) return;
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
         if (!active || player == null || minecraft.level == null) {
+            RADAR_CAMERA_TRACKER.suspend();
             return;
         }
 
         trackedRenderInterpolation = false;
-        cannonAimInterpolationTicks = Math.min(2, cannonAimInterpolationTicks + 1);
-
         if (scoped || podView) {
             // Individual HUD layers are filtered by ScopeHudRenderer. Keep
             // vanilla GUI rendering enabled so the requested hotbar can pass.
@@ -314,19 +531,33 @@ public final class ClientAimState {
         }
 
         boolean lockFirstPerson = shouldLockFirstPerson();
+        boolean followThirdPerson = shouldUseHeadAimThirdPersonFollow();
+        if (followThirdPerson && !thirdPersonCameraFollowActive) {
+            initializeThirdPersonCameraFollow(
+                    minecraft,
+                    player.getYRot(),
+                    player.getXRot()
+            );
+        } else if (!followThirdPerson && thirdPersonCameraFollowActive) {
+            resetThirdPersonCameraFollow();
+        }
+        thirdPersonCameraFollowActive = followThirdPerson;
         if (lockFirstPerson && !wasLockingFirstPerson) {
-            captureStableWorldLook(lastObservedWorldLook);
+            captureStableWorldLook(!headAim && isGroundRadarCameraTracking()
+                    ? new Vec3(minecraft.gameRenderer.getMainCamera().getLookVector()) : lastObservedWorldLook);
         }
         if (lockFirstPerson) {
             applyStableWorldLook(player);
             lastObservedWorldLook = directionFromStableAngles();
+        } else if (followThirdPerson && thirdPersonCameraFollowInitialized) {
+            lastObservedWorldLook = directionFromAngles(
+                    thirdPersonCameraYaw, thirdPersonCameraPitch);
         } else {
             // Sable's unlocked physical-structure view already exposes a
             // world-space vector and remains the sole owner of that mode.
             lastObservedWorldLook = player.getLookAngle().normalize();
         }
         wasLockingFirstPerson = lockFirstPerson;
-        followOpticalLockMotion(minecraft, player);
 
         if (podView) {
             // The pod controller is the sole writer of attitude and target.
@@ -335,13 +566,18 @@ public final class ClientAimState {
             POD_AIM.stabilize(getPodInputOrigin(minecraft));
         }
 
-        if (headAim || podView || opticalLockActive || opticalLockSearching) {
-            AimRay ray = getScreenCenterRay(minecraft, player);
+        if (!ClientTelevisionGuidanceState.isActive()
+                && (headAim || podView || opticalLockActive || opticalLockSearching)) {
+            AimRay ray = freeLookHeld && freeLookFrozenAimDirection != null
+                    && !podView && !opticalLockActive && !opticalLockSearching
+                    ? freeLookDirectionRay(minecraft, player)
+                    : getScreenCenterRay(minecraft, player);
             SubLevelAimHit subLevelHit = resolveSubLevelAimHit(minecraft, player, ray);
             OpticalFrameAngles opticalFrame = opticalFrameAngles(minecraft);
             Vec3 transmittedTarget = podView && POD_AIM.hasTarget()
                     ? POD_AIM.target()
                     : ray.target;
+            Vec3 lockReference = opticalLockActive ? getOpticalLockDisplayPoint(1.0F) : Vec3.ZERO;
             PacketDistributor.sendToServer(new AimDirectionPayload(
                     ray.origin.x, ray.origin.y, ray.origin.z,
                     ray.direction.x, ray.direction.y, ray.direction.z,
@@ -354,12 +590,121 @@ public final class ClientAimState {
                     opticalFrame.halfTanX(),
                     opticalFrame.halfTanY(),
                     opticalLockActive,
-                    opticalLockActive ? opticalLockTarget.x : 0.0,
-                    opticalLockActive ? opticalLockTarget.y : 0.0,
-                    opticalLockActive ? opticalLockTarget.z : 0.0
+                    lockReference.x,
+                    lockReference.y,
+                    lockReference.z,
+                    movingCameraFrame(minecraft,player,ray)
             ));
         }
-        updateThermalHighlights(minecraft, player);
+    }
+
+    public static @Nullable RangeSample captureLaserRangeSample() {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!active || !headAim || podView || minecraft.player == null || minecraft.level == null
+                || minecraft.screen != null || ClientTelevisionGuidanceState.isActive()) return null;
+        AimRay ray = VoxyLodRaycaster.withDiagnostics("rangefinder", () ->
+                getScreenCenterRay(minecraft, minecraft.player));
+        StabilizedTurret.LOGGER.info("Laser rangefinder input snapshot: scoped={} source={} hit={} range={} origin={} direction={}",
+                scoped, !ray.hit ? "miss" : ray.rawResult == null ? "lod" : "loaded",
+                ray.hit, ray.origin.distanceTo(ray.target), ray.origin, ray.direction);
+        return RangeSample.tryCreate(
+                ray.origin(), ray.direction(), ray.target(), ray.hit());
+    }
+
+    /**
+     * Last-line camera-type guard for mods that mutate Options directly
+     * instead of using Minecraft's normal perspective-cycle call site.
+     */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void enforceBoundSeatCameraType(ClientTickEvent.Post event) {
+        if (!isSeatedAtBoundController()) return;
+        Minecraft minecraft = Minecraft.getInstance();
+        CameraType current = minecraft.options.getCameraType();
+        if (isOpticalView()) {
+            if (current != CameraType.FIRST_PERSON) {
+                minecraft.options.setCameraType(CameraType.FIRST_PERSON);
+            }
+            return;
+        }
+        if (isAllowedCameraType(current)) return;
+        minecraft.options.setCameraType(
+                current == CameraType.THIRD_PERSON_BACK
+                        || current == SableCameraTypes.SUB_LEVEL_VIEW
+                        ? SableCameraTypes.SUB_LEVEL_VIEW_UNLOCKED
+                        : CameraType.FIRST_PERSON
+        );
+    }
+
+    /**
+     * Advances the independent third-person camera exactly once per rendered
+     * frame. Camera.setup is not a frame callback: the main renderer and
+     * compatibility renderers may invoke it more than once before presenting
+     * one frame. Advancing the follower from there made those callers apply
+     * several tiny horizontal corrections to the same visible frame.
+     */
+    @SubscribeEvent
+    public static void onRenderFramePre(RenderFrameEvent.Pre event) {
+        if (ClientWeaponViewState.isActive()) return;
+        advanceFreeLookCameraFrame();
+        Minecraft minecraft = Minecraft.getInstance();
+        LocalPlayer player = minecraft.player;
+        long now = System.nanoTime();
+        double elapsed = lastLockTrackingFrameNanos == 0 ? 0
+                : Math.clamp((now - lastLockTrackingFrameNanos) / 1_000_000_000.0, 0, .1);
+        lastLockTrackingFrameNanos = now;
+        ClientCannonLockLead.beginFrame();
+        if (!active || player == null || minecraft.level == null || minecraft.isPaused() || minecraft.screen != null) {
+            opticalLockTargetKnown = false;
+            RADAR_CAMERA_TRACKER.suspend();
+            return;
+        }
+        if (shouldUseHeadAimThirdPersonFollow() && !thirdPersonCameraFollowInitialized) {
+            initializeThirdPersonCameraFollow(minecraft, player.getYRot(), player.getXRot());
+        }
+        if (!headAim && !scoped && isGroundRadarCameraTracking()
+                && minecraft.options.getCameraType() == CameraType.FIRST_PERSON && !wasLockingFirstPerson) {
+            captureStableWorldLook(new Vec3(minecraft.gameRenderer.getMainCamera().getLookVector()));
+            applyStableWorldLook(player);
+            wasLockingFirstPerson = true;
+        }
+        followOpticalLockMotion(minecraft, player);
+        followGroundRadarLockMotion(minecraft, player, elapsed);
+        if (!shouldUseHeadAimThirdPersonFollow()) {
+            return;
+        }
+        updateHeadAimThirdPersonCamera(
+                player,
+                player.getYRot(),
+                player.getXRot()
+        );
+    }
+
+    /** Captures the final shared camera base, then composes our active layer. */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onComputeCameraAngles(ViewportEvent.ComputeCameraAngles event) {
+        if (isFreeLookCameraOverriding()) {
+            recordFreeLookBaseCameraAngles(
+                    event.getYaw(), event.getPitch(), event.getRoll());
+            // Only win camera ownership while free look is visibly active.
+            // The base orientation was already composed from other camera
+            // controllers, and control is released after the smooth return.
+            event.setYaw(freeLookCameraYaw);
+            event.setPitch(freeLookCameraPitch);
+            event.setRoll(freeLookCameraRoll);
+            return;
+        }
+        if (!shouldUseHeadAimThirdPersonFollow()
+                || !thirdPersonCameraFollowInitialized) {
+            return;
+        }
+        event.setYaw(thirdPersonCameraYaw);
+        event.setPitch(thirdPersonCameraPitch);
+        event.setRoll(0.0F);
+
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player != null) {
+            alignPlayerView(player, thirdPersonCameraYaw, thirdPersonCameraPitch);
+        }
     }
 
     @SubscribeEvent
@@ -377,24 +722,101 @@ public final class ClientAimState {
     }
 
     private static AimRay getScreenCenterRay(Minecraft minecraft, LocalPlayer player) {
+        AimRay ray = getUnclippedAimRay(minecraft, player);
+        return clipAimRay(minecraft, player, ray.origin(), ray.direction(), headAim && !podView);
+    }
+
+    /** Camera tracking needs only the sight ray; avoid a second full terrain/LOD raycast each tick. */
+    private static AimRay getUnclippedAimRay(Minecraft minecraft, LocalPlayer player) {
         net.minecraft.client.Camera camera = minecraft.gameRenderer.getMainCamera();
         boolean firstPerson = minecraft.options.getCameraType() == CameraType.FIRST_PERSON;
+        ThirdPersonCameraFrame thirdPersonFrame = thirdPersonCameraFrame(minecraft,player);
         Vec3 start = firstPerson && !scoped && !podView
                 ? Sable.HELPER.getEyePositionInterpolated(player, 1.0F)
-                : camera.getPosition();
+                : thirdPersonFrame == null ? camera.getPosition() : thirdPersonFrame.origin();
         Vec3 direction;
         if (podView) {
             direction = POD_AIM.stabilize(start);
         } else if (firstPerson && shouldLockFirstPerson()) {
             direction = directionFromStableAngles();
+        } else if (shouldUseHeadAimThirdPersonFollow()) {
+            // In independent third-person head aim the stable angles belong to
+            // the mouse target, not the camera that is still catching up.
+            direction = directionFromStableAngles();
         } else {
             Vector3f cameraForward = camera.getLookVector();
             direction = new Vec3(cameraForward.x, cameraForward.y, cameraForward.z).normalize();
         }
-        if (!firstPerson && !scoped) {
+        if (!firstPerson && !scoped && !shouldUseHeadAimThirdPersonFollow()) {
             direction = applyViewAimOffset(minecraft, camera, direction);
         }
-        return clipAimRay(minecraft, player, start, direction, false);
+        return new AimRay(start, direction, start.add(direction.scale(AIM_RAY_DISTANCE)), false, null, null);
+    }
+
+    /** Freeze the final camera and its physical anchor together, before another client tick moves the body. */
+    public static void captureThirdPersonAimCamera(net.minecraft.client.Camera camera, Entity cameraEntity,
+                                                   float partialTick) {
+        Minecraft minecraft=Minecraft.getInstance();
+        if (camera!=minecraft.gameRenderer.getMainCamera() || cameraEntity!=minecraft.player) return;
+        thirdPersonAimCamera=null;
+        if (!active || isOpticalView() || minecraft.level==null
+                || minecraft.options.getCameraType()==CameraType.FIRST_PERSON) return;
+        SubLevel body=Sable.HELPER.getTrackingOrVehicleSubLevel(cameraEntity);
+        if (!(body instanceof ClientSubLevel client) || body.isRemoved()) return;
+        // Sable's unlocked orbit starts at the structure COM, which can be hundreds
+        // of blocks from the seat. Transport the camera through the actual rider
+        // eye instead; the offset includes both COM-to-seat displacement and zoom.
+        Vec3 anchor=Sable.HELPER.getEyePositionInterpolated(cameraEntity,partialTick);
+        Vec3 origin=camera.getPosition();
+        Vector3d local=client.renderPose(partialTick)
+                .transformPositionInverse(new Vector3d(anchor.x,anchor.y,anchor.z));
+        Vec3 offset=origin.subtract(anchor);
+        if (!local.isFinite() || !isFinite(origin) || !isFinite(offset)) return;
+        thirdPersonAimCamera=new ThirdPersonCameraFrame(minecraft.level,cameraEntity.getUUID(),
+                minecraft.options.getCameraType(),body.getUniqueId(),origin,new Vec3(local.x,local.y,local.z),
+                offset,partialTick,minecraft.level.getGameTime());
+    }
+
+    private static ThirdPersonCameraFrame thirdPersonCameraFrame(Minecraft minecraft,LocalPlayer player) {
+        ThirdPersonCameraFrame frame=thirdPersonAimCamera;
+        if (frame==null || player==null || isOpticalView() || minecraft.level!=frame.level()
+                || !player.getUUID().equals(frame.playerId()) || minecraft.options.getCameraType()!=frame.cameraType())
+            return null;
+        long age=minecraft.level.getGameTime()-frame.tick();
+        return age>=0 && age<=2 ? frame : null;
+    }
+
+    private static AimDirectionPayload.CameraFrame movingCameraFrame(Minecraft minecraft,
+                                                                      LocalPlayer player,AimRay ray) {
+        if (podView) return null;
+        Vec3 surfaceNormal=ray.surfaceNormal==null?new Vec3(0,1,0):ray.surfaceNormal;
+        SubLevel body = scoped && scopePoseRelative && cannonMountSubLevelId != null
+                ? SubLevelContainer.getContainer(minecraft.level).getSubLevel(cannonMountSubLevelId)
+                : Sable.HELPER.getTrackingOrVehicleSubLevel(player);
+        if (!(body instanceof ClientSubLevel client) || body.isRemoved()) return null;
+        boolean firstPerson=minecraft.options.getCameraType()==CameraType.FIRST_PERSON;
+        if (!firstPerson && !scoped) {
+            ThirdPersonCameraFrame frame=thirdPersonCameraFrame(minecraft,player);
+            if (frame!=null && body.getUniqueId().equals(frame.bodyId())
+                    && frame.origin().distanceToSqr(ray.origin)<=1e-12
+                    && com.hooya.stabilizedturret.network.AimCameraGeometry.validOffset(frame.worldOffset()))
+                return new AimDirectionPayload.CameraFrame(frame.bodyId(),frame.localOrigin(),
+                        surfaceNormal,frame.worldOffset());
+        }
+        Vec3 worldOffset=Vec3.ZERO;
+        Vector3d local;
+        if (scoped && scopePoseRelative) local=new Vector3d(scopePosition.x,scopePosition.y,scopePosition.z);
+        else {
+            // Client ticks can run without a newly rendered orbit frame, and free
+            // look deliberately uses the rider eye. Both still need a valid frame.
+            Vec3 eye=Sable.HELPER.getEyePositionInterpolated(player,1.0F);
+            local=client.renderPose(1.0F).transformPositionInverse(
+                    new Vector3d(eye.x,eye.y,eye.z));
+            worldOffset=ray.origin.subtract(eye);
+        }
+        if(!local.isFinite()||!com.hooya.stabilizedturret.network.AimCameraGeometry.validOffset(worldOffset))return null;
+        return new AimDirectionPayload.CameraFrame(body.getUniqueId(),new Vec3(local.x,local.y,local.z),
+                surfaceNormal,worldOffset);
     }
 
     private static AimRay clipAimRay(
@@ -408,13 +830,6 @@ public final class ClientAimState {
                 ? direction.normalize()
                 : new Vec3(0.0, 0.0, -1.0);
         Vec3 end = start.add(direction.scale(AIM_RAY_DISTANCE));
-        ClipContext context = new ClipContext(
-                start,
-                end,
-                ClipContext.Block.COLLIDER,
-                ClipContext.Fluid.NONE,
-                player
-        );
         Set<SubLevel> ignored = new HashSet<>(ownStructureClosure(minecraft, player));
         // Pod view may be opened remotely while the player is not riding the
         // aircraft. Ignore the pod's complete connected Sable structure as
@@ -427,16 +842,11 @@ public final class ClientAimState {
                 ignored.addAll(connectedStructureClosure(minecraft.level, podLevel));
             }
         }
-        if (!ignored.isEmpty()) {
-            ((ClipContextExtension) context).sable$setSubLevelIgnoring(
-                    ignored::contains
-            );
-        }
-        HitResult result = minecraft.level.clip(context);
-        boolean hit = result.getType() != HitResult.Type.MISS;
-        Vec3 target = hit
-                ? projectPhysicalHitToWorld(minecraft, start, direction, result.getLocation())
-                : end;
+        SightRaycastResult clipped = clipWorldRayIgnoringStructures(
+                minecraft, player, start, end, direction, ignored);
+        HitResult result = clipped.rawResult();
+        boolean hit = clipped.hit();
+        Vec3 target = clipped.target();
         // Some Sable renderer/clip combinations do not honour the ignored
         // sub-level predicate for the first physical hit after a contraption
         // pose update. Never let that transient self-hit become the pod's
@@ -450,22 +860,16 @@ public final class ClientAimState {
             target = end;
             result = null;
         }
-        if (!hit && allowVoxyLod && (podView || podCameraCaptured)) {
-            Vec3 voxyTarget = VoxyLodRaycaster.clip(
-                    minecraft.level,
-                    start,
-                    direction,
-                    VOXY_AIM_RAY_DISTANCE
-            );
-            if (voxyTarget != null) {
-                target = voxyTarget;
-                hit = true;
-                // A Voxy voxel is world terrain, never a Sable sub-level hit.
-                result = null;
-            }
+        if (allowVoxyLod) {
+            clipped = withVoxyLod(minecraft, start, direction,
+                    new SightRaycastResult(target, hit, result));
+            target = clipped.target();
+            hit = clipped.hit();
+            result = clipped.rawResult();
         }
         lastAimDistance = start.distanceTo(target);
-        return new AimRay(start, direction, target, hit, result);
+        return new AimRay(start, direction, target, hit, result,
+                hit ? clipped.surfaceNormal(direction) : null);
     }
 
     private static OpticalFrameAngles opticalFrameAngles(Minecraft minecraft) {
@@ -497,16 +901,23 @@ public final class ClientAimState {
             return;
         }
         Vec3 currentCameraOrigin = opticalTrackingOrigin(minecraft);
-        if (!opticalLockTargetKnown) {
+        Vec3 target = getOpticalLockDisplayPoint(1.0F);
+        int view = lockTrackingViewMode(minecraft);
+        boolean acquire = OPTICAL_CAMERA_ACQUISITIONS.begin(ClientCannonLockLead.opticalAcquisitionId());
+        if (acquire) {
+            aimReticleAt(minecraft, player, target);
+            currentCameraOrigin = opticalTrackingOrigin(minecraft);
+        }
+        if (acquire || !opticalLockTargetKnown || opticalTrackingView != view) {
             opticalLockTargetKnown = true;
-            previousOpticalLockTarget = opticalLockTarget;
+            opticalTrackingView = view;
+            previousOpticalLockTarget = target;
             previousOpticalCameraOrigin = currentCameraOrigin;
-            aimReticleAt(minecraft, player, opticalLockTarget);
             return;
         }
         Vec3 previousBearing = previousOpticalLockTarget.subtract(previousOpticalCameraOrigin);
-        Vec3 currentBearing = opticalLockTarget.subtract(currentCameraOrigin);
-        previousOpticalLockTarget = opticalLockTarget;
+        Vec3 currentBearing = target.subtract(currentCameraOrigin);
+        previousOpticalLockTarget = target;
         previousOpticalCameraOrigin = currentCameraOrigin;
         if (previousBearing.lengthSqr() < 1.0e-8 || currentBearing.lengthSqr() < 1.0e-8) {
             return;
@@ -521,21 +932,23 @@ public final class ClientAimState {
             return;
         }
         if (isScoped() || minecraft.options.getCameraType() == CameraType.FIRST_PERSON) {
-            float renderFromYaw = stableWorldYaw;
-            float renderFromPitch = stableWorldPitch;
             stableWorldYaw += yawDelta;
             stableWorldPitch = Mth.clamp(stableWorldPitch + pitchDelta, -90.0F, 90.0F);
             lastObservedWorldLook = directionFromStableAngles();
             applyStableWorldLook(player);
-            beginTrackedRenderInterpolation(player, renderFromYaw, renderFromPitch);
+        } else if (shouldUseHeadAimThirdPersonFollow()) {
+            // The target direction is independent from the following camera.
+            // Preserve the player's angular lead by moving that target by the
+            // exact locked-target bearing delta.
+            stableWorldYaw += yawDelta;
+            stableWorldPitch = Mth.clamp(
+                    stableWorldPitch + pitchDelta, -90.0F, 90.0F);
         } else {
             // Preserve the player's manually chosen angular lead while moving
             // the view by exactly the target/vehicle bearing delta.
             Vec3 rawLook = lastObservedWorldLook.lengthSqr() > 1.0e-8
                     ? lastObservedWorldLook
                     : player.getLookAngle();
-            float renderFromYaw = stableWorldYaw;
-            float renderFromPitch = stableWorldPitch;
             Vec3 reticleLook = applyViewAimOffsetToAngles(
                     minecraft,
                     yawOf(rawLook),
@@ -545,15 +958,50 @@ public final class ClientAimState {
             stableWorldYaw += Mth.wrapDegrees(desiredReticleYaw - stableWorldYaw);
             stableWorldPitch = Mth.clamp(pitchOf(reticleLook) + pitchDelta, -90.0F, 90.0F);
             restoreOffsetThirdPersonLook(minecraft, player);
-            beginTrackedRenderInterpolation(player, renderFromYaw, renderFromPitch);
         }
     }
 
+    private static void followGroundRadarLockMotion(Minecraft minecraft, LocalPlayer player, double frameSeconds) {
+        var track = ClientCannonLockLead.radarCameraTrack();
+        if (track == null || opticalLockActive || podView || ClientTelevisionGuidanceState.isActive()
+                || minecraft.screen != null || player.getVehicle() == null) {
+            RADAR_CAMERA_TRACKER.suspend();
+            return;
+        }
+        // This ray already includes the configured third-person reticle offset.
+        // A scope always supplies its centre ray and its own moving camera origin.
+        AimRay ray = getUnclippedAimRay(minecraft, player);
+        UUID acquisition = track.acquisitionId();
+        if (acquisition == null) return;
+        Vec3 target = ClientCannonLockLead.radarTarget();
+        if (target == null) return;
+        var correction = RADAR_CAMERA_TRACKER.update(acquisition, lockTrackingViewMode(minecraft),
+                target, minecraft.gameRenderer.getMainCamera().getPosition(), ray.direction(), frameSeconds);
+        if (isScoped() || minecraft.options.getCameraType() == CameraType.FIRST_PERSON) {
+            stableWorldYaw += correction.yaw();
+            stableWorldPitch = Mth.clamp(stableWorldPitch + correction.pitch(), -90, 90);
+            lastObservedWorldLook = directionFromStableAngles();
+            applyStableWorldLook(player);
+        } else if (shouldUseHeadAimThirdPersonFollow()) {
+            stableWorldYaw += correction.yaw();
+            stableWorldPitch = Mth.clamp(stableWorldPitch + correction.pitch(), -90, 90);
+        } else {
+            Vec3 reticle = ray.direction();
+            stableWorldYaw = yawOf(reticle) + correction.yaw();
+            stableWorldPitch = Mth.clamp(pitchOf(reticle) + correction.pitch(), -90, 90);
+            restoreOffsetThirdPersonLook(minecraft, player);
+        }
+    }
+
+    private static int lockTrackingViewMode(Minecraft minecraft) {
+        int mode = 31 * minecraft.options.getCameraType().ordinal() + (isScoped() ? 1 : 0);
+        mode = 31 * mode + Float.floatToIntBits((float) viewAimOffsetX);
+        return 31 * mode + Float.floatToIntBits((float) viewAimOffsetY);
+    }
+
     private static Vec3 opticalTrackingOrigin(Minecraft minecraft) {
-        LocalPlayer player = minecraft.player;
-        return player == null
-                ? minecraft.gameRenderer.getMainCamera().getPosition()
-                : Sable.HELPER.getEyePositionInterpolated(player, 1.0F);
+        // Follow the same continuously rendered camera, rather than the tick-end eye pose.
+        return minecraft.gameRenderer.getMainCamera().getPosition();
     }
 
     private static float directionYaw(Vec3 direction) {
@@ -586,6 +1034,8 @@ public final class ClientAimState {
         captureStableWorldLook(direction);
         if (isScoped() || minecraft.options.getCameraType() == CameraType.FIRST_PERSON) {
             applyStableWorldLook(player);
+        } else if (shouldUseHeadAimThirdPersonFollow()) {
+            // Camera follow will converge on the new target without snapping.
         } else {
             restoreOffsetThirdPersonLook(minecraft, player);
         }
@@ -632,25 +1082,82 @@ public final class ClientAimState {
             Vec3 origin,
             Vec3 end
     ) {
+        if (VirtualScopeVisibility.isActive()) {
+            return directionalScopeMarker(end.subtract(origin), 1.0F);
+        }
         if (minecraft.level == null || origin.distanceToSqr(end) < 1.0e-8) {
             return end;
         }
         Vec3 direction = end.subtract(origin).normalize();
-        ClipContext context = new ClipContext(
-                origin,
-                end,
-                ClipContext.Block.COLLIDER,
-                ClipContext.Fluid.NONE,
-                player
-        );
+        Vec3 lockPoint = opticalLockMarker(origin, direction, 1.0F, null);
+        if (lockPoint != null) end = lockPoint;
         Set<SubLevel> ignored = ownStructureClosure(minecraft, player);
-        if (!ignored.isEmpty()) {
-            ((ClipContextExtension) context).sable$setSubLevelIgnoring(ignored::contains);
+        SightRaycastResult clipped = clipSightRayIgnoringStructures(
+                minecraft, player, origin, end, direction, ignored);
+        if (lockPoint != null) return opticalLockMarker(origin, direction, 1.0F,
+                clipped.hit() ? clipped.target() : null);
+        return clipped.hit()
+                ? clipped.target()
+                : origin.add(direction.scale(CANNON_DIRECTION_MARKER_DISTANCE));
+    }
+
+    private static @Nullable Vec3 opticalLockMarker(Vec3 origin, Vec3 direction, float partialTick,
+                                                    @Nullable Vec3 worldHit) {
+        if (!isOpticalLockActive() || isPodView()) return null;
+        return OpticalLockAimGeometry.marker(origin, direction,
+                Minecraft.getInstance().gameRenderer.getMainCamera().getPosition(),
+                getOpticalLockDisplayPoint(partialTick), worldHit);
+    }
+
+    /**
+     * Clips with the rendered physical poses and excludes the authoritative
+     * carrier closure before traversing any blocks in those structures.
+     */
+    private static SightRaycastResult clipWorldRayIgnoringStructures(
+            Minecraft minecraft,
+            LocalPlayer player,
+            Vec3 origin,
+            Vec3 end,
+            Vec3 direction,
+            Set<SubLevel> ignored
+    ) {
+        if (minecraft.level == null) {
+            return new SightRaycastResult(end, false, null);
         }
-        HitResult result = minecraft.level.clip(context);
-        return result.getType() == HitResult.Type.MISS
-                ? end
-                : projectPhysicalHitToWorld(minecraft, origin, direction, result.getLocation());
+        float partialTick = minecraft.getTimer().getGameTimeDeltaPartialTick(true);
+        var result = ClientAimRaycaster.clip(minecraft.level, player, origin, end, ignored, partialTick);
+        return new SightRaycastResult(result.point(), result.hit(), result.rawHit());
+    }
+
+    /** Full sight rays may fall back to LOD; short ballistic sweeps must stay bounded. */
+    private static SightRaycastResult clipSightRayIgnoringStructures(
+            Minecraft minecraft, LocalPlayer player, Vec3 origin, Vec3 end,
+            Vec3 direction, Set<SubLevel> ignored
+    ) {
+        return withVoxyLod(minecraft, origin, direction, clipWorldRayIgnoringStructures(
+                minecraft, player, origin, end, direction, ignored));
+    }
+
+    private static SightRaycastResult withVoxyLod(
+            Minecraft minecraft, Vec3 origin, Vec3 direction, SightRaycastResult clipped
+    ) {
+        return clipped.withLodFallback(origin, direction, () -> VoxyLodRaycaster.clipHit(
+                minecraft.level, origin, direction, AimRayLimits.LOD_DISTANCE, lodView(minecraft)));
+    }
+
+    static @Nullable VoxyLodView lodView(Minecraft minecraft) {
+        double subdivision = VoxyLodRaycaster.subdivisionSize();
+        if (!Double.isFinite(subdivision)) return null;
+        var camera = minecraft.gameRenderer.getMainCamera();
+        double fov = ((GameRendererAccessor) minecraft.gameRenderer)
+                .stabilizedTurret$getFov(camera, 1.0F, true);
+        double halfTanY = Math.tan(Math.toRadians(Math.clamp(fov, .01, 179)) * .5);
+        var target = minecraft.getMainRenderTarget();
+        int width = Math.max(1, target.viewWidth), height = Math.max(1, target.viewHeight);
+        return new VoxyLodView(camera.getPosition(), new Vec3(camera.getLookVector()),
+                new Vec3(camera.getLeftVector()).scale(-1), new Vec3(camera.getUpVector()),
+                halfTanY * width / height, halfTanY, subdivision * subdivision / ((double) width * height),
+                (minecraft.options.renderDistance().get() + 2) * 16.0);
     }
 
     private static Vec3 applyViewAimOffset(
@@ -680,41 +1187,27 @@ public final class ClientAimState {
                 .normalize();
     }
 
-    /**
-     * Sable raycasts physical structures in their plot-space coordinates and
-     * returns the selected BlockHitResult without converting its location back
-     * to world space. Head aim is a world-space servo, so sending that raw
-     * location makes the server reject the ray or aim toward the plot area.
-     */
-    private static Vec3 projectPhysicalHitToWorld(
-            Minecraft minecraft,
-            Vec3 worldOrigin,
-            Vec3 worldDirection,
-            Vec3 hitLocation
-    ) {
-        if (minecraft.level == null) {
-            return hitLocation;
+    private static Set<SubLevel> ownStructureClosure(Minecraft minecraft, LocalPlayer player) {
+        if (minecraft.level==null) return Set.of();
+        long tick=minecraft.level.getGameTime();
+        if (ignoredStructureLevel!=minecraft.level || ignoredStructureTick!=tick
+                || !Objects.equals(ignoredStructurePlayer,player.getUUID())
+                || !ignoredStructureIds.equals(cameraIgnoredSubLevelIds)) {
+            ignoredStructureLevel=minecraft.level;
+            ignoredStructureTick=tick;
+            ignoredStructurePlayer=player.getUUID();
+            ignoredStructureIds=cameraIgnoredSubLevelIds;
+            ignoredStructureCache=Set.copyOf(computeOwnStructureClosure(minecraft,player));
         }
-        SubLevel hitSubLevel = Sable.HELPER.getContaining(minecraft.level, hitLocation);
-        if (hitSubLevel == null) {
-            return hitLocation;
-        }
-
-        Vector3d projected = new Vector3d(hitLocation.x, hitLocation.y, hitLocation.z);
-        hitSubLevel.logicalPose().transformPosition(projected);
-        Vec3 worldHit = new Vec3(projected.x, projected.y, projected.z);
-
-        // Preserve the rigid transform's hit distance but rebuild the final
-        // point from the actual screen-centre ray. This removes tiny client
-        // render-pose/logical-pose differences and guarantees that first- and
-        // third-person simulated rays remain exactly at the crosshair centre.
-        double hitDistance = worldOrigin.distanceTo(worldHit);
-        return worldOrigin.add(worldDirection.scale(hitDistance));
+        return ignoredStructureCache;
     }
 
-    private static Set<SubLevel> ownStructureClosure(Minecraft minecraft, LocalPlayer player) {
+    private static Set<SubLevel> computeOwnStructureClosure(Minecraft minecraft, LocalPlayer player) {
         Set<SubLevel> ignored = new HashSet<>();
         Set<SubLevel> seeds = new HashSet<>();
+        if (minecraft.level == null) {
+            return ignored;
+        }
         SubLevel tracking = Sable.HELPER.getTrackingSubLevel(player);
         SubLevel vehicle = Sable.HELPER.getVehicleSubLevel(player);
         if (tracking != null) {
@@ -729,10 +1222,19 @@ public final class ClientAimState {
                 seeds.add(containingVehicle);
             }
         }
-        for (SubLevel seed : seeds) {
-            ignored.addAll(connectedStructureClosure(minecraft.level, seed));
+        // The server expands the player's physical carrier through bearing
+        // dependencies and Synaxis/Photomancy blueprint weld constraints.
+        // Those relationships are not all present in the client actor graph,
+        // so explicitly seed every authoritative member received in the aim
+        // session before applying the local dependency closure.
+        SubLevelContainer container = SubLevelContainer.getContainer(minecraft.level);
+        for (UUID id : cameraIgnoredSubLevelIds) {
+            SubLevel serverMember = container.getSubLevel(id);
+            if (serverMember != null && !serverMember.isRemoved()) {
+                seeds.add(serverMember);
+            }
         }
-        return ignored;
+        return connectedStructureClosure(minecraft.level, seeds);
     }
 
     /**
@@ -741,7 +1243,19 @@ public final class ClientAimState {
      * bearing has received its parent/child connection data.
      */
     private static Set<SubLevel> connectedStructureClosure(net.minecraft.world.level.Level level, SubLevel root) {
-        Set<SubLevel> ignored = new HashSet<>(SubLevelHelper.getConnectedChain(root));
+        return connectedStructureClosure(level, Set.of(root));
+    }
+
+    private static Set<SubLevel> connectedStructureClosure(
+            net.minecraft.world.level.Level level,
+            Set<SubLevel> roots
+    ) {
+        Set<SubLevel> ignored = new HashSet<>();
+        for (SubLevel root : roots) {
+            if (root != null && !root.isRemoved()) {
+                ignored.addAll(SubLevelHelper.getConnectedChain(root));
+            }
+        }
         boolean changed;
         do {
             changed = false;
@@ -759,7 +1273,8 @@ public final class ClientAimState {
         return ignored;
     }
 
-    private record AimRay(Vec3 origin, Vec3 direction, Vec3 target, boolean hit, HitResult rawResult) {
+    private record AimRay(Vec3 origin, Vec3 direction, Vec3 target, boolean hit,
+                          HitResult rawResult, @Nullable Vec3 surfaceNormal) {
     }
 
     private record SubLevelAimHit(UUID id, Vec3 localAnchor) {
@@ -768,8 +1283,15 @@ public final class ClientAimState {
     private record OpticalFrameAngles(double halfTanX, double halfTanY) {
     }
 
+    private record CameraAngles(float yaw, float pitch) {
+    }
+
     /** Called by the client-only Entity.turn mixin; returns true when consumed. */
     public static boolean turnStableFirstPerson(LocalPlayer player, double yawInput, double pitchInput) {
+        if (shouldCaptureFreeLookMouse()) {
+            turnFreeLook(player, yawInput, pitchInput);
+            return true;
+        }
         if (isPodView()) {
             if (Math.abs(yawInput) < 1.0e-7 && Math.abs(pitchInput) < 1.0e-7) {
                 return true;
@@ -791,6 +1313,21 @@ public final class ClientAimState {
             POD_AIM.acceptTarget(origin, resolved.target());
             return true;
         }
+        if (shouldUseHeadAimThirdPersonFollow()) {
+            // Mouse input owns the target circle. The player/camera angles are
+            // deliberately left untouched here and converge independently in
+            // Camera.setup, matching the proven mouse-flight implementation.
+            stableWorldPitch = Mth.clamp(
+                    stableWorldPitch + (float) pitchInput * 0.15F,
+                    -90.0F,
+                    90.0F
+            );
+            stableWorldYaw += (float) yawInput * 0.15F;
+            if (player.getVehicle() != null) {
+                player.getVehicle().onPassengerTurned(player);
+            }
+            return true;
+        }
         if (!shouldLockFirstPerson()) {
             return false;
         }
@@ -807,6 +1344,336 @@ public final class ClientAimState {
             player.getVehicle().onPassengerTurned(player);
         }
         return true;
+    }
+
+    private static boolean shouldCaptureFreeLookMouse() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return active && freeLookHeld && !scoped
+                && minecraft.player != null;
+    }
+
+    private static void turnFreeLook(
+            LocalPlayer player,
+            double yawInput,
+            double pitchInput
+    ) {
+        beginFreeLookCamera(player);
+        if (Math.abs(yawInput) < 1.0e-7 && Math.abs(pitchInput) < 1.0e-7) {
+            return;
+        }
+        float yawRadians = (float) Math.toRadians(yawInput * 0.15);
+        float pitchRadians = (float) Math.toRadians(pitchInput * 0.15);
+        new Quaternionf().rotationY(-yawRadians)
+                .mul(freeLookTargetRotation, freeLookTargetRotation);
+        freeLookTargetRotation.rotateX(-pitchRadians).normalize();
+    }
+
+    private static void beginFreeLookCamera(LocalPlayer player) {
+        if (freeLookCameraActive && !freeLookStartPending) {
+            return;
+        }
+        Quaternionf initial;
+        if (freeLookCameraActive) {
+            initial = new Quaternionf(freeLookCurrentRotation);
+        } else if (lastBaseCameraRotationValid) {
+            initial = new Quaternionf(lastBaseCameraRotation);
+        } else {
+            initial = rotationFromAngles(player.getYRot(), player.getXRot());
+        }
+        freeLookCurrentRotation.set(initial);
+        freeLookTargetRotation.set(initial);
+        freeLookCameraActive = true;
+        freeLookStartPending = false;
+        lastFreeLookCameraNanos = System.nanoTime();
+        captureFreeLookAimDirection(Minecraft.getInstance(), player);
+        updateFreeLookCameraAngles();
+    }
+
+    /**
+     * Composes free look over the final camera produced by vanilla/Sable and
+     * any flight-camera controller. Returning always targets that live base,
+     * so releasing the key does not fight a vehicle that is still moving.
+     */
+    public static boolean prepareFreeLookCamera(
+            Quaternionf baseRotation,
+            boolean fireControlRebuiltBase
+    ) {
+        // During active first-person free look the setup-start camera event
+        // has already supplied the real shared base. Do not feed our own
+        // override back as next frame's return target. Optical and head-aim
+        // third-person paths rebuild an authoritative base later at TAIL.
+        if (!freeLookCameraActive || fireControlRebuiltBase
+                || !lastBaseCameraRotationValid) {
+            lastBaseCameraRotation.set(baseRotation).normalize();
+            lastBaseCameraRotationValid = true;
+        }
+        if (!active || scoped) {
+            resetFreeLookCamera();
+            return false;
+        }
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (freeLookHeld && (!freeLookCameraActive || freeLookStartPending)) {
+            if (player == null) {
+                return false;
+            }
+            beginFreeLookCamera(player);
+        }
+        if (!freeLookCameraActive) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static void recordFreeLookBaseCameraAngles(
+            float yaw,
+            float pitch,
+            float roll
+    ) {
+        lastBaseCameraRotation.rotationYXZ(
+                (float) Math.PI - yaw * Mth.DEG_TO_RAD,
+                -pitch * Mth.DEG_TO_RAD,
+                -roll * Mth.DEG_TO_RAD
+        ).normalize();
+        lastBaseCameraRotationValid = true;
+    }
+
+    private static void advanceFreeLookCameraFrame() {
+        if (!active || scoped) {
+            resetFreeLookCamera();
+            return;
+        }
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (freeLookHeld && (!freeLookCameraActive || freeLookStartPending)) {
+            if (player == null) {
+                return;
+            }
+            beginFreeLookCamera(player);
+        }
+        if (!freeLookCameraActive) {
+            return;
+        }
+
+        Quaternionf desired = freeLookHeld
+                ? freeLookTargetRotation
+                : lastBaseCameraRotation;
+        long now = System.nanoTime();
+        double elapsedSeconds = lastFreeLookCameraNanos == 0L
+                ? 0.0
+                : Math.min(0.1, Math.max(0.0,
+                (now - lastFreeLookCameraNanos) / 1_000_000_000.0));
+        lastFreeLookCameraNanos = now;
+        float alpha = (float) (1.0 - Math.exp(
+                -THIRD_PERSON_CAMERA_FOLLOW_RESPONSE_PER_SECOND * elapsedSeconds));
+        freeLookCurrentRotation.slerp(desired, alpha).normalize();
+
+        if (!freeLookHeld
+                && Math.abs(freeLookCurrentRotation.dot(lastBaseCameraRotation)) > 0.99999F) {
+            freeLookCurrentRotation.set(lastBaseCameraRotation);
+            resetFreeLookCamera();
+            return;
+        }
+        updateFreeLookCameraAngles();
+    }
+
+    public static Quaternionf getFreeLookCameraRotation() {
+        return new Quaternionf(freeLookCurrentRotation);
+    }
+
+    public static boolean isFreeLookCameraOverriding() {
+        return freeLookCameraActive && active && !scoped;
+    }
+
+    private static void resetFreeLookCamera() {
+        freeLookCameraActive = false;
+        freeLookStartPending = false;
+        lastFreeLookCameraNanos = 0L;
+        freeLookFrozenAimDirection = null;
+    }
+
+    private static void captureFreeLookAimDirection(
+            Minecraft minecraft,
+            LocalPlayer player
+    ) {
+        if (freeLookFrozenAimDirection != null || player == null || scoped || podView) {
+            return;
+        }
+        AimRay current = getScreenCenterRay(minecraft, player);
+        freeLookFrozenAimDirection = current.direction.lengthSqr() > 1.0e-8
+                ? current.direction.normalize()
+                : directionFromStableAngles();
+    }
+
+    private static AimRay freeLookDirectionRay(
+            Minecraft minecraft,
+            LocalPlayer player
+    ) {
+        Vec3 origin = Sable.HELPER.getEyePositionInterpolated(player, 1.0F);
+        Vec3 direction = freeLookFrozenAimDirection == null
+                ? directionFromStableAngles()
+                : freeLookFrozenAimDirection;
+        direction = direction.lengthSqr() > 1.0e-8
+                ? direction.normalize()
+                : new Vec3(0.0, 0.0, -1.0);
+        // Free look is an inertial direction, never a persistent block hit.
+        // The moving eye origin keeps packet validation local to the vehicle;
+        // the server consumes only the normalized direction while held.
+        Vec3 target = origin.add(direction.scale(AIM_RAY_DISTANCE));
+        return new AimRay(origin, direction, target, false, null, null);
+    }
+
+    private static Quaternionf rotationFromAngles(float yaw, float pitch) {
+        return new Quaternionf().rotationYXZ(
+                (float) Math.PI - yaw * Mth.DEG_TO_RAD,
+                -pitch * Mth.DEG_TO_RAD,
+                0.0F
+        );
+    }
+
+    private static void updateFreeLookCameraAngles() {
+        Vector3f forward = new Vector3f(0.0F, 0.0F, -1.0F)
+                .rotate(freeLookCurrentRotation);
+        Vector3f actualUp = new Vector3f(0.0F, 1.0F, 0.0F)
+                .rotate(freeLookCurrentRotation);
+        double horizontal = Math.sqrt(forward.x * forward.x + forward.z * forward.z);
+        freeLookCameraYaw = Mth.wrapDegrees((float) Math.toDegrees(
+                Math.atan2(-forward.x, forward.z)));
+        freeLookCameraPitch = Mth.clamp((float) Math.toDegrees(
+                Math.atan2(-forward.y, horizontal)), -90.0F, 90.0F);
+        Vector3f referenceUp = new Vector3f(0.0F, 1.0F, 0.0F)
+                .rotate(rotationFromAngles(freeLookCameraYaw, freeLookCameraPitch));
+        float cosine = Mth.clamp(referenceUp.dot(actualUp), -1.0F, 1.0F);
+        // Camera.setRotation applies the event roll with a negative Z angle.
+        float sine = forward.dot(new Vector3f(referenceUp).cross(actualUp));
+        freeLookCameraRoll = (float) Math.toDegrees(Math.atan2(sine, cosine));
+    }
+
+    /**
+     * True only for the unscoped third-person head-aim view. First person and
+     * both optical views retain their existing direct, world-stable control.
+     */
+    public static boolean shouldUseHeadAimThirdPersonFollow() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return !restoringThirdPersonScopeExit
+                && isSeatedAtBoundController() && (headAim || isGroundRadarCameraTracking()) && !scoped && !podView
+                && minecraft.player != null
+                && minecraft.options.getCameraType() != CameraType.FIRST_PERSON;
+    }
+
+    /**
+     * Advances the independent third-person camera from the once-per-frame
+     * render callback. The exponential response is frame-rate independent and
+     * intentionally matches the referenced mouse-flight view.
+     */
+    public static void updateHeadAimThirdPersonCamera(
+            LocalPlayer player,
+            float currentCameraYaw,
+            float currentCameraPitch
+    ) {
+        if (!shouldUseHeadAimThirdPersonFollow() || player == null) {
+            resetThirdPersonCameraFollow();
+            return;
+        }
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!thirdPersonCameraFollowInitialized) {
+            initializeThirdPersonCameraFollow(
+                    minecraft, currentCameraYaw, currentCameraPitch);
+        }
+
+        CameraAngles desired = solveCameraAnglesForReticle(
+                minecraft, stableWorldYaw, stableWorldPitch);
+        long now = System.nanoTime();
+        double elapsedSeconds = lastThirdPersonCameraFollowNanos == 0L
+                ? 0.0
+                : Math.min(0.1, Math.max(0.0,
+                (now - lastThirdPersonCameraFollowNanos) / 1_000_000_000.0));
+        lastThirdPersonCameraFollowNanos = now;
+        double alpha = ClientVisualConfig.cameraFollowAlpha(elapsedSeconds);
+        thirdPersonCameraYaw += Mth.wrapDegrees(
+                desired.yaw - thirdPersonCameraYaw) * (float) alpha;
+        thirdPersonCameraPitch = Mth.clamp(
+                (float) (thirdPersonCameraPitch
+                        + (desired.pitch - thirdPersonCameraPitch) * alpha),
+                -90.0F,
+                90.0F
+        );
+
+        alignPlayerView(player, thirdPersonCameraYaw, thirdPersonCameraPitch);
+        lastObservedWorldLook = directionFromAngles(
+                thirdPersonCameraYaw, thirdPersonCameraPitch);
+        thirdPersonCameraFollowActive = true;
+    }
+
+    /**
+     * Camera.setup may also be called outside the normal render-frame path.
+     * Such a caller may initialize the stored view, but must never advance the
+     * follower or feed a transformed camera result back into it.
+     */
+    public static void ensureHeadAimThirdPersonCamera(
+            float currentCameraYaw,
+            float currentCameraPitch
+    ) {
+        if (!shouldUseHeadAimThirdPersonFollow()
+                || thirdPersonCameraFollowInitialized) {
+            return;
+        }
+        initializeThirdPersonCameraFollow(
+                Minecraft.getInstance(), currentCameraYaw, currentCameraPitch);
+    }
+
+    public static float getHeadAimThirdPersonCameraYaw() {
+        return thirdPersonCameraYaw;
+    }
+
+    public static float getHeadAimThirdPersonCameraPitch() {
+        return thirdPersonCameraPitch;
+    }
+
+    public static Vec3 getHeadAimTargetDirection() {
+        return directionFromStableAngles();
+    }
+
+    private static void initializeThirdPersonCameraFollow(
+            Minecraft minecraft,
+            float cameraYaw,
+            float cameraPitch
+    ) {
+        if (!headAim && isGroundRadarCameraTracking()) {
+            // An AA-only vehicle has no cannon head-aim state to seed from.
+            // Enter from the visible world camera, never stale/local player angles.
+            Vec3 visibleLook = new Vec3(minecraft.gameRenderer.getMainCamera().getLookVector());
+            cameraYaw = yawOf(visibleLook);
+            cameraPitch = pitchOf(visibleLook);
+        }
+        thirdPersonCameraYaw = cameraYaw;
+        thirdPersonCameraPitch = Mth.clamp(cameraPitch, -90.0F, 90.0F);
+        // Preserve the configured reticle baseline on entry. The camera stays
+        // where it is while the mouse target begins at the old fixed marker.
+        Vec3 initialTarget = applyViewAimOffsetToAngles(
+                minecraft, thirdPersonCameraYaw, thirdPersonCameraPitch);
+        captureStableWorldLook(initialTarget);
+        lastObservedWorldLook = directionFromAngles(
+                thirdPersonCameraYaw, thirdPersonCameraPitch);
+        lastThirdPersonCameraFollowNanos = System.nanoTime();
+        thirdPersonCameraFollowInitialized = true;
+        thirdPersonCameraFollowActive = true;
+    }
+
+    private static void resetThirdPersonCameraFollow() {
+        thirdPersonCameraFollowActive = false;
+        thirdPersonCameraFollowInitialized = false;
+        lastThirdPersonCameraFollowNanos = 0L;
+    }
+
+    private static void alignPlayerView(LocalPlayer player, float yaw, float pitch) {
+        player.setYRot(yaw);
+        player.setXRot(pitch);
+        player.setYHeadRot(yaw);
+        player.yBodyRot = yaw;
+        player.yRotO = yaw;
+        player.xRotO = pitch;
+        player.yHeadRotO = yaw;
+        player.yBodyRotO = yaw;
     }
 
     public static void restoreObservedWorldLook(LocalPlayer player) {
@@ -918,6 +1785,14 @@ public final class ClientAimState {
         return active && remoteControl;
     }
 
+    public static boolean isSeatedAtBoundController() {
+        return active && seatedAtBoundController;
+    }
+
+    public static Set<UUID> getCameraIgnoredSubLevelIds() {
+        return cameraIgnoredSubLevelIds;
+    }
+
     public static boolean isHeadAimEnabled() {
         return active && headAim;
     }
@@ -926,14 +1801,30 @@ public final class ClientAimState {
         return active && aircraftEquipment;
     }
 
+    public static boolean hasRocketImpactPoint() {
+        return active && seatedAtBoundController && rocketImpactAvailable;
+    }
+
+    public static Vec3 getRocketImpactPoint(float partialTick) {
+        if (!hasRocketImpactPoint()) return Vec3.ZERO;
+        return previousRocketImpactPoint.lerp(
+                rocketImpactPoint, Mth.clamp(partialTick, 0.0F, 1.0F));
+    }
+
+    private static boolean isGroundRadarCameraTracking() {
+        return !podView && !opticalLockActive && !ClientTelevisionGuidanceState.isActive()
+                && ClientCannonLockLead.radarCameraTrack() != null;
+    }
+
     public static boolean shouldLockFirstPerson() {
         Minecraft minecraft = Minecraft.getInstance();
-        return active && (headAim || scoped)
+        return active && (headAim || scoped || isGroundRadarCameraTracking())
                 && minecraft.options.getCameraType() == CameraType.FIRST_PERSON;
     }
 
     public static boolean shouldSuppressSableCameraRotation() {
-        return shouldLockFirstPerson();
+        return shouldLockFirstPerson()
+                || MianbaoRemoteWeaponStationClientCompat.isControlActive();
     }
 
     public static boolean isAllowedCameraType(CameraType type) {
@@ -944,20 +1835,49 @@ public final class ClientAimState {
         return active && scoped;
     }
 
+    public static ScopePreset getScopePreset() {
+        return scopePreset;
+    }
+
     public static boolean isPodView() {
         return active && podView;
     }
 
     public static boolean shouldHidePodHead(BlockEntity pod) {
-        if (!isPodView() || pod == null || pod.getLevel() == null) return false;
-        Vec3 worldCenter = Sable.HELPER.projectOutOfSubLevel(
-                pod.getLevel(), Vec3.atCenterOf(pod.getBlockPos())
-        );
-        return worldCenter.distanceToSqr(getScopePosition(1.0F)) <= 1.0;
+        return pod != null
+                && pod.getLevel() != null
+                && ElectroOpticalPodCompat.isPod(pod.getBlockState())
+                && isActivePodBlock(pod.getLevel(), pod.getBlockPos());
+    }
+
+    /** Hides the complete pod renderer while viewing through that same pod. */
+    public static boolean shouldHidePod(BlockEntity pod) {
+        return shouldHidePodHead(pod);
+    }
+
+    /** Exact section hook for fixed pod blocks without a block entity renderer. */
+    public static boolean shouldHidePod(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+        if (POD_RENDER_VISIBILITY.hiddenPod() == null || !ElectroOpticalPodCompat.isPod(state)) return false;
+        Level world = level instanceof Level direct
+                ? direct
+                : level instanceof RenderChunkRegionAccessor region
+                ? region.stabilizedTurret$getLevel() : null;
+        return world != null && isActivePodBlock(world, pos);
+    }
+
+    /** Matches the exact bound camera block, including identical local positions in other plots. */
+    private static boolean isActivePodBlock(Level level, BlockPos pos) {
+        PodRenderVisibility.Pod hidden = POD_RENDER_VISIBILITY.hiddenPod();
+        if (level == null || level != Minecraft.getInstance().level || pos == null
+                || hidden == null || !hidden.pos().equals(pos)) return false;
+        SubLevel containing = Sable.HELPER.getContaining(level, pos);
+        UUID containingId = containing == null || containing.isRemoved()
+                ? null : containing.getUniqueId();
+        return hidden.matches(pos, containingId);
     }
 
     public static boolean isOpticalView() {
-        return active && (scoped || podView);
+        return !ClientWeaponViewState.isActive() && active && (scoped || podView);
     }
 
     public static double getScopeZoom() {
@@ -976,6 +1896,10 @@ public final class ClientAimState {
             lastZoomUpdateNanos = now;
             return;
         }
+        // A live config edit can narrow the range while the view is already zoomed in.
+        // Keep the rendered FOV and aiming sensitivity within the new limits immediately.
+        displayedScopeZoom = Mth.clamp(displayedScopeZoom, ClientScopeConfig.getMinZoom(), ClientScopeConfig.getMaxZoom());
+        displayedPodZoom = Mth.clamp(displayedPodZoom, ClientScopeConfig.getPodMinZoom(), ClientScopeConfig.getPodMaxZoom());
         double elapsedSeconds = Math.min(0.1, Math.max(0.0,
                 (now - lastZoomUpdateNanos) / 1_000_000_000.0));
         lastZoomUpdateNanos = now;
@@ -1053,8 +1977,6 @@ public final class ClientAimState {
                     origin.add(POD_AIM.direction().scale(AIM_RAY_DISTANCE))
             );
         }
-        SCOPE_CANNON_DIAGNOSTICS.clear();
-        SCOPE_SUBLEVEL_DIAGNOSTICS.clear();
     }
 
     private static void restoreCameraAfterPod(Minecraft minecraft) {
@@ -1089,7 +2011,31 @@ public final class ClientAimState {
                 ? player
                 : minecraft.getCameraEntity();
         CameraType cameraType = minecraft.options.getCameraType();
-        for (int i = 0; i < 5; i++) {
+        boolean initializeFollowingCamera = shouldUseHeadAimThirdPersonFollow();
+        // Camera.setup reaches CameraMixin at TAIL. Suppress the following
+        // writer during this synchronous inverse solve, otherwise it treats
+        // an intermediate raw camera angle as a fresh mouse-target angle and
+        // applies the vertical reticle offset a second time after scope exit.
+        restoringThirdPersonScopeExit = initializeFollowingCamera;
+        try {
+            for (int i = 0; i < 5; i++) {
+                camera.setup(
+                        minecraft.level,
+                        cameraEntity,
+                        !cameraType.isFirstPerson(),
+                        cameraType.isMirrored(),
+                        1.0F
+                );
+                Vec3 direction = target.subtract(camera.getPosition());
+                if (direction.lengthSqr() < 1.0e-8) {
+                    break;
+                }
+                captureStableWorldLook(direction);
+                restoreOffsetThirdPersonLook(minecraft, player);
+            }
+            // Keep HUD projection and the first post-scope aim packet on the
+            // final solved pose instead of waiting for GameRenderer's next
+            // setup call.
             camera.setup(
                     minecraft.level,
                     cameraEntity,
@@ -1097,22 +2043,29 @@ public final class ClientAimState {
                     cameraType.isMirrored(),
                     1.0F
             );
-            Vec3 direction = target.subtract(camera.getPosition());
-            if (direction.lengthSqr() < 1.0e-8) {
-                break;
-            }
-            captureStableWorldLook(direction);
-            restoreOffsetThirdPersonLook(minecraft, player);
+        } finally {
+            restoringThirdPersonScopeExit = false;
         }
-        // Keep HUD projection and the first post-scope aim packet on the final
-        // solved pose instead of waiting for GameRenderer's next setup call.
-        camera.setup(
-                minecraft.level,
-                cameraEntity,
-                !cameraType.isFirstPerson(),
-                cameraType.isMirrored(),
-                1.0F
-        );
+
+        if (initializeFollowingCamera) {
+            // Legacy third-person control stores the solved raw camera pose in
+            // stableWorldYaw/Pitch. Following mode instead needs that pose and
+            // the white reticle's world direction as two separate states.
+            Vec3 targetDirection = target.subtract(camera.getPosition());
+            if (targetDirection.lengthSqr() > 1.0e-8) {
+                captureStableWorldLook(targetDirection);
+            }
+            CameraAngles solvedCamera = solveCameraAnglesForReticle(
+                    minecraft, stableWorldYaw, stableWorldPitch);
+            thirdPersonCameraYaw = solvedCamera.yaw;
+            thirdPersonCameraPitch = solvedCamera.pitch;
+            alignPlayerView(player, thirdPersonCameraYaw, thirdPersonCameraPitch);
+            lastObservedWorldLook = directionFromAngles(
+                    thirdPersonCameraYaw, thirdPersonCameraPitch);
+            lastThirdPersonCameraFollowNanos = System.nanoTime();
+            thirdPersonCameraFollowInitialized = true;
+            thirdPersonCameraFollowActive = true;
+        }
     }
 
     /**
@@ -1166,6 +2119,27 @@ public final class ClientAimState {
                 .normalize();
     }
 
+    /** Inverse of applyViewAimOffsetToAngles for the following camera. */
+    private static CameraAngles solveCameraAnglesForReticle(
+            Minecraft minecraft,
+            float targetYaw,
+            float targetPitch
+    ) {
+        float cameraYaw = targetYaw;
+        float cameraPitch = targetPitch;
+        for (int i = 0; i < 6; i++) {
+            Vec3 produced = applyViewAimOffsetToAngles(
+                    minecraft, cameraYaw, cameraPitch);
+            cameraYaw += Mth.wrapDegrees(targetYaw - yawOf(produced));
+            cameraPitch = Mth.clamp(
+                    cameraPitch + targetPitch - pitchOf(produced),
+                    -90.0F,
+                    90.0F
+            );
+        }
+        return new CameraAngles(cameraYaw, cameraPitch);
+    }
+
     private static float yawOf(Vec3 direction) {
         Vec3 normalized = direction.normalize();
         return Mth.wrapDegrees((float) Math.toDegrees(Math.atan2(-normalized.x, normalized.z)));
@@ -1197,15 +2171,360 @@ public final class ClientAimState {
         return active && cannonAimAvailable;
     }
 
+    public static boolean hasAimGroups() { return !renderAimGroups.isEmpty(); }
+
     public static Vec3 getCannonAimPoint(float partialTick) {
-        // The server now reports the measured cannon pose every tick. Extra
-        // two-tick interpolation made the blue mark visibly trail the barrel
-        // while the target mark had already moved to its new position.
-        return cannonAimPoint;
+        if (!renderAimGroups.isEmpty()) {
+            Vec3 live=renderCannonPoint(renderAimGroups.getFirst(),partialTick);
+            if (live!=null) return live;
+        }
+        if (VirtualScopeVisibility.isActive()) return directionalScopeMarker(cannonAimDirection, partialTick);
+        // Network samples still arrive once per game tick, but the displayed
+        // impact point is evaluated on every render frame. Do not classify a
+        // large world-space delta as a teleport: at long range even a tiny
+        // barrel rotation moves the endpoint many blocks and would otherwise
+        // make the marker fall back to visibly stepping at the packet rate.
+        return previousCannonAimPoint.lerp(
+                cannonAimPoint,
+                Mth.clamp(partialTick, 0.0F, 1.0F)
+        );
+    }
+
+    public static List<Vec3> getCannonAimGroupPoints(float partialTick) {
+        if (!renderAimGroups.isEmpty()) {
+            List<Vec3> points=new ArrayList<>();
+            for (int index=0;index<renderAimGroups.size();index++) {
+                var group=renderAimGroups.get(index);
+                Vec3 point=renderCannonPoint(group,partialTick);
+                if (point==null && !hasRenderMuzzle(group)) {
+                    int stored=cannonAimGroupIndices.indexOf(index);
+                    if (stored>=0) point=previousCannonAimGroupPoints.get(stored)
+                            .lerp(cannonAimGroupPoints.get(stored),Mth.clamp(partialTick,0,1));
+                }
+                if (point!=null) points.add(point);
+            }
+            return List.copyOf(points);
+        }
+        if (previousCannonAimGroupPoints.size() != cannonAimGroupPoints.size()) {
+            return cannonAimGroupPoints;
+        }
+        float alpha = Mth.clamp(partialTick, 0.0F, 1.0F);
+        List<Vec3> interpolated = new ArrayList<>(cannonAimGroupPoints.size());
+        for (int index = 0; index < cannonAimGroupPoints.size(); index++) {
+            Vec3 previous = previousCannonAimGroupPoints.get(index);
+            Vec3 current = cannonAimGroupPoints.get(index);
+            interpolated.add(previous.lerp(current, alpha));
+        }
+        return List.copyOf(interpolated);
+    }
+
+    /** A camera-relative far point projects as a direction, without muzzle parallax or terrain queries. */
+    private static Vec3 directionalScopeMarker(Vec3 direction, float partialTick) {
+        Vec3 ray = direction.lengthSqr() > 1.0e-12 ? direction.normalize() : directionFromStableAngles();
+        return getScopePosition(partialTick).add(ray.scale(CANNON_DIRECTION_MARKER_DISTANCE));
+    }
+
+    public static void acceptAimGroups(AimGroupSessionPayload payload) {
+        Minecraft minecraft = Minecraft.getInstance();
+        LocalPlayer player = minecraft.player;
+        renderAimGroups=payload.groups();
+        Set<SightSource> sightSources=new HashSet<>();
+        for (var group : payload.groups()) {
+            if (group.frame()==null || group.sightAim()==null) continue;
+            SightSource source=SightSource.of(group.frame());
+            sightSources.add(source);
+            var sight=group.sightAim();
+            var history=renderSightTracking.computeIfAbsent(source,key->new CannonSightDirection.History());
+            history.add(sight.interpolationTick(),sight.launchGoal(),sight.geometricGoal());
+        }
+        renderSightTracking.keySet().retainAll(sightSources);
+        for (var group : payload.groups()) {
+            var frame=group.frame();
+            if (frame==null || frame.motion()==null) continue;
+            List<AimGroupSessionPayload.BodyMotion> history=new ArrayList<>(renderMotionHistory.getOrDefault(frame.bodyId(),List.of()));
+            if (history.isEmpty() || !history.getLast().equals(frame.motion())) history.add(frame.motion());
+            if (history.size()>24) history.removeFirst();
+            renderMotionHistory.put(frame.bodyId(),List.copyOf(history));
+        }
+        while (renderMotionHistory.size()>128) renderMotionHistory.remove(renderMotionHistory.keySet().iterator().next());
+        if (payload.groups().isEmpty()) {
+            groupAimOwnsMarker = false;
+            directionalGroupMarkers = false;
+            renderMotionHistory.clear();
+            renderMarkerContacts.clear();
+            renderSightTracking.clear();
+            cannonAimAvailable = false;
+            cannonAimGroupPoints = List.of();
+            previousCannonAimGroupPoints = List.of();
+            cannonAimGroupIndices = List.of();
+            cannonAimGroupBallistics = List.of();
+            groupPrimaryAimPoint = null;
+            return;
+        }
+        // Session and group packets describe the same tick; only one may own interpolation.
+        groupAimOwnsMarker = true;
+        boolean virtualScope = VirtualScopeVisibility.isActive();
+        List<Vec3> points = new ArrayList<>(payload.groups().size());
+        List<Integer> indices = new ArrayList<>(payload.groups().size());
+        List<Boolean> ballistics = new ArrayList<>(payload.groups().size());
+        Vec3 primary = null;
+        Set<SubLevel> ignored = player == null || virtualScope ? Set.of() : ownStructureClosure(minecraft, player);
+        for (int index = 0; index < payload.groups().size(); index++) {
+            AimGroupSessionPayload.GroupAim group = payload.groups().get(index);
+            Vec3 origin = new Vec3(group.originX(), group.originY(), group.originZ());
+            Vec3 direction = new Vec3(group.directionX(), group.directionY(), group.directionZ());
+            if (direction.lengthSqr() < 1.0e-8) {
+                continue;
+            }
+            direction = direction.normalize();
+            Vec3 point;
+            // Achieved correction is sampled separately on the physical pose clock.
+            // Pod trajectories keep their existing impact policy.
+            AimGroupSessionPayload.BallisticAim ballistic = group.ballistic();
+            if (virtualScope) {
+                point = directionalScopeMarker(direction, 1.0F);
+            } else if (hasRenderMuzzle(group)) {
+                // The render path owns this muzzle. Do not repeat the full
+                // collision sweep when its network sample arrives as well.
+                point=ballistic==null ? origin.add(direction.scale(CANNON_DIRECTION_MARKER_DISTANCE))
+                        : ballistic.impactAvailable() ? new Vec3(ballistic.impactX(),ballistic.impactY(),ballistic.impactZ()) : null;
+            } else if (ballistic == null) {
+                Vec3 end = origin.add(direction.scale(AIM_RAY_DISTANCE));
+                point = player == null ? end : clipCannonRay(minecraft, player, origin, end);
+            } else if (ballistic.impactAvailable()) {
+                // An authoritative trajectory hit must never be clipped along a straight barrel ray.
+                point = new Vec3(ballistic.impactX(), ballistic.impactY(), ballistic.impactZ());
+            } else {
+                point = VoxyLodRaycaster.clipCannonBallistic(minecraft.level, origin,
+                        new Vec3(ballistic.velocityX(), ballistic.velocityY(), ballistic.velocityZ()),
+                        ballistic.maxTicks(), ballistic.gravity(), ballistic.drag(), ballistic.quadraticDrag(),
+                        (from, to) -> {
+                            Vec3 segment = to.subtract(from);
+                            if (segment.lengthSqr() < 1e-12) return null;
+                            SightRaycastResult clipped = clipWorldRayIgnoringStructures(
+                                    minecraft, player, from, to, segment.normalize(), ignored);
+                            return clipped.hit() ? clipped.target() : null;
+                        });
+            }
+            // A ballistic miss has no finite impact marker; retain the aim input crosshair.
+            if (index == 0) primary = point;
+            if (point != null) {
+                indices.add(index);
+                ballistics.add(ballistic != null);
+                points.add(point);
+            }
+        }
+        List<Vec3> nextPoints = List.copyOf(points);
+        boolean sameMarkerSpace = cannonAimGroupIndices.equals(indices)
+                && cannonAimGroupBallistics.equals(ballistics)
+                && directionalGroupMarkers == virtualScope;
+        directionalGroupMarkers = virtualScope;
+        previousCannonAimGroupPoints = sameMarkerSpace
+                ? cannonAimGroupPoints
+                : nextPoints;
+        cannonAimGroupPoints = nextPoints;
+        cannonAimGroupIndices = List.copyOf(indices);
+        cannonAimGroupBallistics = List.copyOf(ballistics);
+        cannonAimAvailable = primary != null;
+        if (primary != null) {
+            previousCannonAimPoint = sameMarkerSpace && groupPrimaryAimPoint != null ? groupPrimaryAimPoint : primary;
+            cannonAimPoint = primary;
+        }
+        groupPrimaryAimPoint = primary;
+    }
+
+    private static Vec3 renderCannonPoint(AimGroupSessionPayload.GroupAim group,float partialTick) {
+        Minecraft minecraft=Minecraft.getInstance();
+        boolean virtualScope = VirtualScopeVisibility.isActive();
+        var frame=group.frame();
+        if (frame==null || minecraft.level==null || minecraft.player==null) return virtualScope
+                ? directionalScopeMarker(new Vec3(group.directionX(), group.directionY(), group.directionZ()), partialTick) : null;
+        SubLevel body=SubLevelContainer.getContainer(minecraft.level).getSubLevel(frame.bodyId());
+        if (!(body instanceof ClientSubLevel client) || body.isRemoved()) return virtualScope
+                ? directionalScopeMarker(new Vec3(group.directionX(), group.directionY(), group.directionZ()), partialTick) : null;
+        var pose=client.renderPose(partialTick);
+        var ballistic=group.ballistic();
+        Vec3 carrier=ballistic==null || virtualScope ? Vec3.ZERO : ClientSableMotionHistory.velocity(frame,client,partialTick);
+        if (!virtualScope && ballistic!=null && carrier==null) carrier=frame.motion()==null
+                ? com.hooya.stabilizedturret.content.controller.CannonBallisticsCompat.sampleBodyVelocity(
+                minecraft.level,body,body.logicalPose().transformPosition(frame.localOrigin()))
+                : CannonRenderFrame.carrierVelocity(frame,pose,renderMotionHistory.getOrDefault(frame.bodyId(),List.of(frame.motion())));
+        CannonRenderFrame launch=CannonRenderFrame.from(frame,pose,carrier);
+        Vec3 direction=launch.direction();
+        if (ballistic==null || virtualScope) {
+            SightSource sightSource=SightSource.of(frame);
+            if (group.sightAim()==null) renderSightTracking.remove(sightSource);
+            else {
+                var history=renderSightTracking.get(sightSource);
+                var container=dev.ryanhcode.sable.api.sublevel.ClientSubLevelContainer.getContainer(minecraft.level);
+                double sightTick=group.sightAim().interpolationTick();
+                if (container!=null && !container.getInterpolation().isStopped()) {
+                    var clock=container.getInterpolation();
+                    sightTick=clock.lastInterpolationTick+(clock.mostRecentInterpolationTick-clock.lastInterpolationTick)
+                            * Math.clamp(partialTick,0,1);
+                }
+                direction=history==null ? CannonSightDirection.direction(direction,
+                        group.sightAim().launchGoal(),group.sightAim().geometricGoal())
+                        : CannonRenderFrame.sightDirection(group,pose,history,sightTick);
+                while (renderSightTracking.size()>128) renderSightTracking.remove(renderSightTracking.keySet().iterator().next());
+            }
+        }
+        Vec3 origin=launch.origin();
+        if (virtualScope) return directionalScopeMarker(direction, partialTick);
+        Set<SubLevel> ignored=ownStructureClosure(minecraft,minecraft.player);
+        SightSource source=SightSource.of(frame);
+        MarkerProfile profile=ballistic==null ? new MarkerProfile(frame.muzzleSpeed(),false,0,0,false,0)
+                : new MarkerProfile(frame.muzzleSpeed(),true,ballistic.gravity(),ballistic.drag(),
+                ballistic.quadraticDrag(),ballistic.maxTicks());
+        long renderTick=minecraft.level.getGameTime();
+        MarkerContact contact=renderMarkerContacts.get(source);
+        // The point itself must follow the rendered bore at FPS, not the 20 Hz query clock.
+        // Leaving the finite cached voxel requires an immediate new terrain query.
+        Vec3 lodPoint=ballistic==null && contact!=null && contact.lodHit()!=null
+                ? contact.lodHit().ray(origin,direction,AimRayLimits.LOD_DISTANCE) : null;
+        if (contact==null || contact.tick()!=renderTick || !contact.profile().equals(profile)
+                || (ballistic==null && contact.lodHit()!=null && lodPoint==null)) {
+            long sweepStarted=System.nanoTime();
+            MarkerFace[] surface={null};
+            VoxyLodRaycaster.RayHit lodHit=null;
+            Vec3 sampled;
+            if (ballistic==null) {
+                SightRaycastResult hit=clipSightRayIgnoringStructures(minecraft,minecraft.player,origin,
+                        origin.add(direction.scale(AIM_RAY_DISTANCE)),direction,ignored);
+                sampled=hit.hit()?hit.target():null;
+                surface[0]=markerSurface(minecraft,hit);
+                lodHit=hit.lodHit();
+            } else sampled=VoxyLodRaycaster.clipCannonBallistic(minecraft.level,origin,
+                    launch.velocity(),ballistic.maxTicks(),ballistic.gravity(),ballistic.drag(),ballistic.quadraticDrag(),
+                    (from,to)->{
+                        Vec3 segment=to.subtract(from);
+                        if (segment.lengthSqr()<1e-12) return null;
+                        SightRaycastResult hit=clipWorldRayIgnoringStructures(minecraft,minecraft.player,
+                                from,to,segment.normalize(),ignored);
+                        if (hit.hit()) surface[0]=markerSurface(minecraft,hit);
+                        return hit.hit()?hit.target():null;
+                    });
+            CannonMarkerSurface queriedSurface = surface[0] == null ? null : surface[0].rendered(minecraft.level, partialTick);
+            if (queriedSurface!=null && (sampled==null || queriedSurface.point().distanceToSqr(sampled)>1e-8)) surface[0]=null;
+            contact=new MarkerContact(renderTick,profile,sampled,surface[0],lodHit);
+            lodPoint=lodHit==null ? null : lodHit.ray(origin,direction,AimRayLimits.LOD_DISTANCE);
+            long elapsed=System.nanoTime()-sweepStarted;
+            markerSweepCount++;
+            markerSweepNanos+=elapsed;
+            markerSweepMaxNanos=Math.max(markerSweepMaxNanos,elapsed);
+            renderMarkerContacts.put(source,contact);
+            while (renderMarkerContacts.size()>128) renderMarkerContacts.remove(renderMarkerContacts.keySet().iterator().next());
+        }
+        Vec3 impact=ballistic==null && contact.lodHit()!=null ? lodPoint : contact.point();
+        CannonMarkerSurface currentSurface = contact.face() == null ? null : contact.face().rendered(minecraft.level, partialTick);
+        if (currentSurface!=null) {
+            Vec3 current=ballistic==null ? currentSurface.ray(origin,direction,AIM_RAY_DISTANCE)
+                    : currentSurface.trajectory(launch,ballistic.gravity(),ballistic.drag(),ballistic.quadraticDrag(),
+                    ballistic.maxTicks(),minecraft.level.getMinBuildHeight()-64.0);
+            // Continue the exact rendered trajectory across a flat face only
+            // while the current contact is still a real loaded collision face.
+            // Periodic scene queries refresh cached data; leaving a LOD voxel also re-queries immediately.
+            Vec3 collisionPoint = current;
+            if (current != null && contact.face().bodyId() != null) {
+                SubLevel surfaceBody = SubLevelContainer.getContainer(minecraft.level).getSubLevel(contact.face().bodyId());
+                collisionPoint = surfaceBody instanceof ClientSubLevel surfaceClient && !surfaceBody.isRemoved()
+                        ? surfaceClient.renderPose(partialTick).transformPositionInverse(current) : null;
+            }
+            boolean valid=collisionPoint!=null && validMarkerSurface(minecraft,collisionPoint,contact.face().surface().normal());
+            if (ballistic==null) impact=valid ? current : null;
+            else if (valid) impact=current;
+        }
+        if (ballistic==null) {
+            Vec3 lockPoint = opticalLockMarker(origin, direction, partialTick, impact);
+            if (lockPoint != null) return lockPoint;
+        }
+        if (ballistic==null && impact==null) return origin.add(direction.scale(CANNON_DIRECTION_MARKER_DISTANCE));
+        if (impact!=null && headAim && !podView && !opticalLockActive
+                && !renderAimGroups.isEmpty() && group==renderAimGroups.getFirst()) {
+            long now=minecraft.level.getGameTime();
+            if (lastFiniteMarkerDiagnosticTick==Long.MIN_VALUE || now<lastFiniteMarkerDiagnosticTick
+                    || now-lastFiniteMarkerDiagnosticTick>=200) {
+                var camera=minecraft.gameRenderer.getMainCamera();
+                Vec3 sightOrigin=camera.getPosition();
+                Vec3 sightDirection=scoped || shouldLockFirstPerson() || shouldUseHeadAimThirdPersonFollow()
+                        ? directionFromStableAngles() : new Vec3(camera.getLookVector()).normalize();
+                if (!scoped && minecraft.options.getCameraType()!=CameraType.FIRST_PERSON
+                        && !shouldUseHeadAimThirdPersonFollow())
+                    sightDirection=applyViewAimOffset(minecraft,camera,sightDirection);
+                Vec3 measured=impact.subtract(sightOrigin).normalize();
+                double error=Math.toDegrees(Math.acos(Math.clamp(measured.dot(sightDirection),-1,1)));
+                StabilizedTurret.LOGGER.info("Finite marker diagnostics: markerMode={} errorDeg={} scoped={} sightBody={} muzzleBody={} sight={} marker={} inheritedVelocity={}",
+                        ballistic==null ? "sight-direction" : "ballistic-impact",error,scoped,cannonMountSubLevelId,frame.bodyId(),sightOrigin,impact,carrier);
+                if (ballistic==null && group.sightAim()!=null) {
+                    var clock=dev.ryanhcode.sable.api.sublevel.ClientSubLevelContainer.getContainer(minecraft.level).getInterpolation();
+                    double displayedTick=clock.lastInterpolationTick
+                            +(clock.mostRecentInterpolationTick-clock.lastInterpolationTick)*Math.clamp(partialTick,0,1);
+                    StabilizedTurret.LOGGER.info("Cannon sight correction: mode=applied-angle sampleTick={} renderTick={} muzzleSpeed={} localMuzzle={} bore={} sightDirection={}",
+                            group.sightAim().interpolationTick(),displayedTick,frame.muzzleSpeed(),frame.localOrigin(),
+                            launch.direction(),direction);
+                }
+                ThirdPersonCameraFrame cameraFrame=thirdPersonCameraFrame(minecraft,minecraft.player);
+                if (cameraFrame!=null) {
+                    SubLevel cameraBody=SubLevelContainer.getContainer(minecraft.level).getSubLevel(cameraFrame.bodyId());
+                    Vector3d projected=cameraBody instanceof ClientSubLevel cameraClient
+                            ? cameraClient.renderPose(partialTick).transformPosition(new Vector3d(cameraFrame.localOrigin().x,
+                            cameraFrame.localOrigin().y,cameraFrame.localOrigin().z)).add(new Vector3d(
+                            cameraFrame.worldOffset().x,cameraFrame.worldOffset().y,cameraFrame.worldOffset().z)) : null;
+                    StabilizedTurret.LOGGER.info("Third person aim frame: body={} capturedTick={} partial={} age={} origin={} worldOffset={} renderOriginError={}",
+                            cameraFrame.bodyId(),cameraFrame.tick(),cameraFrame.partialTick(),now-cameraFrame.tick(),
+                            cameraFrame.origin(),cameraFrame.worldOffset(),projected==null ? Double.NaN
+                                    : Math.sqrt(sightOrigin.distanceToSqr(projected.x,projected.y,projected.z)));
+                }
+                StabilizedTurret.LOGGER.info("Aim HUD performance: fps={} collisionSweeps={} averageSweepMs={} maximumSweepMs={}",
+                        minecraft.getFps(),markerSweepCount,markerSweepCount==0?0:markerSweepNanos/1e6/markerSweepCount,
+                        markerSweepMaxNanos/1e6);
+                markerSweepCount=markerSweepNanos=markerSweepMaxNanos=0;
+                lastFiniteMarkerDiagnosticTick=now;
+            }
+        }
+        return impact;
+    }
+
+    private static MarkerFace markerSurface(Minecraft minecraft,SightRaycastResult clipped) {
+        if (!clipped.hit() || !(clipped.rawResult() instanceof net.minecraft.world.phys.BlockHitResult hit)) return null;
+        SubLevel body = Sable.HELPER.getContaining(minecraft.level, hit.getLocation());
+        var state=minecraft.level.getBlockState(hit.getBlockPos());
+        if (state.getCollisionShape(minecraft.level,hit.getBlockPos()).isEmpty()) return null;
+        var face=hit.getDirection();
+        return new MarkerFace(new CannonMarkerSurface(body == null ? clipped.target() : hit.getLocation(),
+                new Vec3(face.getStepX(),face.getStepY(),face.getStepZ())), body == null ? null : body.getUniqueId());
+    }
+
+    private static boolean validMarkerSurface(Minecraft minecraft,Vec3 point,Vec3 normal) {
+        BlockPos block=BlockPos.containing(point.subtract(normal.scale(1e-4)));
+        if (!minecraft.level.hasChunkAt(block)) return false;
+        var state=minecraft.level.getBlockState(block);
+        Vec3 local=point.subtract(block.getX(),block.getY(),block.getZ());
+        if (state.isCollisionShapeFullBlock(minecraft.level,block))
+            return Math.abs(local.dot(normal)-(normal.x+normal.y+normal.z>0?1:0))<1e-5;
+        for (AABB box:state.getCollisionShape(minecraft.level,block).toAabbs()) {
+            double face=normal.x>0?box.maxX:normal.x<0?-box.minX:
+                    normal.y>0?box.maxY:normal.y<0?-box.minY:normal.z>0?box.maxZ:-box.minZ;
+            if (Math.abs(local.dot(normal)-face)<1e-5
+                    && local.x>=box.minX-1e-5 && local.x<=box.maxX+1e-5
+                    && local.y>=box.minY-1e-5 && local.y<=box.maxY+1e-5
+                    && local.z>=box.minZ-1e-5 && local.z<=box.maxZ+1e-5) return true;
+        }
+        return false;
+    }
+
+    private static boolean hasRenderMuzzle(AimGroupSessionPayload.GroupAim group) {
+        var level=Minecraft.getInstance().level;
+        if (level==null || group.frame()==null) return false;
+        SubLevel body=SubLevelContainer.getContainer(level).getSubLevel(group.frame().bodyId());
+        return body instanceof ClientSubLevel && !body.isRemoved();
     }
 
     public static Vec3 getScopePosition(float partialTick) {
         Vec3 anchor = scopePosition;
+        // This id is the current sublevel of the scope reference (the
+        // cannon/designator block), not necessarily the CBC cannon entity.
+        // Blueprint welding can place those in different nested sublevels.
         UUID poseSubLevelId = cannonMountSubLevelId;
         if (scopePoseRelative && poseSubLevelId != null) {
             Minecraft minecraft = Minecraft.getInstance();
@@ -1249,11 +2568,20 @@ public final class ClientAimState {
     }
 
     public static boolean isThermal() {
-        return active && (scoped || podView) && thermal;
+        return active && (scoped || podView
+                || ClientTelevisionGuidanceState.isActive()) && thermal;
     }
 
     public static boolean isOpticalLockActive() {
         return active && opticalLockActive;
+    }
+
+    public static TargetLockTelemetry getOpticalLockTelemetry() {
+        return opticalLockTelemetry;
+    }
+
+    public static TargetLockTelemetry getAirToGroundLockTelemetry() {
+        return airToGroundLockTelemetry;
     }
 
     public static boolean isOpticalLockSearching() {
@@ -1283,6 +2611,8 @@ public final class ClientAimState {
     }
 
     public static Vec3 getOpticalLockDisplayPoint(float partialTick) {
+        Vec3 smooth = ClientCannonLockLead.opticalTarget();
+        if (opticalLockActive && smooth != null) return smooth;
         // The green marker represents the target itself, never the player's
         // independently adjustable lead point.
         return opticalLockActive
@@ -1374,221 +2704,6 @@ public final class ClientAimState {
         POD_AIM.recordRenderedOrigin(origin);
     }
 
-    public static boolean shouldHideScopedEntity(net.minecraft.world.entity.Entity entity) {
-        if (!isScoped()) {
-            return false;
-        }
-        if (cannonEntityId >= 0 && entity.getId() == cannonEntityId) {
-            return true;
-        }
-        if (cannonEntityUuid != null && cannonEntityUuid.equals(entity.getUUID())) {
-            return true;
-        }
-
-        // Entity ids can differ across Sable's nested client/server levels,
-        // and that leaves Flywheel's CBC contraption visual visible even
-        // though the server sent the correct mounted cannon. Identify CBC's
-        // actual assembled-cannon entity by its class hierarchy as a local
-        // fallback, then restrict the match to the cannon beside this sight.
-        // All CBC cannon add-ons based on the standard mount inherit this
-        // entity, including CBC Neo Warfare's mounted cannon contraptions.
-        if (isCbcMountedCannon(entity)) {
-            CannonControllerRef controller = getCannonControllerRef(entity);
-            boolean controllerMatches = matchesBoundCannonController(controller);
-            boolean positionMatches = isNearScopePosition(entity);
-            if (SCOPE_CANNON_DIAGNOSTICS.add(entity.getUUID())) {
-                StabilizedTurret.LOGGER.info(
-                        "Scope cannon candidate: entityClass={}, contraptionClass={}, entityId={}, entityUuid={}, "
-                                + "controller={}, boundMount={}@{}, controllerMatch={}, positionMatch={}",
-                        entity.getClass().getName(),
-                        getContraptionClassName(entity),
-                        entity.getId(),
-                        entity.getUUID(),
-                        controller,
-                        cannonMountPos,
-                        cannonMountSubLevelId,
-                        controllerMatches,
-                        positionMatches
-                );
-            }
-            if (controllerMatches || positionMatches) {
-                return true;
-            }
-        }
-
-        // Fallback for Create/Flywheel paths whose client-side contraption id
-        // is not yet synchronized when the first scope packet arrives.
-        SubLevel containing = Sable.HELPER.getContaining(entity);
-        if (containing == null) {
-            return false;
-        }
-        UUID containingId = containing.getUniqueId();
-        return (cannonSubLevelId != null && cannonSubLevelId.equals(containingId))
-                || (pitchSubLevelId != null && pitchSubLevelId.equals(containingId));
-    }
-
-    private static boolean isCbcMountedCannon(net.minecraft.world.entity.Entity entity) {
-        if (hasClassInHierarchy(entity.getClass(), CBC_CANNON_ENTITY_CLASS)) {
-            return true;
-        }
-        Object contraption = invokePublicNoArg(entity, "getContraption");
-        return contraption != null
-                && hasClassInHierarchy(contraption.getClass(), CBC_CANNON_CONTRAPTION_CLASS);
-    }
-
-    private static boolean hasClassInHierarchy(Class<?> type, String expectedName) {
-        for (Class<?> cursor = type; cursor != null; cursor = cursor.getSuperclass()) {
-            if (expectedName.equals(cursor.getName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static String getContraptionClassName(net.minecraft.world.entity.Entity entity) {
-        Object contraption = invokePublicNoArg(entity, "getContraption");
-        return contraption == null ? "-" : contraption.getClass().getName();
-    }
-
-    private static boolean matchesBoundCannonController(CannonControllerRef controller) {
-        if (controller == null || cannonMountPos == null || !cannonMountPos.equals(controller.pos())) {
-            return false;
-        }
-        return cannonMountSubLevelId == null
-                || controller.subLevelId() == null
-                || cannonMountSubLevelId.equals(controller.subLevelId());
-    }
-
-    private static CannonControllerRef getCannonControllerRef(net.minecraft.world.entity.Entity entity) {
-        Object controller = invokePublicNoArg(entity, "getController");
-        if (controller instanceof BlockEntity blockEntity) {
-            SubLevel containing = Sable.HELPER.getContaining(blockEntity);
-            UUID subLevelId = containing == null ? null : containing.getUniqueId();
-            return new CannonControllerRef(blockEntity.getBlockPos(), subLevelId);
-        }
-
-        // CBC can receive the contraption entity before its controller block
-        // entity is present on the client. The synchronized controllerPos
-        // field still identifies the exact mount in that short window.
-        Field field = findField(entity.getClass(), "controllerPos");
-        if (field != null) {
-            try {
-                if (field.trySetAccessible() && field.get(entity) instanceof BlockPos pos) {
-                    SubLevel containing = Sable.HELPER.getContaining(entity);
-                    UUID subLevelId = containing == null ? null : containing.getUniqueId();
-                    return new CannonControllerRef(pos, subLevelId);
-                }
-            } catch (IllegalAccessException | RuntimeException ignored) {
-                // The position-based fallback below remains available.
-            }
-        }
-        return null;
-    }
-
-    private static Object invokePublicNoArg(Object owner, String methodName) {
-        try {
-            Method method = owner.getClass().getMethod(methodName);
-            return method.invoke(owner);
-        } catch (ReflectiveOperationException | RuntimeException | LinkageError ignored) {
-            return null;
-        }
-    }
-
-    private static Field findField(Class<?> type, String fieldName) {
-        for (Class<?> cursor = type; cursor != null; cursor = cursor.getSuperclass()) {
-            try {
-                return cursor.getDeclaredField(fieldName);
-            } catch (NoSuchFieldException ignored) {
-                // Continue through the CBC entity hierarchy.
-            }
-        }
-        return null;
-    }
-
-    private static boolean isNearScopePosition(net.minecraft.world.entity.Entity entity) {
-        try {
-            Vec3 sightPosition = getScopePosition(1.0F);
-            Vec3 localCenter = entity.getBoundingBox().getCenter();
-            if (localCenter.distanceToSqr(sightPosition) <= SCOPED_CANNON_FALLBACK_DISTANCE_SQR) {
-                return true;
-            }
-            Vec3 worldCenter = Sable.HELPER.projectOutOfSubLevel(
-                    entity.level(),
-                    localCenter
-            );
-            if (worldCenter.distanceToSqr(sightPosition) <= SCOPED_CANNON_FALLBACK_DISTANCE_SQR) {
-                return true;
-            }
-            SubLevel subLevel = Sable.HELPER.getContaining(entity);
-            if (subLevel != null) {
-                Vector3d localScope = new Vector3d(sightPosition.x, sightPosition.y, sightPosition.z);
-                subLevel.logicalPose().transformPositionInverse(localScope);
-                double dx = localCenter.x - localScope.x;
-                double dy = localCenter.y - localScope.y;
-                double dz = localCenter.z - localScope.z;
-                return dx * dx + dy * dy + dz * dz <= SCOPED_CANNON_FALLBACK_DISTANCE_SQR;
-            }
-            return false;
-        } catch (RuntimeException | LinkageError ignored) {
-            // If another compatibility layer is still constructing the
-            // entity, retain the exact id/UUID/sub-level checks above.
-            return false;
-        }
-    }
-
-    private record CannonControllerRef(BlockPos pos, UUID subLevelId) {
-    }
-
-    public static boolean shouldHideScopedSubLevel(SubLevel subLevel) {
-        if (!isScoped() || subLevel == null) {
-            return false;
-        }
-        UUID id = subLevel.getUniqueId();
-        boolean idMatch = (cannonSubLevelId != null && cannonSubLevelId.equals(id))
-                || (pitchSubLevelId != null && pitchSubLevelId.equals(id));
-
-        // Do not hide the mount/turret parent. CBC Neo Warfare folds the gun
-        // into the child assembled by the bound pitch bearing, so that child
-        // UUID is the authoritative barrel structure to suppress.
-        boolean hide = idMatch;
-        if (hide && id != null && SCOPE_SUBLEVEL_DIAGNOSTICS.add(id)) {
-            StabilizedTurret.LOGGER.info(
-                    "Scope hiding cannon/pitch physical sublevel {} (cannonId={}, pitchId={})",
-                    id,
-                    cannonSubLevelId,
-                    pitchSubLevelId
-            );
-        }
-        return hide;
-    }
-
-    private static void updateThermalHighlights(Minecraft minecraft, LocalPlayer player) {
-        if (!isThermal() || minecraft.level == null) {
-            restoreThermalHighlights();
-            return;
-        }
-        for (net.minecraft.world.entity.Entity entity : minecraft.level.entitiesForRendering()) {
-            if (entity == player || entity.isRemoved() || shouldHideScopedEntity(entity)) {
-                continue;
-            }
-            THERMAL_GLOW_STATES.computeIfAbsent(entity, current -> {
-                boolean previous = current.hasGlowingTag();
-                current.setGlowingTag(true);
-                return previous;
-            });
-        }
-        THERMAL_GLOW_STATES.entrySet().removeIf(entry -> entry.getKey().isRemoved());
-    }
-
-    private static void restoreThermalHighlights() {
-        THERMAL_GLOW_STATES.forEach((entity, previous) -> {
-            if (!entity.isRemoved()) {
-                entity.setGlowingTag(previous);
-            }
-        });
-        THERMAL_GLOW_STATES.clear();
-    }
-
     private static void setThermal(boolean requested) {
         if (thermal == requested) {
             return;
@@ -1597,7 +2712,6 @@ public final class ClientAimState {
         if (requested) {
             ThermalPostProcessor.beginSession();
         } else {
-            restoreThermalHighlights();
             ThermalPostProcessor.shutdown();
         }
     }

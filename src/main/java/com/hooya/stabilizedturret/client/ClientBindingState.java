@@ -17,6 +17,13 @@ public final class ClientBindingState {
     }
 
     public static void accept(boolean active, List<BindingSessionPayload.Candidate> candidates) {
+        accept(active,false,candidates);
+    }
+    public static void accept(boolean active,boolean append,List<BindingSessionPayload.Candidate> candidates) {
+        if(active&&append&&ClientBindingState.active) {
+            var combined=new java.util.LinkedHashSet<>(ClientBindingState.candidates);combined.addAll(candidates);
+            ClientBindingState.candidates=List.copyOf(combined);return;
+        }
         ClientBindingState.active = active;
         ClientBindingState.candidates = active ? List.copyOf(candidates) : List.of();
     }

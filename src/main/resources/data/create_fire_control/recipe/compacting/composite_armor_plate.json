@@ -1,0 +1,11 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    {"item": "create:iron_sheet"},
+    {"item": "create:iron_sheet"},
+    {"item": "create:copper_sheet"}
+  ],
+  "results": [
+    {"id": "create_fire_control:composite_armor_plate"}
+  ]
+}

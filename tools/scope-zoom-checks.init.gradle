@@ -1,0 +1,9 @@
+gradle.projectsEvaluated {
+    def p = rootProject
+    p.tasks.register('testScopeZoomLimits', JavaExec) {
+        dependsOn p.tasks.named('testClasses')
+        classpath = p.sourceSets.test.runtimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.client.ClientScopeConfigChecks'
+        args p.layout.buildDirectory.dir('test-runs/scope-zoom-limits').get().asFile.absolutePath
+    }
+}

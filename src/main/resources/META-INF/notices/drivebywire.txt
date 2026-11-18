@@ -1,0 +1,21 @@
+Drive-By-Wire-derived code and assets
+Copyright (c) 2023 endalion
+Upstream: https://github.com/Endalion/drivebywire
+MIT license: META-INF/licenses/drivebywire-model-MIT.txt
+
+Code copied or adapted from Drive-By-Wire retains the upstream MIT license,
+including portions now stored in Fire Control's controller/wire integration
+package. The same applies to the copied hub model, texture and plug sounds;
+their exact resource paths, upstream paths and hashes are documented in
+META-INF/notices/drivebywire-model.txt, which is preserved unchanged.
+
+Fire Control's reservation of rights covers only its original work. It does
+not override the MIT license for third-party code, modifications of that code,
+or assets merely because their path/namespace is create_fire_control.
+Existing local source does not supply a complete per-line controller-code
+provenance map; no blanket proprietary label is applied to those portions.
+
+Drive-By-Wire remains an optional external mod. This distribution does not
+bundle its standalone mod JAR or its complete source tree. Calling an external
+API does not by itself classify an entire Fire Control integration as copied
+Drive-By-Wire code. Other third-party notices and licenses remain applicable.

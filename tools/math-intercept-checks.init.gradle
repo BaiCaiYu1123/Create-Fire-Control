@@ -1,0 +1,24 @@
+gradle.projectsEvaluated {
+    def project = rootProject
+    def fixture = project.sourceSets.create('interceptorIntegration') {
+        java.srcDirs = ['src/interceptorIntegration/java']
+        compileClasspath += project.sourceSets.main.output + project.sourceSets.main.compileClasspath
+        runtimeClasspath += project.sourceSets.main.output + project.sourceSets.main.runtimeClasspath
+    }
+    def libs = project.file(project.providers.gradleProperty('referenceLibs').getOrElse('libs'))
+    project.dependencies.add('localRuntime', project.files(
+            new File(libs, 'compat-latest/simulated-neoforge-1.21.1-1.3.2.jar'),
+            new File(libs, 'compat-latest/sable-rapier-1.21.1-2.0.6.jar')))
+    project.runs.server { modSource fixture }
+    def result = project.layout.projectDirectory.dir(project.providers.gradleProperty('runRoot').get())
+            .file('server/moving-interceptor-result.txt').asFile
+    project.tasks.named('runServer').configure {
+        doFirst { result.parentFile.mkdirs(); result.text = 'RUNNING' }
+        doLast {
+            if (!result.isFile() || !result.text.startsWith('PASS')) {
+                throw new GradleException('Moving interceptor integration failed: ' +
+                        (result.isFile() ? result.text : 'missing result'))
+            }
+        }
+    }
+}

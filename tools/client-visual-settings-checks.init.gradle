@@ -1,0 +1,52 @@
+gradle.beforeProject { p ->
+    p.layout.buildDirectory.set(p.layout.projectDirectory.dir('build-client-visual-settings-verify'))
+}
+gradle.projectsEvaluated {
+    def p = rootProject
+    p.tasks.register('testClientVisualSettings', JavaExec) {
+        dependsOn p.tasks.named('testClasses')
+        classpath = p.sourceSets.test.runtimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.client.ClientVisualSettingsChecks'
+        args p.layout.buildDirectory.dir('test-runs/client-visual-settings').get().asFile.absolutePath,
+                p.file(p.providers.gradleProperty('mianbaoJar').get()).absolutePath,
+                p.file('deliverables/config-missile-occlusion-20261114-1.0.4/create-fire-control-1.0.4-missile-occlusion-toggle.jar').absolutePath
+    }
+    def fixture = p.sourceSets.create('clientVisualIntegration') {
+        java.srcDirs = ['src/visualConfigIntegration/java', 'src/configIntegration/java']
+        java.include '**/ClientVisualSettingsClientChecks.java', '**/FireControlConfigLanguageChecks.java'
+        compileClasspath += p.sourceSets.main.output + p.sourceSets.main.compileClasspath
+        runtimeClasspath += p.sourceSets.main.output + p.sourceSets.main.runtimeClasspath
+    }
+    p.dependencies.add('localRuntime', p.files('libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+            'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar'))
+    def language = p.providers.gradleProperty('visualLanguageChecks').getOrElse('false').toBoolean()
+    p.runs.client {
+        modSource fixture
+        systemProperty 'create_fire_control.visualSettingsChecks', (!language).toString()
+        systemProperty 'create_fire_control.configLanguageChecks', language.toString()
+        argument '--width'; argument '1440'
+        argument '--height'; argument '960'
+    }
+    def runDir = p.layout.projectDirectory.dir(p.providers.gradleProperty('runRoot')
+            .getOrElse('analysis/client-visual-settings-20261115')).dir('client').asFile
+    if (p.providers.gradleProperty('visualSnapshotJar').isPresent()) {
+        def snapshot = new File(runDir, 'mod-snapshot')
+        p.copy { from p.zipTree(p.file(p.providers.gradleProperty('visualSnapshotJar').get())); into snapshot }
+        p.sourceSets.main.output.classesDirs.setFrom(snapshot)
+        p.sourceSets.main.output.resourcesDir = new File(runDir, 'empty-resources')
+        p.tasks.named('compileJava').configure { enabled = false }
+        p.tasks.named('processResources').configure { enabled = false }
+    }
+    p.tasks.named('runClient').configure {
+        def resultName = language ? 'config-language-client-result.txt' : 'visual-settings-client-result.txt'
+        doFirst {
+            runDir.mkdirs(); new File(runDir, resultName).text = 'RUNNING'
+            def options = new File(runDir, 'options.txt')
+            if (!options.exists()) options.text = 'lang:zh_cn\nguiScale:2\nrenderDistance:3\nsimulationDistance:5\nmaxFps:60\n'
+        }
+        doLast {
+            def result = new File(runDir, resultName)
+            if (!result.isFile() || !result.text.startsWith('PASS')) throw new GradleException('Visual client checks failed: ' + (result.isFile() ? result.text : 'missing result'))
+        }
+    }
+}

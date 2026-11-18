@@ -12,13 +12,17 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.UUID;
+import java.util.List;
 
 public record AimSessionPayload(
         boolean active,
         boolean remoteControl,
+        boolean seatedAtBoundController,
         boolean headAim,
+        boolean freeLookHeld,
         boolean aircraftEquipment,
         boolean scoped,
+        int scopePreset,
         boolean podView,
         boolean thermal,
         double thirdPersonHeight,
@@ -65,7 +69,26 @@ public record AimSessionPayload(
         double airToGroundLockMinZ,
         double airToGroundLockMaxX,
         double airToGroundLockMaxY,
-        double airToGroundLockMaxZ
+        double airToGroundLockMaxZ,
+        boolean rocketImpactAvailable,
+        double rocketImpactX,
+        double rocketImpactY,
+        double rocketImpactZ,
+        boolean rocketTrajectoryAvailable,
+        double rocketOriginX,
+        double rocketOriginY,
+        double rocketOriginZ,
+        double rocketVelocityX,
+        double rocketVelocityY,
+        double rocketVelocityZ,
+        double rocketFirstDrag,
+        double rocketFlightDrop,
+        double rocketFirstGravity,
+        List<UUID> cameraIgnoredSubLevelIds,
+        TargetLockTelemetry opticalLockTelemetry,
+        TargetLockTelemetry airToGroundLockTelemetry,
+        List<UUID> virtualScopeHiddenSubLevels,
+        List<UUID> virtualScopeHiddenEntities
 )
         implements CustomPacketPayload {
     public static final Type<AimSessionPayload> TYPE = new Type<>(
@@ -75,9 +98,12 @@ public record AimSessionPayload(
             (buffer, payload) -> {
                 buffer.writeBoolean(payload.active);
                 buffer.writeBoolean(payload.remoteControl);
+                buffer.writeBoolean(payload.seatedAtBoundController);
                 buffer.writeBoolean(payload.headAim);
+                buffer.writeBoolean(payload.freeLookHeld);
                 buffer.writeBoolean(payload.aircraftEquipment);
                 buffer.writeBoolean(payload.scoped);
+                buffer.writeVarInt(payload.scopePreset);
                 buffer.writeBoolean(payload.podView);
                 buffer.writeBoolean(payload.thermal);
                 buffer.writeDouble(payload.thirdPersonHeight);
@@ -140,6 +166,26 @@ public record AimSessionPayload(
                 buffer.writeDouble(payload.airToGroundLockMaxX);
                 buffer.writeDouble(payload.airToGroundLockMaxY);
                 buffer.writeDouble(payload.airToGroundLockMaxZ);
+                buffer.writeBoolean(payload.rocketImpactAvailable);
+                buffer.writeDouble(payload.rocketImpactX);
+                buffer.writeDouble(payload.rocketImpactY);
+                buffer.writeDouble(payload.rocketImpactZ);
+                buffer.writeBoolean(payload.rocketTrajectoryAvailable);
+                buffer.writeDouble(payload.rocketOriginX);
+                buffer.writeDouble(payload.rocketOriginY);
+                buffer.writeDouble(payload.rocketOriginZ);
+                buffer.writeDouble(payload.rocketVelocityX);
+                buffer.writeDouble(payload.rocketVelocityY);
+                buffer.writeDouble(payload.rocketVelocityZ);
+                buffer.writeDouble(payload.rocketFirstDrag);
+                buffer.writeDouble(payload.rocketFlightDrop);
+                buffer.writeDouble(payload.rocketFirstGravity);
+                buffer.writeVarInt(payload.cameraIgnoredSubLevelIds.size());
+                for (UUID id : payload.cameraIgnoredSubLevelIds) buffer.writeUUID(id);
+                TargetLockTelemetry.write(buffer, payload.opticalLockTelemetry);
+                TargetLockTelemetry.write(buffer, payload.airToGroundLockTelemetry);
+                writeUuidList(buffer, payload.virtualScopeHiddenSubLevels);
+                writeUuidList(buffer, payload.virtualScopeHiddenEntities);
             },
             buffer -> new AimSessionPayload(
                     buffer.readBoolean(),
@@ -147,6 +193,9 @@ public record AimSessionPayload(
                     buffer.readBoolean(),
                     buffer.readBoolean(),
                     buffer.readBoolean(),
+                    buffer.readBoolean(),
+                    buffer.readBoolean(),
+                    buffer.readVarInt(),
                     buffer.readBoolean(),
                     buffer.readBoolean(),
                     buffer.readDouble(),
@@ -193,9 +242,50 @@ public record AimSessionPayload(
                     buffer.readDouble(),
                     buffer.readDouble(),
                     buffer.readDouble(),
-                    buffer.readDouble()
+                    buffer.readDouble(),
+                    buffer.readBoolean(),
+                    buffer.readDouble(),
+                    buffer.readDouble(),
+                    buffer.readDouble(),
+                    buffer.readBoolean(),
+                    buffer.readDouble(),
+                    buffer.readDouble(),
+                    buffer.readDouble(),
+                    buffer.readDouble(),
+                    buffer.readDouble(),
+                    buffer.readDouble(),
+                    buffer.readDouble(),
+                    buffer.readDouble(),
+                    buffer.readDouble(),
+                    readUuidList(buffer),
+                    TargetLockTelemetry.read(buffer),
+                    TargetLockTelemetry.read(buffer),
+                    readUuidList(buffer),
+                    readUuidList(buffer)
             )
     );
+
+    public AimSessionPayload {
+        cameraIgnoredSubLevelIds = cameraIgnoredSubLevelIds == null
+                ? List.of() : List.copyOf(cameraIgnoredSubLevelIds);
+        virtualScopeHiddenSubLevels = List.copyOf(virtualScopeHiddenSubLevels);
+        virtualScopeHiddenEntities = List.copyOf(virtualScopeHiddenEntities);
+    }
+
+    private static void writeUuidList(RegistryFriendlyByteBuf buffer, List<UUID> ids) {
+        buffer.writeVarInt(ids.size());
+        for (UUID id : ids) buffer.writeUUID(id);
+    }
+
+    private static List<UUID> readUuidList(RegistryFriendlyByteBuf buffer) {
+        int size = buffer.readVarInt();
+        if (size < 0 || size > 4096) {
+            throw new IllegalArgumentException("Invalid camera sub-level group size: " + size);
+        }
+        java.util.ArrayList<UUID> ids = new java.util.ArrayList<>(size);
+        for (int i = 0; i < size; i++) ids.add(buffer.readUUID());
+        return List.copyOf(ids);
+    }
 
     public static void handle(AimSessionPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {

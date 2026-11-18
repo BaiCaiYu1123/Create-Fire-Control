@@ -2,14 +2,12 @@ package com.hooya.stabilizedturret.network;
 
 import com.hooya.stabilizedturret.StabilizedTurret;
 import com.hooya.stabilizedturret.content.controller.StabilizerControllerBlockEntity;
-import dev.ryanhcode.sable.Sable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /** Sets one half of an embedded Create wireless-redstone channel. */
@@ -39,12 +37,12 @@ public record SetWirelessFrequencyPayload(
             if (!(context.player() instanceof ServerPlayer player)) {
                 return;
             }
-            if (Sable.HELPER.distanceSquaredWithSubLevels(
-                    player.level(), player.position(), Vec3.atCenterOf(payload.pos)) > 64.0) {
+            if (!C2SWriteAuthorization.canEditNearby(player, payload.pos)) {
                 return;
             }
             if (player.level().getBlockEntity(payload.pos) instanceof StabilizerControllerBlockEntity controller) {
-                if (payload.channel >= 0 && payload.channel < 11) {
+                if (payload.channel >= 0
+                        && payload.channel < StabilizerControllerBlockEntity.WIRELESS_INPUT_ACTION_COUNT) {
                     controller.setFrequency(payload.channel, payload.first, player.getMainHandItem());
                 }
             }

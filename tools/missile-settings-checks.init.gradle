@@ -1,0 +1,8 @@
+gradle.projectsEvaluated {
+    def project = rootProject
+    project.tasks.register('testMissileSettings', JavaExec) {
+        dependsOn project.tasks.named('testClasses')
+        classpath = project.sourceSets.test.runtimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.config.MissileSettingsChecks'
+    }
+}

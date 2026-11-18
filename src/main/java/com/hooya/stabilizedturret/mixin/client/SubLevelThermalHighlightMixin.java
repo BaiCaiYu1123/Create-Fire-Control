@@ -1,17 +1,17 @@
 package com.hooya.stabilizedturret.mixin.client;
 
-import com.hooya.stabilizedturret.client.ClientAimState;
+import com.hooya.stabilizedturret.client.ThermalRenderMode;
 import dev.ryanhcode.sable.sublevel.render.dispatcher.VanillaSubLevelRenderDispatcher;
 import net.minecraft.client.renderer.ShaderInstance;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Brightens Sable physical structures before the thermal grayscale pass.
- * Textures and directional lighting remain intact, so the result retains
- * surface detail instead of becoming a flat white silhouette.
+ * Disables Sable's visible-spectrum lighting and uniformly raises physical
+ * sub-levels before the monochrome pass.
  */
 @Mixin(value = VanillaSubLevelRenderDispatcher.class, remap = false)
 public abstract class SubLevelThermalHighlightMixin {
@@ -22,13 +22,36 @@ public abstract class SubLevelThermalHighlightMixin {
             boolean upload,
             CallbackInfo ci
     ) {
-        if (shader.COLOR_MODULATOR == null) {
+        if (ThermalRenderMode.isFixedLightThermal()) {
+            setFloat(shader, "SableEnableNormalLighting", 0.0F, upload);
+            setFloat(shader, "SableShadowsEnabled", 0.0F, upload);
+            setFloat(shader, "SableSkyLightScale", 1.0F, upload);
+        }
+        if (shader.COLOR_MODULATOR != null) {
+            if (onSubLevel && ThermalRenderMode.isFixedLightThermal()) {
+                shader.COLOR_MODULATOR.set(4.0F, 4.0F, 4.0F, 1.0F);
+            } else {
+                shader.COLOR_MODULATOR.set(1.0F, 1.0F, 1.0F, 1.0F);
+            }
+            if (upload) {
+                shader.COLOR_MODULATOR.upload();
+            }
+        }
+    }
+
+    private static void setFloat(
+            ShaderInstance shader,
+            String name,
+            float value,
+            boolean upload
+    ) {
+        var uniform = shader.getUniform(name);
+        if (uniform == null) {
             return;
         }
-        float brightness = onSubLevel && ClientAimState.isThermal() ? 2.0F : 1.0F;
-        shader.COLOR_MODULATOR.set(brightness, brightness, brightness, 1.0F);
+        uniform.set(value);
         if (upload) {
-            shader.COLOR_MODULATOR.upload();
+            uniform.upload();
         }
     }
 }

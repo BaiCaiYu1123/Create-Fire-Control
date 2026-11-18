@@ -1,0 +1,1392 @@
+{
+  "commit": "07fd12efffbf20b2053d630ed5cf7ca3ddfa54a6",
+  "eventId": "e4b1917d-d838-4490-8cb1-b8f43f4b1a94",
+  "eventSha256": "9ccc90494e2f167f43b5bb781c1544532ccab24419c56d8fcdf9428542e4e1ff",
+  "tracks": [
+    {
+      "id": "{d3246191-3789-40e9-9d34-88da7e470955}",
+      "asset": "tanks/engines/panzer6/update/idle_load.wav",
+      "sample": "idle_load",
+      "group": "load",
+      "groupVolumeDb": -3.01999998,
+      "staticDb": 8.0,
+      "start": 0.0,
+      "end": 16.591901779174805,
+      "root": 14.5,
+      "pitchAtMinimum": 0.955000043,
+      "fadeIn": [],
+      "fadeOut": [
+        {
+          "id": "{7f7cb88f-40fc-446d-b9ac-799803041231}",
+          "position": 2.0,
+          "value": 1.0,
+          "shape": 0.25471893
+        },
+        {
+          "id": "{60124105-d429-48e8-b718-4036646f1e95}",
+          "position": 16.5919,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{bc1344e7-5a9d-42de-a4aa-1b9cf78bd498}",
+      "asset": "tanks/engines/panzer6/update/slow_not_load.wav",
+      "sample": "slow_not_load",
+      "group": "load",
+      "groupVolumeDb": -3.01999998,
+      "staticDb": 2.0,
+      "start": 1.43498,
+      "end": 55.515682220458984,
+      "root": 25.0,
+      "pitchAtMinimum": 0.800000012,
+      "fadeIn": [
+        {
+          "id": "{2e4ee9a3-77d0-487b-abfa-97e702451a3a}",
+          "position": 1.43498,
+          "value": 0.0,
+          "shape": -0.2547189
+        },
+        {
+          "id": "{d9b3f83d-3af5-4c06-8275-ab0fcab94685}",
+          "position": 15.0,
+          "value": 1.0,
+          "shape": 0.0
+        }
+      ],
+      "fadeOut": [
+        {
+          "id": "{269af855-10b8-4554-9a59-0b299c77faac}",
+          "position": 33.0942,
+          "value": 1.0,
+          "shape": 0.25471893
+        },
+        {
+          "id": "{681025c8-dc24-4342-aefe-ee51055a8088}",
+          "position": 55.515682220458984,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{bd31b4d6-6511-43b1-99cf-9e8e5d1da080}",
+      "asset": "tanks/engines/panzer6/update/med_not_load.wav",
+      "sample": "med_not_load",
+      "group": "load",
+      "groupVolumeDb": -3.01999998,
+      "staticDb": 1.0,
+      "start": 33.0942,
+      "end": 83.67720794677734,
+      "root": 50.0,
+      "pitchAtMinimum": 0.600000024,
+      "fadeIn": [
+        {
+          "id": "{5eeb6e02-268e-411a-91e5-b68ce3185b60}",
+          "position": 33.0942,
+          "value": 0.0,
+          "shape": -0.2547189
+        },
+        {
+          "id": "{7cb913fb-09fe-4929-b6aa-fc0cdfb1b007}",
+          "position": 55.515682220458984,
+          "value": 1.0,
+          "shape": 0.0
+        }
+      ],
+      "fadeOut": [
+        {
+          "id": "{0eb432cf-3ebd-4eb7-b3b5-c11082dacb1d}",
+          "position": 67.629,
+          "value": 1.0,
+          "shape": 0.25471893
+        },
+        {
+          "id": "{a18b0d6d-a49a-4d60-bbdd-706cdbfdcab6}",
+          "position": 83.67720794677734,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{7283bc5b-1e87-4242-9b12-28d6d9060498}",
+      "asset": "tanks/engines/panzer6/update/fast_not_load.wav",
+      "sample": "fast_not_load",
+      "group": "load",
+      "groupVolumeDb": -3.01999998,
+      "staticDb": 4.0,
+      "start": 67.629,
+      "end": 100.0,
+      "root": 75.0,
+      "pitchAtMinimum": 0.699999988,
+      "fadeIn": [
+        {
+          "id": "{a4d0d0aa-a42c-4750-a089-489865123384}",
+          "position": 67.629,
+          "value": 0.0,
+          "shape": -0.2547189
+        },
+        {
+          "id": "{9b333f97-a556-4b0c-b27e-b90bbf42fce2}",
+          "position": 83.67720794677734,
+          "value": 1.0,
+          "shape": 0.0
+        }
+      ],
+      "fadeOut": []
+    },
+    {
+      "id": "{5f60fce8-1084-4942-8256-421877131fb1}",
+      "asset": "tanks/engines/panzer6/update/slow_load.wav",
+      "sample": "slow_load",
+      "group": "not_load",
+      "groupVolumeDb": -3.01999998,
+      "staticDb": -4.0,
+      "start": 1.43498,
+      "end": 40.0,
+      "root": 25.0,
+      "pitchAtMinimum": 0.800000012,
+      "fadeIn": [
+        {
+          "id": "{72e243a8-3f64-4931-aa21-94bba720ce2d}",
+          "position": 1.43498,
+          "value": 0.0,
+          "shape": -0.2547189
+        },
+        {
+          "id": "{1dd2d9c4-98ed-4288-a551-dcfef9c94606}",
+          "position": 15.0,
+          "value": 1.0,
+          "shape": 0.0
+        }
+      ],
+      "fadeOut": [
+        {
+          "id": "{248c6757-dca3-4bd7-a5fa-86ea7a269040}",
+          "position": 25.0,
+          "value": 1.0,
+          "shape": 0.340737492
+        },
+        {
+          "id": "{5fc00b33-ebb9-4a3c-b7d4-d61d83b146d4}",
+          "position": 40.0,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{6a892b7b-ad6d-4a11-94c9-ee4de77d6a3a}",
+      "asset": "tanks/engines/panzer6/update/med_load.wav",
+      "sample": "med_load",
+      "group": "not_load",
+      "groupVolumeDb": -3.01999998,
+      "staticDb": -2.0,
+      "start": 25.0,
+      "end": 75.0,
+      "root": 55.0,
+      "pitchAtMinimum": 0.539999962,
+      "fadeIn": [
+        {
+          "id": "{615d201c-b47c-4a4e-ac2d-95d06b073ec7}",
+          "position": 25.0,
+          "value": 0.0,
+          "shape": -0.2547189
+        },
+        {
+          "id": "{ff04619e-7239-4bd8-97f6-1868474ada3a}",
+          "position": 40.0,
+          "value": 1.0,
+          "shape": 0.0
+        }
+      ],
+      "fadeOut": [
+        {
+          "id": "{e47a44ab-afe3-46d1-aeb9-9233d265dd65}",
+          "position": 60.0,
+          "value": 1.0,
+          "shape": 0.541490972
+        },
+        {
+          "id": "{9f7ae38b-cca3-498b-9b1c-f57dea4d5451}",
+          "position": 75.0,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{e0d662eb-45d2-4fb7-a2f0-305167a82c44}",
+      "asset": "tanks/engines/panzer6/update/fast_load.wav",
+      "sample": "fast_load",
+      "group": "not_load",
+      "groupVolumeDb": -3.01999998,
+      "staticDb": 0.0,
+      "start": 60.0,
+      "end": 100.0,
+      "root": 100.0,
+      "pitchAtMinimum": 0.579999983,
+      "fadeIn": [
+        {
+          "id": "{6be7cdc6-328a-4b1b-85da-ce7ee5280e3b}",
+          "position": 60.0,
+          "value": 0.0,
+          "shape": -0.49234125
+        },
+        {
+          "id": "{9438a818-9a8f-4c70-b52f-3f58c90692cb}",
+          "position": 75.0,
+          "value": 1.0,
+          "shape": 0.0
+        }
+      ],
+      "fadeOut": []
+    }
+  ],
+  "automation": [
+    {
+      "id": "{5e12976b-ae2d-4f40-a0d7-157262f2f0c4}",
+      "property": "pitch",
+      "parameter": "gameplay_rate",
+      "points": [
+        {
+          "id": "{a0bc9ff0-7e64-4bcf-a76c-d8a4296475a0}",
+          "position": 0.25,
+          "value": -24.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{ba35cb4a-b706-4700-8ed2-0d106d352770}",
+          "position": 0.519774011299435,
+          "value": -12.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{249ac75b-67a3-465c-b9a8-8155666a993c}",
+          "position": 1.0,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{0ff599e4-e48f-4cda-8d4f-19832887624b}",
+          "position": 2.0112994350282487,
+          "value": 12.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{2c7a4c22-bf72-4f6f-b18f-268501904c93}",
+          "position": 3.9548022598870056,
+          "value": 24.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{c7954a9d-a596-41d2-9d27-6187ac2f103e}",
+      "property": "gain",
+      "parameter": "reverbIndoor",
+      "points": [
+        {
+          "id": "{44a6dceb-89e5-4e16-a701-81685c8550aa}",
+          "position": 0.423728813559322,
+          "value": 0.0,
+          "shape": 1.0
+        },
+        {
+          "id": "{5134d4df-ca46-47fb-8eed-e19b0d80ed39}",
+          "position": 59.745762648519005,
+          "value": -0.379417419,
+          "shape": 0.0
+        },
+        {
+          "id": "{518935e1-d95a-4174-a5d1-3030b65b6539}",
+          "position": 99.29378531073446,
+          "value": -6.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{2c4a044c-8021-4664-bb81-7b52b1a81f0a}",
+      "property": "gainB",
+      "parameter": "reverbIndoor",
+      "points": [
+        {
+          "id": "{23a594ad-f315-4ce0-b3e3-3fc30dac5139}",
+          "position": 0.423728813559322,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{3ded5efc-1277-4991-9141-eb0f6ef7cb45}",
+          "position": 100.0,
+          "value": -6.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{9d3a820b-a4f6-4ad7-9825-c0bb3eed1508}",
+      "property": "volume",
+      "parameter": "broken",
+      "points": [
+        {
+          "id": "{40afefc4-c4ad-4cd7-b7b4-c15962a3ed1c}",
+          "position": 0.0,
+          "value": -2.0,
+          "shape": 0.309102207
+        },
+        {
+          "id": "{bdff65d6-a08c-4b28-9d58-d4ebc42659c4}",
+          "position": 0.265275,
+          "value": -7.09036064,
+          "shape": 0.00232674018
+        },
+        {
+          "id": "{8aa565c0-136f-4179-a054-a15216f4d69d}",
+          "position": 0.53055,
+          "value": -21.3358917,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{5a29e9b0-58a5-4d74-94d8-b7e9f73f38b0}",
+      "property": "pitch",
+      "parameter": "climb",
+      "points": [
+        {
+          "id": "{5d397991-b671-4ea4-bd0e-5a070d9b0108}",
+          "position": 0.00423728813559322,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{e3b7f228-141b-4906-9385-d13663c1ac11}",
+          "position": 0.9957627118644068,
+          "value": 6.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{9d15aefe-7aa3-4b48-9c52-880fbb3d940f}",
+      "property": "pitch",
+      "parameter": "climb",
+      "points": [
+        {
+          "id": "{4ab2fbbd-3b78-4d1e-9c26-dfcca9ddc6ac}",
+          "position": 0.00423728813559322,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{efbd3bf8-4540-4ad6-a14e-48ae4ecc9403}",
+          "position": 0.9957627118644068,
+          "value": 6.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{6962e574-484d-4a40-adf4-1ab8cfe3bbd7}",
+      "property": "pitch",
+      "parameter": "climb",
+      "points": [
+        {
+          "id": "{fdf2d0a1-34ef-4cf6-b2fc-25131dbd49aa}",
+          "position": 0.00423728813559322,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{53cb9403-cb0c-4701-bc90-6713c922b020}",
+          "position": 0.9957627118644068,
+          "value": 6.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{627eeb4c-513d-4f3a-8b7b-4505cf3bd11a}",
+      "property": "volume",
+      "parameter": "broken",
+      "points": [
+        {
+          "id": "{43edb651-2177-49c6-93b4-2c86778f551d}",
+          "position": 0.0,
+          "value": 6.0,
+          "shape": 0.309102207
+        },
+        {
+          "id": "{7b53cc0d-3280-4741-91c8-f37324ea7d2a}",
+          "position": 0.265275,
+          "value": 0.909639359,
+          "shape": 0.00232674018
+        },
+        {
+          "id": "{47021da5-76fd-424d-8832-2bf5397d0df5}",
+          "position": 0.53055,
+          "value": -3.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{5873430f-12b6-4f81-9172-b46b8b3e0992}",
+      "property": "pitch",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{9ea2846f-3bbb-42ba-a203-d456c038068c}",
+          "position": 0.0,
+          "value": -4.00003433,
+          "shape": 0.226822957
+        },
+        {
+          "id": "{ba3b75a1-66ce-4992-b766-0170910104a1}",
+          "position": 33.0,
+          "value": -1.00003052,
+          "shape": -0.226822466
+        },
+        {
+          "id": "{22b673c7-794f-4e95-afcd-388b740c4d3a}",
+          "position": 66.0,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{f8e5a95b-d0ac-437e-b45b-dfa042998189}",
+      "property": "volume",
+      "parameter": "broken",
+      "points": [
+        {
+          "id": "{b6cb6ac7-6ef9-47a3-b13c-903489270f6b}",
+          "position": 0.0,
+          "value": -80.0,
+          "shape": -0.223754004
+        },
+        {
+          "id": "{5fe29562-dae7-4219-a190-73b4a8aabd27}",
+          "position": 0.2519675,
+          "value": -5.0,
+          "shape": -0.323595792
+        },
+        {
+          "id": "{410ca79d-e535-4455-a2be-8e2948cac8b8}",
+          "position": 0.503935,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{036f0bbf-a346-40dd-917c-6efa8ee56e03}",
+      "property": "intensity",
+      "parameter": "Distance",
+      "points": [
+        {
+          "id": "{fff078b2-dc6e-451a-b084-aa9125a95a87}",
+          "position": 0.0,
+          "value": 100.0,
+          "shape": 0.670255601
+        },
+        {
+          "id": "{9dfd93fa-c031-4e45-99f0-9cf737ddf511}",
+          "position": 100.0,
+          "value": 86.0,
+          "shape": -0.259862751
+        },
+        {
+          "id": "{8ca0faa3-318e-4838-84bf-654ca2240c2a}",
+          "position": 130.27542084712525,
+          "value": 70.4802551,
+          "shape": 0.616254747
+        },
+        {
+          "id": "{1f56b350-953a-46cf-9090-c2e45cda576d}",
+          "position": 215.0,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{f0f74607-89d7-4840-81fe-b24a058cfedf}",
+      "property": "volume",
+      "parameter": "headphones",
+      "points": [
+        {
+          "id": "{7fe2cf9f-289c-4019-8554-628899ecc212}",
+          "position": 0.0,
+          "value": -80.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{ad7bb97b-9ae8-4b7a-bf07-3076ed56189e}",
+          "position": 1.0,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{dc4fa2ea-697a-451a-b711-1fa9f1451c73}",
+      "property": "volume",
+      "parameter": "headphones",
+      "points": [
+        {
+          "id": "{aa90a622-0f6c-4a20-8a31-2deb8218f37d}",
+          "position": 0.0,
+          "value": -80.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{fa909951-06de-4479-b5e2-456e3e11689a}",
+          "position": 1.0,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{ce5198c6-3fbc-4dee-8c83-da8085c29afb}",
+      "property": "gain",
+      "parameter": "headphones",
+      "points": [
+        {
+          "id": "{acd85670-c634-465f-9777-ccd4570fca1d}",
+          "position": 0.0,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{964dc82e-d83e-4c4f-835e-200c54b739be}",
+          "position": 1.0,
+          "value": -80.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{38e3cb59-7159-419e-95f8-b3e1df83630c}",
+      "property": "gain",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{bb2879b8-c9e6-4e8a-b0df-00d8fec27d4f}",
+          "position": 0.0,
+          "value": -3.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{a8ce2020-4551-4ec0-9426-e0c6156ba610}",
+          "position": 9.745762711864407,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{7bb7201c-9bcf-492e-b8bd-8d52944a0d2e}",
+          "position": 100.0,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{63106dd3-2974-4e2c-bd2e-b349f098da1c}",
+      "property": "frequencyA",
+      "parameter": "Direction",
+      "points": [
+        {
+          "id": "{bdce2b2e-2307-4a81-ab5e-15ab5da022bc}",
+          "position": -1.3983050847457719,
+          "value": 22000.0,
+          "shape": -0.0907866284
+        },
+        {
+          "id": "{16538282-912b-4905-8c6a-5921208f9298}",
+          "position": 180.0,
+          "value": 20.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{071b036a-aebc-4c0c-bde0-461b13b4d551}",
+      "property": "gainB",
+      "parameter": "Direction",
+      "points": [
+        {
+          "id": "{0b050223-6ed6-480c-a31a-eb3ec03919bd}",
+          "position": -180.0,
+          "value": -10.0,
+          "shape": -0.275389701
+        },
+        {
+          "id": "{55553578-bde9-49cc-ba37-10f01347d63b}",
+          "position": -90.00000030543508,
+          "value": 4.0,
+          "shape": -0.176261216
+        },
+        {
+          "id": "{b990d89d-dffd-40ae-b6e9-208f0fee6ae8}",
+          "position": 0.5084745762711691,
+          "value": 0.0,
+          "shape": -0.619467616
+        },
+        {
+          "id": "{f8f795c9-05d6-40c1-aa96-db2742d7838a}",
+          "position": 180.0,
+          "value": -10.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{ea592efb-2620-4605-80c8-05092480d5c3}",
+      "property": "frequencyB",
+      "parameter": "Direction",
+      "points": [
+        {
+          "id": "{c2f730f2-dcb5-41be-892b-5019632711ad}",
+          "position": -180.0,
+          "value": 4000.0,
+          "shape": -0.282937616
+        },
+        {
+          "id": "{4d9e9c66-b350-4716-8ae5-45500c335844}",
+          "position": -90.0,
+          "value": 650.0,
+          "shape": 0.353103578
+        },
+        {
+          "id": "{fdd90d42-5408-4481-9d74-10997e3146b3}",
+          "position": 1.5254237288135641,
+          "value": 4000.00146,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{b2767274-6963-4b0e-bedf-a049b32e828b}",
+      "property": "panBlend",
+      "parameter": "Distance",
+      "points": [
+        {
+          "id": "{92fa68b5-09fb-42a6-a519-8056987c0247}",
+          "position": 0.0,
+          "value": 0.199999988,
+          "shape": 0.046485398
+        },
+        {
+          "id": "{81d149c1-c0e4-45cf-bffe-ede3caa62a47}",
+          "position": 99.7563551677489,
+          "value": 0.5,
+          "shape": 0.0
+        },
+        {
+          "id": "{f4826c89-92f3-4a26-8619-e0df029e3dca}",
+          "position": 215.0,
+          "value": 0.699999988,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{b2767274-6963-4b0e-bedf-a049b32e828b}",
+      "property": "panBlend",
+      "parameter": "headphones",
+      "points": [
+        {
+          "id": "{e11a4b93-23bd-450a-94f6-b65f29e8ad2c}",
+          "position": 0.0,
+          "value": 1.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{3ff4743f-0d8b-4926-9ebe-1545e8f318d2}",
+          "position": 1.0,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{9c750567-fc0a-4e24-9354-238aaa881785}",
+      "property": "gain",
+      "parameter": "Distance",
+      "points": [
+        {
+          "id": "{1d1ad2e7-6d94-4fe1-9924-c13527ed6529}",
+          "position": 0.0,
+          "value": -80.0,
+          "shape": -0.707364678
+        },
+        {
+          "id": "{49a856c5-1c44-493a-b769-dca0e30359ef}",
+          "position": 100.0,
+          "value": 10.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{9c750567-fc0a-4e24-9354-238aaa881785}",
+      "property": "gain",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{e90f9ac4-24a1-42c5-bcb0-3d8235f8f9e5}",
+          "position": 0.14124293785310735,
+          "value": -4.0,
+          "shape": -0.246438071
+        },
+        {
+          "id": "{2a4e0547-29ee-44f2-81c1-ae175688d8bb}",
+          "position": 19.63276836158192,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{02777651-4e60-4608-b168-6530be535348}",
+          "position": 100.0,
+          "value": 0.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{6fe91f43-c7ed-4a71-8b22-86367c6c84d4}",
+      "property": "gain",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{8a107d98-298c-4816-9b77-f18a66d1b1b5}",
+          "position": 0.14124293785310735,
+          "value": 8.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{04369539-1003-4e28-a99a-3f808354ede8}",
+      "property": "gainC",
+      "parameter": "is_visible",
+      "points": [
+        {
+          "id": "{35593b67-bc83-4d2e-b606-b06249bcca5a}",
+          "position": 0.007062146892655367,
+          "value": -4.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{a3432a33-7c63-4694-b33f-d54891a5501f}",
+          "position": 1.0,
+          "value": 4.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{8341ca44-6eac-4a46-b200-88f3404f5112}",
+      "property": "frequencyA",
+      "parameter": "Distance",
+      "points": [
+        {
+          "id": "{eea18625-7394-4617-b670-d189f0b9ba4f}",
+          "position": 0.0,
+          "value": 20.0,
+          "shape": -0.644155085
+        },
+        {
+          "id": "{c4541592-40b9-4142-ba3f-7b6c3a433a36}",
+          "position": 99.30084645235499,
+          "value": 150.206635,
+          "shape": 0.0
+        },
+        {
+          "id": "{607adb6d-6ec6-4a8c-967f-d9738c569256}",
+          "position": 150.0,
+          "value": 240.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{05f0b88c-0a24-43dc-8abb-bd0ebde3e6a2}",
+          "position": 215.0,
+          "value": 350.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{04701af2-0fed-49f2-8c05-c59f994d4748}",
+      "property": "frequencyB",
+      "parameter": "Distance",
+      "points": [
+        {
+          "id": "{cc023218-1b5f-467f-847a-433ad4ab0c09}",
+          "position": 0.0,
+          "value": 22000.0,
+          "shape": -0.00551092066
+        },
+        {
+          "id": "{dc1b0221-0d7a-4bf0-a2ee-c44c4f1fc274}",
+          "position": 101.12994324939811,
+          "value": 3500.0,
+          "shape": -0.0577867888
+        },
+        {
+          "id": "{fceea4e2-d1fb-4da1-8671-1cb415076ead}",
+          "position": 215.0,
+          "value": 1100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{7378070d-0b23-494f-9734-cc134a1199eb}",
+      "property": "gainD",
+      "parameter": "occlusion",
+      "points": [
+        {
+          "id": "{dfe15c36-1e62-4f0c-b497-02ba1e2bd11c}",
+          "position": 0.0,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{7185aa13-8fd0-40b2-a327-a16d752ef6bc}",
+          "position": 0.8,
+          "value": -16.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{4a845e13-429b-462a-88c1-43ee1d1c30e1}",
+          "position": 2.0,
+          "value": -30.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{b0b3b622-6470-46bf-80a5-c18b522f886f}",
+      "property": "gainE",
+      "parameter": "occlusion",
+      "points": [
+        {
+          "id": "{f3dd3179-0866-4fec-b352-1425445c22b7}",
+          "position": 0.002824858757062147,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{6a81d0e6-61f7-4871-a1c2-37da34d5f3cd}",
+          "position": 0.8,
+          "value": -10.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{ba1a085a-b851-4f69-b610-20d63daf0070}",
+          "position": 2.0,
+          "value": -30.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{2813d0c3-7ad3-46ea-a163-40d47b21b1ba}",
+      "property": "frequencyA",
+      "parameter": "Direction",
+      "points": [
+        {
+          "id": "{7c291072-ffe8-4222-961b-6a2946b38e04}",
+          "position": -180.0,
+          "value": 20.0,
+          "shape": 0.0907865092
+        },
+        {
+          "id": "{1cf2732f-85f4-43d1-90f2-3f3607257210}",
+          "position": 0.0,
+          "value": 22000.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{c7125d5f-fcd4-43fe-b038-4162f55c9c1c}",
+      "property": "gainB",
+      "parameter": "Direction",
+      "points": [
+        {
+          "id": "{4f2e37ce-dd07-437b-a2da-2661af040e9e}",
+          "position": -180.0,
+          "value": -10.0,
+          "shape": 0.659125328
+        },
+        {
+          "id": "{fa60db13-ebd1-451f-b12a-c7e48ba5e6f4}",
+          "position": 1.5254237288135641,
+          "value": 0.0,
+          "shape": 0.318583727
+        },
+        {
+          "id": "{c93c7ba3-dc07-43cc-8f94-5b75087b234b}",
+          "position": 89.99999843436342,
+          "value": 4.0,
+          "shape": 0.234627306
+        },
+        {
+          "id": "{7bd909e7-f092-444c-ab11-0a5f4031bcd2}",
+          "position": 180.0,
+          "value": -10.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{a2b7b127-26d5-48a8-9bfd-5eda327c985b}",
+      "property": "frequencyB",
+      "parameter": "Direction",
+      "points": [
+        {
+          "id": "{b7bf66b5-91d4-41fe-9edc-34c2943ce91a}",
+          "position": 1.5254237288135641,
+          "value": 4000.0,
+          "shape": -0.310340405
+        },
+        {
+          "id": "{cdff7f49-ab52-47a3-988c-55fa42294138}",
+          "position": 90.0,
+          "value": 650.0,
+          "shape": 0.310340285
+        },
+        {
+          "id": "{3877875b-75ca-43d6-8d28-38817acc5b6c}",
+          "position": 180.0,
+          "value": 4000.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{1362c4e4-b32a-489d-985b-e42da6e43a92}",
+      "property": "gain",
+      "parameter": "Distance",
+      "points": [
+        {
+          "id": "{3291ddc1-cddd-4c98-8a83-271258ee4584}",
+          "position": 0.0,
+          "value": 4.0,
+          "shape": -0.223791778
+        },
+        {
+          "id": "{881f3409-3c06-447d-8877-de537f9d183a}",
+          "position": 150.0,
+          "value": 1.0,
+          "shape": 0.263805032
+        },
+        {
+          "id": "{8d220eb1-0747-4d0d-b1ae-0ba423b089ab}",
+          "position": 200.12005649717514,
+          "value": -4.0,
+          "shape": 0.666075528
+        },
+        {
+          "id": "{f7faf801-b921-4b3a-85d9-c0e42bdb58b5}",
+          "position": 215.0,
+          "value": -80.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{1362c4e4-b32a-489d-985b-e42da6e43a92}",
+      "property": "gain",
+      "parameter": "Direction",
+      "points": [
+        {
+          "id": "{3b9396f8-c98c-4fdd-b09d-30a6527a508e}",
+          "position": -180.0,
+          "value": 6.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{b98701a4-e17f-4aa3-87c8-69ddc799e2f2}",
+          "position": 1.5254237288135641,
+          "value": 2.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{d9e85424-d68b-4f81-b305-16971565ae4d}",
+          "position": 180.0,
+          "value": 6.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{7e44dbb8-348a-41ca-bd27-b9fd97486450}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{dd4eaa21-a448-42e2-b6ef-8806dd00f7a8}",
+          "position": 0.0,
+          "value": 0.0,
+          "shape": -0.01857467
+        },
+        {
+          "id": "{5bd51b38-80c2-4827-8c0a-04c96e9ca3c0}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{6b703b61-82ae-4b92-bbf2-a936f607255a}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{6a68c9c2-b06e-4bca-94ed-e0cccd0bee45}",
+          "position": 0.0,
+          "value": 0.0,
+          "shape": 0.0842896104
+        },
+        {
+          "id": "{d9fd85c0-1818-4672-bb8b-ff86e35ad4ad}",
+          "position": 39.406778816229036,
+          "value": 40.0,
+          "shape": -0.0666108727
+        },
+        {
+          "id": "{78a454d6-0d9c-4535-973e-2d3256e6ac02}",
+          "position": 80.0,
+          "value": 80.0,
+          "shape": -0.00260157557
+        },
+        {
+          "id": "{53ebe972-e2d8-45c7-829b-76a8f26c4d7c}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{586558ec-477d-489c-8212-410fc0e5a248}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{5d9d3b5e-53e0-4a6c-bb02-fa2d82ffe3f1}",
+          "position": 0.0,
+          "value": 0.0,
+          "shape": -0.336173087
+        },
+        {
+          "id": "{a849b3e9-e392-44bf-90bd-372d0f8ea80a}",
+          "position": 40.0,
+          "value": 50.0,
+          "shape": -0.255415618
+        },
+        {
+          "id": "{b333453b-2c5b-489e-bf6f-16791b83518c}",
+          "position": 80.0,
+          "value": 80.0,
+          "shape": -0.285329789
+        },
+        {
+          "id": "{09d3e7b8-a663-4b7b-a245-79a5cfc0d668}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{2aad2d3b-3580-4d2c-b184-5f00d3bb4df4}",
+      "property": "rate",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{a2d1d11d-856f-4fa6-b6dc-4781987f9aef}",
+          "position": 0.0838629943502825,
+          "value": 0.100000001,
+          "shape": 0.0
+        },
+        {
+          "id": "{5ca19131-3bdb-417a-89ae-9a581d0ec081}",
+          "position": 99.23640536723164,
+          "value": 1.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{65a2272c-c0eb-4b4a-95b4-4e518cf01844}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{489e77d9-33f7-4be4-9b32-0f0d18c03990}",
+          "position": 0.14124293785310735,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{ae1afd63-1706-4860-8a22-851024aeb45a}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{0a698e48-57a6-4cea-8294-a50d4c0b3d43}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{a0e83779-10f8-4f48-852d-d0f7d7cec3af}",
+          "position": 0.14124293785310735,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{998bffa6-c4e7-4a3e-89e9-c37a339ad8cb}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{134ba0cf-060b-420f-911b-a7a0d128091c}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{6c6b83f8-9f3d-483d-8bfb-fb96840aa1bf}",
+          "position": 800.0,
+          "value": 800.0,
+          "shape": -0.393278629
+        },
+        {
+          "id": "{4a50f4f2-dfba-4c43-9a53-9d234099bdac}",
+          "position": 1100.0,
+          "value": 1300.0,
+          "shape": 0.159243271
+        },
+        {
+          "id": "{e9d10c3e-5a58-4206-83f6-d6c689edc043}",
+          "position": 2400.0,
+          "value": 2400.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{8771ae70-6e89-42be-b811-4246e052ae8d}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{17f1b801-5a12-4fe9-ad48-6fc988c490af}",
+          "position": 0.14124293785310735,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{c4dd8cb2-b227-4dc7-ac4a-37cb59d37704}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{346ba2a0-91ea-46d0-b63e-38ed051269ae}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{b15064cf-4454-4c87-a6c6-704d1057d106}",
+          "position": 0.14124293785310735,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{2b417a43-b113-4dff-b1b2-8d46711a361e}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{c4ca3e79-0b15-4e24-b40b-5cadb2871000}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{1bd20033-b1a9-4d35-9bda-7fa84b712a34}",
+          "position": 0.0,
+          "value": 0.0,
+          "shape": -0.00593162421
+        },
+        {
+          "id": "{c986382f-36d6-4ebe-a53f-4ff543bc97ea}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{3150be9f-8d58-4e0b-93b9-dfc5eec638dd}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{3fd6b3a8-809f-47bf-b6d0-e34de6f9d646}",
+          "position": 0.0,
+          "value": 0.0,
+          "shape": -0.0178001523
+        },
+        {
+          "id": "{d9623654-a004-495b-b83c-4ade52a6fa67}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{2f27203c-bf6a-4a55-917f-ed1102282724}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{c5182d78-95ca-41f0-9eeb-32442e491895}",
+          "position": 0.14124293785310735,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{4afdc962-77d3-47ab-99d5-ba31fc805992}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{7aa20764-b191-46d9-bad0-bd9a62888c86}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{c158c03b-837a-4633-9eb6-d69d2b5ab0e8}",
+          "position": 0.14124293785310735,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{a98c5d36-7464-456c-9990-7b2ffdcb532e}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{e584f73b-be00-4291-8401-ddd53add1855}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{e0662b9e-f11b-48ef-9551-b332678c7b91}",
+          "position": 0.14124293785310735,
+          "value": 0.0,
+          "shape": 0.0
+        },
+        {
+          "id": "{2df45b93-3e37-4ee5-a593-29aa314c3945}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{70f9dc9a-125c-4966-a834-a2428a68721e}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{e44797dc-4c90-4ebc-ba3a-e3de5d7eb8d3}",
+          "position": 0.0,
+          "value": 0.0,
+          "shape": 0.380789757
+        },
+        {
+          "id": "{c33e747f-6761-43b5-a73b-d4abe1cfc3f5}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    },
+    {
+      "id": "{66c0ad87-3218-4728-b0c6-bbb5d169bca0}",
+      "property": "cursorPosition",
+      "parameter": "rpm",
+      "points": [
+        {
+          "id": "{926f6c36-c6f0-4168-aaed-55d1009ad4d4}",
+          "position": 0.0,
+          "value": 0.0,
+          "shape": 0.0665305257
+        },
+        {
+          "id": "{f50cad68-237c-4e72-b8cb-f587badeed43}",
+          "position": 40.0,
+          "value": 40.0,
+          "shape": -0.0197794326
+        },
+        {
+          "id": "{a8c80b54-f546-4479-baaf-82f7f6edfc0a}",
+          "position": 70.0,
+          "value": 70.0,
+          "shape": -0.0724681243
+        },
+        {
+          "id": "{ee2419db-29e4-4f7e-b43b-ac5e7abbfb4e}",
+          "position": 100.0,
+          "value": 100.0,
+          "shape": 0.0
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Group volume automators use broken, NOT load. Healthy broken=0: load=-2 dB, not_load=+6 dB.",
+    "Tank_AI_rpm_Compensator_Gain is RPM automation (-3 dB at 0, 0 dB at 9.7457627).",
+    "SU crossfade is a Minecraft adaptation, not an authored FMOD load curve.",
+    "Climb automation endpoints .004237288 -> 0 st, .995762712 -> 6 st, on slow_load/med_load/fast_load only. MC acceleration mapping is an approximation.",
+    "Revv MultiSound uses loadswitch, not load. MC maps positive audio-RPM target gap / 25, seek +2/-4, one trigger at entry >= .1.",
+    "Revv randomizer serialized amount=5 is not assumed to be semitones: 240 native triggers measured about +/-1.2 st.",
+    "Reference mode interpolates the full 401-row native RPM sweep without equal-power or RMS normalization.",
+    "Serial gains: event +2, engines_enemies -8, enemy parent -16 dB; shared near/front Distance +4 and Direction approximately +2 dB.",
+    "Revv Tank_AI_Load_Speed_Gain automated +8 replaces base +6; local Gain -2 dB. Group automations replace base values.",
+    "Spatializer preset overrides range to 3..400 and Doppler multiplier to 0; event base max=1000 and scale=205 are not effective range/multiplier.",
+    "Full EQ, compressor/limiter, snapshot, headphone return and WT gameplay occlusion chains are not emulated. Installed bank and pinned XML are separate builds."
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "layer0": "create_fire_control:item/apfsds_projectile",
+    "particle": "create_fire_control:item/apfsds_projectile"
+  },
+  "loader": "neoforge:obj",
+  "flip_v": true,
+  "automatic_culling": false,
+  "shade_quads": true,
+  "model": "create_fire_control:models/item/apfsds_medium_cannon_round.obj",
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        88,
+        1,
+        2
+      ],
+      "translation": [
+        0,
+        0.75,
+        1
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        88,
+        1,
+        2
+      ],
+      "translation": [
+        0,
+        0.75,
+        1
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        88,
+        1,
+        2
+      ],
+      "translation": [
+        0,
+        0.75,
+        1
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        88,
+        1,
+        2
+      ],
+      "translation": [
+        0,
+        0.75,
+        1
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "ground": {
+      "rotation": [
+        -90,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        2.5
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    },
+    "gui": {
+      "rotation": [
+        50,
+        40,
+        -30
+      ],
+      "translation": [
+        -6.853425,
+        6.303879,
+        0
+      ],
+      "scale": [
+        1.5782,
+        1.5782,
+        1.5782
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        90,
+        0,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    }
+  }
+}

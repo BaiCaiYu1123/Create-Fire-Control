@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "create_fire_control:block/connected_display_front_single",
+    "north": "create_fire_control:block/connected_display_front_single",
+    "south": "create_fire_control:block/connected_display_casing_standalone",
+    "east": "create_fire_control:block/connected_display_casing_standalone",
+    "west": "create_fire_control:block/connected_display_casing_standalone",
+    "up": "create_fire_control:block/connected_display_casing_standalone",
+    "down": "create_fire_control:block/connected_display_casing_standalone"
+  }
+}

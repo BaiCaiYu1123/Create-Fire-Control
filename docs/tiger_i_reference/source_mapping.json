@@ -1,0 +1,188 @@
+{
+  "blips-001": {
+    "source": "Assets/tanks/engines/panzer6/update/blips-001.wav",
+    "gitBlob": "198b1955128de74629a9650374259516a764de62",
+    "sha256": "7d8d864e0293f048048621a7710890b2e1dfafb3c08c359602b449c1ad26cdbc",
+    "used": true
+  },
+  "blips-002": {
+    "source": "Assets/tanks/engines/panzer6/update/blips-002.wav",
+    "gitBlob": "a23d63687176331a512e65d98aae0a8c4215474a",
+    "sha256": "51f14b7f0c94f4e72be5682ea5f99b9bcb1f5aca0635a750b404876b565e1604",
+    "used": true
+  },
+  "blips-003": {
+    "source": "Assets/tanks/engines/panzer6/update/blips-003.wav",
+    "gitBlob": "d0e0604bdf1c3f797384fae50a92b223c558d720",
+    "sha256": "9a0056d7e919ce065502fa4634d5d9ee5f2d92a2a5a50f56a08700298920a214",
+    "used": true
+  },
+  "blips-004": {
+    "source": "Assets/tanks/engines/panzer6/update/blips-004.wav",
+    "gitBlob": "f1ab5bdf9ee6db50903541421657a2b39cd4f307",
+    "sha256": "ffa4238a2d7f7c7cac0d2873ef7cc0350aa9d8c731936941f9e6b567042330db",
+    "used": true
+  },
+  "blips-005": {
+    "source": "Assets/tanks/engines/panzer6/update/blips-005.wav",
+    "gitBlob": "effecdbec48348c7d47bd9a13492d34c7478f602",
+    "sha256": "2042bd7d20a02fee89363dbba8a449f8efdae810afecdb2a29492565601d0e79",
+    "used": true
+  },
+  "blips-006": {
+    "source": "Assets/tanks/engines/panzer6/update/blips-006.wav",
+    "gitBlob": "a27cd54942003affbdb6e6334ea80c6f3cdcf9bb",
+    "sha256": "6262e2c1b529554625abc2a7bcd0db5cd721a26635bdbac9bc8d9c9634024c1e",
+    "used": true
+  },
+  "blips-007": {
+    "source": "Assets/tanks/engines/panzer6/update/blips-007.wav",
+    "gitBlob": "d0323186bc7850d7ed147041e83bb4fa2105045b",
+    "sha256": "b7a7e9896be080d0c3abd34db14ba45eeb255704b5d8d5aa48727b0519d01f24",
+    "used": true
+  },
+  "blips-008": {
+    "source": "Assets/tanks/engines/panzer6/update/blips-008.wav",
+    "gitBlob": "efc81bc9772554b95a3ce837f02e4f74df3b3468",
+    "sha256": "d34742e135cb2387019074c06a3ca0cb348077e8d6d9bf36981fe127e22b831c",
+    "used": true
+  },
+  "blips-009": {
+    "source": "Assets/tanks/engines/panzer6/update/blips-009.wav",
+    "gitBlob": "be63845d5488ce455d39f7961478e357b3c637ad",
+    "sha256": "2119843f0747f510f8fd7b20d0feb6878eb0830b85a6720c1b87bfac6722890b",
+    "used": true
+  },
+  "fast_load": {
+    "source": "Assets/tanks/engines/panzer6/update/fast_load.wav",
+    "gitBlob": "868f513634112a9906f77b27e795cbc868efe3d8",
+    "sha256": "dfa69f5a2c65f2f229526a15359949d4a18ae4a4df115d342db78e6acbd72c17",
+    "used": true
+  },
+  "fast_not_load": {
+    "source": "Assets/tanks/engines/panzer6/update/fast_not_load.wav",
+    "gitBlob": "ff066713dc94d4712a0d3f18524283b173eb99ca",
+    "sha256": "83cdc604ed1071994f3bd13c497204b21e254d771d455cf003da016f2c0fc3c3",
+    "used": true
+  },
+  "idle_load": {
+    "source": "Assets/tanks/engines/panzer6/update/idle_load.wav",
+    "gitBlob": "2778e894df86afdcabd9aa6ca9f4469bc212c8ca",
+    "sha256": "9f18a0ad103eaeaa0ad267e27bf9799cdf9c6286dd10d7c7aa1788cae6ecdb0c",
+    "used": true
+  },
+  "idle_not_load": {
+    "source": "Assets/tanks/engines/panzer6/update/idle_not_load.wav",
+    "gitBlob": "4fb1ad5f7a9277f9065eca1efde8eb593b99b989",
+    "sha256": "30b70fb64801af391e9efcdd8089812bf8d1b0654879220374ebac4fcacc96c5",
+    "used": false
+  },
+  "med_load": {
+    "source": "Assets/tanks/engines/panzer6/update/med_load.wav",
+    "gitBlob": "8d216a403a47f9ba835c039355216b8344e8b462",
+    "sha256": "200565b60a2c24e1b944bf9772498952919c5ece30180ba6c33454650ba21d2d",
+    "used": true
+  },
+  "med_not_load": {
+    "source": "Assets/tanks/engines/panzer6/update/med_not_load.wav",
+    "gitBlob": "9e28cb262a1792be3408c0af7edbfa434d4f6da0",
+    "sha256": "1c001b58cb8a1f5287627509f1606e9f2d590c6fffbda0d3c60aeab6c26dfc3f",
+    "used": true
+  },
+  "release-001": {
+    "source": "Assets/tanks/engines/panzer6/update/release-001.wav",
+    "gitBlob": "85ecfa9ce9bfc9004bf934d861deaaaf2a71a28c",
+    "sha256": "8112372ef9063089ed7f93f0d17683852b5a8995be3c1e5a0f0d7043663e2da3",
+    "used": true
+  },
+  "release-002": {
+    "source": "Assets/tanks/engines/panzer6/update/release-002.wav",
+    "gitBlob": "c7e65c5f339887196b1efa94612b85401ea7f9f7",
+    "sha256": "a8a850c67a0f416e1d23583e10a98f69a95ecb137cc0b2bfc14d1c236c55abc8",
+    "used": true
+  },
+  "release-003": {
+    "source": "Assets/tanks/engines/panzer6/update/release-003.wav",
+    "gitBlob": "8952b2d308515fe697bdad03683cd4a1c8285a85",
+    "sha256": "51c0fae71e7f5fdfa89432d8b6a71f5192d30fafcb8d173d913c7beb31d9ffcf",
+    "used": true
+  },
+  "release-004": {
+    "source": "Assets/tanks/engines/panzer6/update/release-004.wav",
+    "gitBlob": "82a3a53f840839ab62406a245909baae946664dc",
+    "sha256": "1616fb790829aff79c8f6e5e632a0c2a15e27a8ae19e3085f6e11b1f5c202bf9",
+    "used": true
+  },
+  "release-005": {
+    "source": "Assets/tanks/engines/panzer6/update/release-005.wav",
+    "gitBlob": "e774efaf37c1782e58e1cd9e03b58c12c4cbdd0b",
+    "sha256": "ad03e235a00f9ce7723f2b3f4db5111032930d1e8a006c9c7b61817e2ff4f605",
+    "used": true
+  },
+  "release-006": {
+    "source": "Assets/tanks/engines/panzer6/update/release-006.wav",
+    "gitBlob": "dbb29b0bf08bb7b373c71d0317d08b6c36179e60",
+    "sha256": "4affe862143a58fb7fed4883ae1faf4d066d438ce8d18ef5265885eff39cf52c",
+    "used": true
+  },
+  "release-007": {
+    "source": "Assets/tanks/engines/panzer6/update/release-007.wav",
+    "gitBlob": "38c7cab1279fbbcb89cee9a0dab807ed97ae5b05",
+    "sha256": "2fca168cc49358e013c765408507a12c24b02ff1770b01acaaa1df72a323f879",
+    "used": true
+  },
+  "revv-001": {
+    "source": "Assets/tanks/engines/panzer6/update/revv-001.wav",
+    "gitBlob": "eab803b3e117b69e867a59ec2988d2ab09f17ed5",
+    "sha256": "b927576330be33351a76084a89e4f4fb1854d01bd438e04531df8cac7ac293c9",
+    "used": true
+  },
+  "revv-002": {
+    "source": "Assets/tanks/engines/panzer6/update/revv-002.wav",
+    "gitBlob": "db7bdd7d3593b12ec32c0cdc5c57be7a582afb92",
+    "sha256": "7971b43b03be2debd36f8837aac359e1af6daef199ad769c67c852ca4f36e205",
+    "used": true
+  },
+  "revv-003": {
+    "source": "Assets/tanks/engines/panzer6/update/revv-003.wav",
+    "gitBlob": "730388fba0b17ad9f9ff6c03aaff01c99029d922",
+    "sha256": "bf6a438cc890f56066d0bf4c607d0be02fccafe1e7e03f0f3fb51882a2f54442",
+    "used": true
+  },
+  "revv-004": {
+    "source": "Assets/tanks/engines/panzer6/update/revv-004.wav",
+    "gitBlob": "25dbc3d198a1654743d6fad63866be8c759ec24e",
+    "sha256": "6c9efa81b2454784b7a7e61b3952c47b82972ee7357cce5ee26fa75e85e6c563",
+    "used": true
+  },
+  "revv-005": {
+    "source": "Assets/tanks/engines/panzer6/update/revv-005.wav",
+    "gitBlob": "c8f8703fd6c790ad909ba2939b6ad509cef95a27",
+    "sha256": "3d0c912c2e50954e48581fd4d1e28e824496d3abcfad86c771e349a321a7fb38",
+    "used": true
+  },
+  "slow_load": {
+    "source": "Assets/tanks/engines/panzer6/update/slow_load.wav",
+    "gitBlob": "193d464604228c0f4a958e8d41bab6961471c5ce",
+    "sha256": "66b3a5214895e114fd005167a18a68f76c586f36eedb9f270aa112a016bd8adb",
+    "used": true
+  },
+  "slow_not_load": {
+    "source": "Assets/tanks/engines/panzer6/update/slow_not_load.wav",
+    "gitBlob": "4aab25e4bcd3640656ffd3e32e3ca954afe467c2",
+    "sha256": "0e219a19a810518f44ddf1bbca59f27cf7116080f4905c9f9ea49e866ff8551e",
+    "used": true
+  },
+  "start": {
+    "source": "Assets/tanks/engines/panzer6/update/start.wav",
+    "gitBlob": "adab76bd0156ac407639e1fc56cea5437528ed67",
+    "sha256": "51bb1fb1f28491b3a26f61f863e3ceca973822b013960770e43285acbc3b1c5f",
+    "used": true
+  },
+  "stop": {
+    "source": "Assets/tanks/engines/panzer6/update/stop.wav",
+    "gitBlob": "26fa31b82bbc855e8bfd4b0c8ca769156df1ba32",
+    "sha256": "c3134cb525aafb076ce0731ebea551f69f4ce8502f1bc8d2544cffbe2901854d",
+    "used": true
+  }
+}

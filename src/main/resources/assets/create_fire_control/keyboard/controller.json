@@ -1,0 +1,2307 @@
+{
+  "active": {
+    "models": [
+      "item/keyboard/active_001",
+      "item/keyboard/active_002",
+      "item/keyboard/active_003",
+      "item/keyboard/active_004",
+      "item/keyboard/active_005",
+      "item/keyboard/active_006",
+      "item/keyboard/active_007",
+      "item/keyboard/active_008",
+      "item/keyboard/active_009",
+      "item/keyboard/active_010",
+      "item/keyboard/active_011",
+      "item/keyboard/active_012",
+      "item/keyboard/active_013",
+      "item/keyboard/active_014",
+      "item/keyboard/active_015",
+      "item/keyboard/active_016",
+      "item/keyboard/active_017",
+      "item/keyboard/active_018",
+      "item/keyboard/active_019",
+      "item/keyboard/active_020",
+      "item/keyboard/active_021",
+      "item/keyboard/active_022",
+      "item/keyboard/active_023",
+      "item/keyboard/active_024",
+      "item/keyboard/active_025",
+      "item/keyboard/active_026",
+      "item/keyboard/active_027",
+      "item/keyboard/active_028",
+      "item/keyboard/active_029",
+      "item/keyboard/active_030",
+      "item/keyboard/active_031",
+      "item/keyboard/active_032",
+      "item/keyboard/active_033",
+      "item/keyboard/active_034",
+      "item/keyboard/active_035",
+      "item/keyboard/active_036",
+      "item/keyboard/active_037",
+      "item/keyboard/active_038",
+      "item/keyboard/active_039",
+      "item/keyboard/active_040",
+      "item/keyboard/active_041",
+      "item/keyboard/active_042",
+      "item/keyboard/active_043",
+      "item/keyboard/active_044",
+      "item/keyboard/active_045",
+      "item/keyboard/active_046",
+      "item/keyboard/active_047",
+      "item/keyboard/active_048",
+      "item/keyboard/active_049",
+      "item/keyboard/active_050",
+      "item/keyboard/active_051",
+      "item/keyboard/active_052",
+      "item/keyboard/active_053",
+      "item/keyboard/active_054",
+      "item/keyboard/active_055",
+      "item/keyboard/active_056",
+      "item/keyboard/active_057",
+      "item/keyboard/active_058",
+      "item/keyboard/active_059",
+      "item/keyboard/active_060",
+      "item/keyboard/active_061",
+      "item/keyboard/active_062",
+      "item/keyboard/active_063",
+      "item/keyboard/active_064",
+      "item/keyboard/active_065",
+      "item/keyboard/active_066",
+      "item/keyboard/active_067",
+      "item/keyboard/active_068",
+      "item/keyboard/active_069",
+      "item/keyboard/active_070",
+      "item/keyboard/active_071",
+      "item/keyboard/active_072",
+      "item/keyboard/active_073",
+      "item/keyboard/active_074",
+      "item/keyboard/active_075",
+      "item/keyboard/active_076",
+      "item/keyboard/active_077",
+      "item/keyboard/active_078",
+      "item/keyboard/active_079",
+      "item/keyboard/active_080",
+      "item/keyboard/active_081",
+      "item/keyboard/active_082",
+      "item/keyboard/active_083",
+      "item/keyboard/active_084",
+      "item/keyboard/active_085",
+      "item/keyboard/active_086",
+      "item/keyboard/active_087"
+    ],
+    "nodes": [
+      {
+        "name": "Controller",
+        "pivot": [
+          8.0,
+          8.0,
+          8.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "parts": [
+          {
+            "model": "item/keyboard/active_003",
+            "input": "",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "3161d409-80f7-e116-6eda-ba2c5906530c",
+              "43a01be1-43d9-bc5d-6e4e-28faa109efd7",
+              "8f30fb54-5bff-5427-239a-9234da858e0a",
+              "91162a9b-9be4-27fd-fd58-978522430afc",
+              "91e592bb-fc01-fa62-6826-11211b18bc2b",
+              "bdc6bfa8-ca97-6e0b-7e45-5e7747edf3cd",
+              "4ac02281-c913-5d2b-db4c-91b08081d85d"
+            ]
+          }
+        ],
+        "children": [
+          {
+            "name": "Controller",
+            "pivot": [
+              8.0,
+              8.0,
+              8.0
+            ],
+            "rotation": [
+              0,
+              0,
+              0
+            ],
+            "parts": [
+              {
+                "model": "item/keyboard/active_001",
+                "input": "",
+                "depth": 0.3,
+                "glow": false,
+                "elements": [
+                  "239ac148-392a-7eb3-62b7-3e430486499f",
+                  "dd7f30f9-3511-14e7-1616-f2df750dd520",
+                  "84735be8-5e8e-24e9-4f0b-d3bbaa977c75",
+                  "f3d5bfba-be90-64fb-25d4-e71311dd8e9b"
+                ]
+              }
+            ],
+            "children": [],
+            "tracks": {}
+          },
+          {
+            "name": "Controller",
+            "pivot": [
+              8.0,
+              8.0,
+              8.0
+            ],
+            "rotation": [
+              0,
+              0,
+              0
+            ],
+            "parts": [
+              {
+                "model": "item/keyboard/active_002",
+                "input": "",
+                "depth": 0.3,
+                "glow": false,
+                "elements": [
+                  "31b7ebfb-e7ad-a04d-c3ff-075a1b659423",
+                  "8b34f39e-0595-304b-a697-14b26c8fce1c",
+                  "021e1694-fdb8-ecd1-ea0d-6b7fbfbdf2c9",
+                  "85b49113-0ffe-1901-1d0e-59a5ac097ca1"
+                ]
+              }
+            ],
+            "children": [],
+            "tracks": {}
+          }
+        ],
+        "tracks": {}
+      },
+      {
+        "name": "buttons",
+        "pivot": [
+          8.0,
+          8.0,
+          8.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "parts": [
+          {
+            "model": "item/keyboard/active_008",
+            "input": "",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "52316a40-b0fd-2710-366d-bf4f795820bb",
+              "ab0275b0-0ac4-fdae-5d94-73e6d1508561",
+              "b96a3327-56ff-e26b-ea14-98d16edfa1ea",
+              "46ed317d-0f34-6db2-7245-0dce74bbd21d",
+              "ad49ac01-eefb-3713-745c-a7e3bbb88b8f",
+              "0e62cf44-5414-b491-8f89-5413571fe46b",
+              "07863a25-9bcd-800f-56b2-4c1cee7001a7",
+              "961fbbb5-1f8b-a431-c524-0cfb49d4f2e2",
+              "1edaa9ca-879b-8a44-3b90-ecb24e67e6b7",
+              "9f693785-9825-3130-2c96-efef1d28bbed",
+              "5e56932a-0313-bb22-9307-69f27f4a6b7d",
+              "73abfaeb-7899-ac43-3151-d7b314dcb71f",
+              "4f9987b2-f332-b592-93fc-8ff42f6ca686",
+              "1423dde6-eda0-6dfc-1c8c-82ef75f435d2",
+              "8338c7c9-4bb9-6570-eaab-ff7a5bc23ccf",
+              "d9f7baa0-9f66-28c5-7bfa-c2934cf9be9a",
+              "ed9bfebc-c367-62f1-d9a8-c65d3ea72ff1",
+              "d7014ffd-dc7f-89fb-b3d0-dc5338632d15",
+              "9ccb4cc9-e4ee-4a09-20aa-eac7c18f48ca"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_004",
+            "input": "key_265",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "5a70d2f7-2b6e-4c01-2956-d9bd9b04f213"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_005",
+            "input": "key_264",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "1eebbf45-70d2-8007-5908-3bb23632582c"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_006",
+            "input": "key_263",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "02c6fd0b-8870-68cf-9443-a2e13ac8816e"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_007",
+            "input": "key_262",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "dccc3e48-a787-230f-35b3-55a3a930f5ba"
+            ]
+          }
+        ],
+        "children": [],
+        "tracks": {}
+      },
+      {
+        "name": "buttons2",
+        "pivot": [
+          8.0,
+          8.0,
+          8.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "parts": [
+          {
+            "model": "item/keyboard/active_086",
+            "input": "",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "5934e9dc-5c8a-8284-d983-8af7bb9cc518",
+              "04c7391a-36fe-0060-2c5e-8633773a82f4"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_009",
+            "input": "key_256",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "da5cd609-5329-0728-c0ea-c98b7260cd78"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_010",
+            "input": "key_290",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "f3ff7511-a211-d548-296e-15c5065ebef8"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_011",
+            "input": "key_291",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "fc041168-2947-764c-f031-0764a4704a87"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_012",
+            "input": "key_292",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "d328b652-d62c-51a0-d588-0a5a5995b296"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_013",
+            "input": "key_293",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "310139d1-27ce-e92a-c1ba-d75352d6d64b"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_014",
+            "input": "key_294",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "e6386990-d73e-0146-8bbc-e4fa7fa6c608"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_015",
+            "input": "key_295",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "2f56e525-4e94-5a92-d762-473f0678a82b"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_016",
+            "input": "key_296",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "94a44b41-151c-23aa-42d5-263a5478ce02"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_017",
+            "input": "key_297",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "0747ed93-b19b-d71f-0b82-1601ef1882ff"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_018",
+            "input": "key_298",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "d2924467-39bf-3c57-588f-0433101cd76d"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_019",
+            "input": "key_299",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "93799034-587c-a162-67dd-c0bb22975758"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_020",
+            "input": "key_300",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "b4fd3f2c-1844-6464-dfc9-de0eb6fe58df"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_021",
+            "input": "key_301",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "6723bd60-d3ec-5afc-7c92-dd8e12287b03"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_022",
+            "input": "key_61",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "b6a48a27-02bb-cdcc-b567-362d16e939a3"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_023",
+            "input": "key_259",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "585e342f-2552-66a9-7adb-f5eef3608aac"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_024",
+            "input": "key_45",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "af130097-649f-91c9-878f-af141a4389c8"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_025",
+            "input": "key_48",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "cb9580a5-0ab9-e8f8-7189-297b533feb60"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_026",
+            "input": "key_57",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "bbc2eb6c-0f5f-7721-d1a2-c444d4297008"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_027",
+            "input": "key_56",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "de276b3b-b80d-00dd-7301-d078d16f1f9f"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_028",
+            "input": "key_55",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "c3f2e047-9380-a50b-7cfe-1effefdff654"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_029",
+            "input": "key_54",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "1aa89200-5e1b-7f00-5482-a6183e625199"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_030",
+            "input": "key_53",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "41bc3831-8d39-07e2-dc30-cd3828e38183"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_031",
+            "input": "key_52",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "e4be7fc1-16d8-89cb-8805-87d9b2572953"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_032",
+            "input": "key_51",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "48ac4e29-00d0-2b8b-e689-b63e06eb83b2"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_033",
+            "input": "key_50",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "eba53a2d-bbe2-062a-ee39-97819eb6db06"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_034",
+            "input": "key_49",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "d8e88006-595d-5824-0c37-07975fd4cc5b"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_035",
+            "input": "key_96",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "562b16bf-be8f-17f5-ca62-eaee7ce6c91f"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_036",
+            "input": "key_92",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "4a77ba6f-77b1-33f0-e9a1-b11257e82ef1"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_037",
+            "input": "key_93",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "a47476df-ac4f-a23d-4aec-c601305bef5c"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_038",
+            "input": "key_91",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "18eb9bee-bdde-4c86-9243-840607d7178c"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_039",
+            "input": "key_80",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "98485271-e9b7-ade2-0922-0ff3ee836786"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_040",
+            "input": "key_79",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "3de23c9a-162d-700a-88b4-3de825db477e"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_041",
+            "input": "key_73",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "89700564-fd0f-afd0-c841-672a34a9f902"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_042",
+            "input": "key_85",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "29df48fc-ce4a-3293-ce5e-936f358bdf24"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_043",
+            "input": "key_89",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "2699d28c-98b8-9ccf-fcec-03a14b1183c1"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_044",
+            "input": "key_84",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "bd4351f8-b002-f800-ae07-fe063b711fc0"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_045",
+            "input": "key_82",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "70c4fc79-b10d-37d2-04d5-5213138ed8d4"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_046",
+            "input": "key_69",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "1a257ac9-5cc2-c241-f456-3e1370c5130e"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_047",
+            "input": "key_87",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "64d70409-b9ff-5dcc-f7fa-6829ac8259d8"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_048",
+            "input": "key_81",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "aae0eb7f-f61f-02ab-e6e5-70279aa87b37"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_049",
+            "input": "key_258",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "231264c2-969f-a39e-d937-40741eea1923"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_050",
+            "input": "key_257",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "16b5c9fc-e012-eded-43d5-9f8e037a8452"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_051",
+            "input": "key_39",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "0e287ecd-93f2-56e1-929d-7e58a50894c4"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_052",
+            "input": "key_59",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "fdc5a74c-aeac-7358-01ea-663099eea37d"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_053",
+            "input": "key_76",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "c88d9acb-f094-ab49-fd1b-0e2fc9f1ad65"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_054",
+            "input": "key_75",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "1a7faa9f-8f60-5673-c30b-5f5eb9c4669e"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_055",
+            "input": "key_74",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "2d94a175-f0e4-b261-aa3e-62ecb97d23ce"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_056",
+            "input": "key_72",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "ca055e58-dca4-4b7b-ed18-359976a8d8c9"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_057",
+            "input": "key_71",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "dd1a34f0-7119-f54a-bae1-9161939a377f"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_058",
+            "input": "key_70",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "90a2e901-7efa-4a19-51b0-bb982800fb93"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_059",
+            "input": "key_68",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "c670450a-c5db-a1ad-252a-f8cb5073e337"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_060",
+            "input": "key_83",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "62063873-e227-232f-a803-5910b7b0db27"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_061",
+            "input": "key_65",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "a056b5c6-eeac-b839-b9b1-bec2afc04042"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_062",
+            "input": "key_280",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "0ff03dd7-b011-ec6b-ffb8-cc7f9b2c2c85"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_063",
+            "input": "key_345",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "3d934662-711b-7318-3c23-d5ab33e8a512"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_064",
+            "input": "key_347",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "9e433f88-53ba-0420-5e0c-d7c78f47b384"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_065",
+            "input": "key_346",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "816dbd66-efd1-dd6e-02c4-01503ce9a73c"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_066",
+            "input": "key_341",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "cf428f5a-f9be-3277-032e-e14e36e5876f"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_067",
+            "input": "key_343",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "4e53bb4e-b37b-2d7e-1bd4-0365d683b047"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_068",
+            "input": "key_342",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "471efb1e-bf22-7500-0424-e85488f75ced"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_069",
+            "input": "key_32",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "b7471095-5264-3f0b-e21e-cb915b29f9e0"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_070",
+            "input": "key_344",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "8d05244e-cb34-2228-a830-383be150650b"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_071",
+            "input": "key_47",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "0d0812e8-f962-9264-59a8-83742273369e"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_072",
+            "input": "key_46",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "d74972ee-c257-5bff-6d37-ec3b2e29dd06"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_073",
+            "input": "key_44",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "75e99601-f427-d5b0-e58c-9322b3034a91"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_074",
+            "input": "key_77",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "8a865019-ead1-cc78-23d9-59d52fc64350"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_075",
+            "input": "key_78",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "17e4452b-603b-75ff-b5df-25d55f40a202"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_076",
+            "input": "key_66",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "319982c4-16fb-f76c-d922-27b599f7fbc6"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_077",
+            "input": "key_86",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "eb9ab350-d069-89a9-bfdc-e96a81095e34"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_078",
+            "input": "key_67",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "d21d433e-5aef-a456-832e-6ba986ade02c"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_079",
+            "input": "key_88",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "1232b592-632f-3499-81a4-b305dd661548"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_080",
+            "input": "key_90",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "4b0b17ff-0167-5a72-5230-e766119a63bb"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_081",
+            "input": "key_340",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "ef621ea2-0f0c-114e-4f02-4f497be65a44"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_082",
+            "input": "mouse_0",
+            "depth": 0.08,
+            "glow": false,
+            "elements": [
+              "6f9d6ccf-a487-cec5-168e-70d309fbed86"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_083",
+            "input": "mouse_1",
+            "depth": 0.08,
+            "glow": false,
+            "elements": [
+              "772326f8-429e-eade-7226-c6fd955b2e43"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_084",
+            "input": "mouse_3",
+            "depth": 0.08,
+            "glow": false,
+            "elements": [
+              "a00b1535-7a04-80bd-0d5a-fbbca460b225"
+            ]
+          },
+          {
+            "model": "item/keyboard/active_085",
+            "input": "mouse_4",
+            "depth": 0.08,
+            "glow": false,
+            "elements": [
+              "8226fe08-cfac-3c07-65ef-ea64d48227ca"
+            ]
+          }
+        ],
+        "children": [],
+        "tracks": {}
+      },
+      {
+        "name": "faguang",
+        "pivot": [
+          8.0,
+          8.0,
+          8.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "parts": [
+          {
+            "model": "item/keyboard/active_087",
+            "input": "",
+            "depth": 0.3,
+            "glow": true,
+            "elements": [
+              "ab8bed0b-2e7d-c66e-fe47-e679473c6b1e"
+            ]
+          }
+        ],
+        "children": [],
+        "tracks": {}
+      }
+    ],
+    "length": 0
+  },
+  "folded": {
+    "models": [
+      "item/keyboard/folded_001",
+      "item/keyboard/folded_002",
+      "item/keyboard/folded_003",
+      "item/keyboard/folded_004",
+      "item/keyboard/folded_005",
+      "item/keyboard/folded_006",
+      "item/keyboard/folded_007",
+      "item/keyboard/folded_008"
+    ],
+    "nodes": [
+      {
+        "name": "Controller2",
+        "pivot": [
+          8.0,
+          8.0,
+          8.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "parts": [],
+        "children": [
+          {
+            "name": "Controller3",
+            "pivot": [
+              8.0,
+              8.0,
+              8.0
+            ],
+            "rotation": [
+              0,
+              0,
+              0
+            ],
+            "parts": [
+              {
+                "model": "item/keyboard/folded_001",
+                "input": "",
+                "depth": 0.3,
+                "glow": false,
+                "elements": [
+                  "239ac148-392a-7eb3-62b7-3e430486499f",
+                  "dd7f30f9-3511-14e7-1616-f2df750dd520",
+                  "84735be8-5e8e-24e9-4f0b-d3bbaa977c75",
+                  "f3d5bfba-be90-64fb-25d4-e71311dd8e9b"
+                ]
+              }
+            ],
+            "children": [],
+            "tracks": {
+              "position": [
+                {
+                  "time": 0,
+                  "value": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "time": 0.5,
+                  "value": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "time": 1.5,
+                  "value": [
+                    0.0,
+                    0.0,
+                    -3.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "Controller",
+            "pivot": [
+              8.0,
+              8.0,
+              8.0
+            ],
+            "rotation": [
+              0,
+              0,
+              0
+            ],
+            "parts": [
+              {
+                "model": "item/keyboard/folded_002",
+                "input": "",
+                "depth": 0.3,
+                "glow": false,
+                "elements": [
+                  "31b7ebfb-e7ad-a04d-c3ff-075a1b659423",
+                  "8b34f39e-0595-304b-a697-14b26c8fce1c",
+                  "021e1694-fdb8-ecd1-ea0d-6b7fbfbdf2c9",
+                  "85b49113-0ffe-1901-1d0e-59a5ac097ca1"
+                ]
+              }
+            ],
+            "children": [],
+            "tracks": {
+              "position": [
+                {
+                  "time": 0,
+                  "value": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "time": 0.5,
+                  "value": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "time": 1.5,
+                  "value": [
+                    0.0,
+                    0.0,
+                    3.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "tracks": {}
+      },
+      {
+        "name": "buttons",
+        "pivot": [
+          8.0,
+          8.0,
+          8.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "parts": [],
+        "children": [
+          {
+            "name": "右边",
+            "pivot": [
+              9.8,
+              1.9,
+              0.8
+            ],
+            "rotation": [
+              0,
+              0,
+              0
+            ],
+            "parts": [
+              {
+                "model": "item/keyboard/folded_003",
+                "input": "",
+                "depth": 0.3,
+                "glow": false,
+                "elements": [
+                  "ab0275b0-0ac4-fdae-5d94-73e6d1508561",
+                  "52316a40-b0fd-2710-366d-bf4f795820bb",
+                  "ed9bfebc-c367-62f1-d9a8-c65d3ea72ff1",
+                  "9ccb4cc9-e4ee-4a09-20aa-eac7c18f48ca",
+                  "d7014ffd-dc7f-89fb-b3d0-dc5338632d15",
+                  "dccc3e48-a787-230f-35b3-55a3a930f5ba",
+                  "1eebbf45-70d2-8007-5908-3bb23632582c",
+                  "02c6fd0b-8870-68cf-9443-a2e13ac8816e",
+                  "5a70d2f7-2b6e-4c01-2956-d9bd9b04f213",
+                  "1edaa9ca-879b-8a44-3b90-ecb24e67e6b7",
+                  "9f693785-9825-3130-2c96-efef1d28bbed",
+                  "8338c7c9-4bb9-6570-eaab-ff7a5bc23ccf",
+                  "d9f7baa0-9f66-28c5-7bfa-c2934cf9be9a"
+                ]
+              }
+            ],
+            "children": [],
+            "tracks": {
+              "position": [
+                {
+                  "time": 0,
+                  "value": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "time": 0.5,
+                  "value": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "time": 1.5,
+                  "value": [
+                    0.0,
+                    0.0,
+                    3.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "左边",
+            "pivot": [
+              7.4,
+              1.5,
+              15.3
+            ],
+            "rotation": [
+              0,
+              0,
+              0
+            ],
+            "parts": [
+              {
+                "model": "item/keyboard/folded_004",
+                "input": "",
+                "depth": 0.3,
+                "glow": false,
+                "elements": [
+                  "07863a25-9bcd-800f-56b2-4c1cee7001a7",
+                  "0e62cf44-5414-b491-8f89-5413571fe46b",
+                  "46ed317d-0f34-6db2-7245-0dce74bbd21d",
+                  "b96a3327-56ff-e26b-ea14-98d16edfa1ea",
+                  "961fbbb5-1f8b-a431-c524-0cfb49d4f2e2",
+                  "ad49ac01-eefb-3713-745c-a7e3bbb88b8f",
+                  "5e56932a-0313-bb22-9307-69f27f4a6b7d",
+                  "73abfaeb-7899-ac43-3151-d7b314dcb71f",
+                  "4f9987b2-f332-b592-93fc-8ff42f6ca686",
+                  "1423dde6-eda0-6dfc-1c8c-82ef75f435d2"
+                ]
+              }
+            ],
+            "children": [],
+            "tracks": {
+              "position": [
+                {
+                  "time": 0,
+                  "value": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "time": 0.5,
+                  "value": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "time": 1.5,
+                  "value": [
+                    0.0,
+                    0.0,
+                    -3.0
+                  ],
+                  "interpolation": "bezier",
+                  "left_time": [
+                    -0.1,
+                    -0.1,
+                    -0.1
+                  ],
+                  "left_value": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "right_time": [
+                    0.1,
+                    0.1,
+                    0.1
+                  ],
+                  "right_value": [
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "tracks": {}
+      },
+      {
+        "name": "buttons2",
+        "pivot": [
+          8.0,
+          8.0,
+          8.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "parts": [
+          {
+            "model": "item/keyboard/folded_005",
+            "input": "",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "da5cd609-5329-0728-c0ea-c98b7260cd78",
+              "f3ff7511-a211-d548-296e-15c5065ebef8",
+              "fc041168-2947-764c-f031-0764a4704a87",
+              "d328b652-d62c-51a0-d588-0a5a5995b296",
+              "310139d1-27ce-e92a-c1ba-d75352d6d64b",
+              "e6386990-d73e-0146-8bbc-e4fa7fa6c608",
+              "2f56e525-4e94-5a92-d762-473f0678a82b",
+              "94a44b41-151c-23aa-42d5-263a5478ce02",
+              "0747ed93-b19b-d71f-0b82-1601ef1882ff",
+              "d2924467-39bf-3c57-588f-0433101cd76d",
+              "93799034-587c-a162-67dd-c0bb22975758",
+              "b4fd3f2c-1844-6464-dfc9-de0eb6fe58df",
+              "6723bd60-d3ec-5afc-7c92-dd8e12287b03",
+              "b6a48a27-02bb-cdcc-b567-362d16e939a3",
+              "585e342f-2552-66a9-7adb-f5eef3608aac",
+              "af130097-649f-91c9-878f-af141a4389c8",
+              "cb9580a5-0ab9-e8f8-7189-297b533feb60",
+              "bbc2eb6c-0f5f-7721-d1a2-c444d4297008",
+              "de276b3b-b80d-00dd-7301-d078d16f1f9f",
+              "c3f2e047-9380-a50b-7cfe-1effefdff654",
+              "1aa89200-5e1b-7f00-5482-a6183e625199",
+              "41bc3831-8d39-07e2-dc30-cd3828e38183",
+              "e4be7fc1-16d8-89cb-8805-87d9b2572953",
+              "48ac4e29-00d0-2b8b-e689-b63e06eb83b2",
+              "eba53a2d-bbe2-062a-ee39-97819eb6db06",
+              "d8e88006-595d-5824-0c37-07975fd4cc5b",
+              "562b16bf-be8f-17f5-ca62-eaee7ce6c91f",
+              "4a77ba6f-77b1-33f0-e9a1-b11257e82ef1",
+              "a47476df-ac4f-a23d-4aec-c601305bef5c",
+              "18eb9bee-bdde-4c86-9243-840607d7178c",
+              "98485271-e9b7-ade2-0922-0ff3ee836786",
+              "3de23c9a-162d-700a-88b4-3de825db477e",
+              "89700564-fd0f-afd0-c841-672a34a9f902",
+              "29df48fc-ce4a-3293-ce5e-936f358bdf24",
+              "2699d28c-98b8-9ccf-fcec-03a14b1183c1",
+              "bd4351f8-b002-f800-ae07-fe063b711fc0",
+              "70c4fc79-b10d-37d2-04d5-5213138ed8d4",
+              "1a257ac9-5cc2-c241-f456-3e1370c5130e",
+              "64d70409-b9ff-5dcc-f7fa-6829ac8259d8",
+              "aae0eb7f-f61f-02ab-e6e5-70279aa87b37",
+              "231264c2-969f-a39e-d937-40741eea1923",
+              "16b5c9fc-e012-eded-43d5-9f8e037a8452",
+              "0e287ecd-93f2-56e1-929d-7e58a50894c4",
+              "fdc5a74c-aeac-7358-01ea-663099eea37d",
+              "c88d9acb-f094-ab49-fd1b-0e2fc9f1ad65",
+              "1a7faa9f-8f60-5673-c30b-5f5eb9c4669e",
+              "2d94a175-f0e4-b261-aa3e-62ecb97d23ce",
+              "ca055e58-dca4-4b7b-ed18-359976a8d8c9",
+              "dd1a34f0-7119-f54a-bae1-9161939a377f",
+              "90a2e901-7efa-4a19-51b0-bb982800fb93",
+              "c670450a-c5db-a1ad-252a-f8cb5073e337",
+              "62063873-e227-232f-a803-5910b7b0db27",
+              "a056b5c6-eeac-b839-b9b1-bec2afc04042",
+              "0ff03dd7-b011-ec6b-ffb8-cc7f9b2c2c85",
+              "3d934662-711b-7318-3c23-d5ab33e8a512",
+              "9e433f88-53ba-0420-5e0c-d7c78f47b384",
+              "5934e9dc-5c8a-8284-d983-8af7bb9cc518",
+              "816dbd66-efd1-dd6e-02c4-01503ce9a73c",
+              "cf428f5a-f9be-3277-032e-e14e36e5876f",
+              "4e53bb4e-b37b-2d7e-1bd4-0365d683b047",
+              "471efb1e-bf22-7500-0424-e85488f75ced",
+              "b7471095-5264-3f0b-e21e-cb915b29f9e0",
+              "8d05244e-cb34-2228-a830-383be150650b",
+              "0d0812e8-f962-9264-59a8-83742273369e",
+              "d74972ee-c257-5bff-6d37-ec3b2e29dd06",
+              "75e99601-f427-d5b0-e58c-9322b3034a91",
+              "8a865019-ead1-cc78-23d9-59d52fc64350",
+              "17e4452b-603b-75ff-b5df-25d55f40a202",
+              "319982c4-16fb-f76c-d922-27b599f7fbc6",
+              "eb9ab350-d069-89a9-bfdc-e96a81095e34",
+              "d21d433e-5aef-a456-832e-6ba986ade02c",
+              "1232b592-632f-3499-81a4-b305dd661548",
+              "4b0b17ff-0167-5a72-5230-e766119a63bb",
+              "ef621ea2-0f0c-114e-4f02-4f497be65a44",
+              "6f9d6ccf-a487-cec5-168e-70d309fbed86",
+              "772326f8-429e-eade-7226-c6fd955b2e43",
+              "04c7391a-36fe-0060-2c5e-8633773a82f4",
+              "a00b1535-7a04-80bd-0d5a-fbbca460b225",
+              "8226fe08-cfac-3c07-65ef-ea64d48227ca"
+            ]
+          }
+        ],
+        "children": [],
+        "tracks": {
+          "position": [
+            {
+              "time": 0,
+              "value": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "interpolation": "linear",
+              "left_time": [
+                0,
+                0,
+                0
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0,
+                0,
+                0
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.25,
+              "value": [
+                0.0,
+                -0.5,
+                0.0
+              ],
+              "interpolation": "linear",
+              "left_time": [
+                0,
+                0,
+                0
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0,
+                0,
+                0
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "scale": [
+            {
+              "time": 0,
+              "value": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "interpolation": "linear",
+              "left_time": [
+                0,
+                0,
+                0
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0,
+                0,
+                0
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.5,
+              "value": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "interpolation": "linear",
+              "left_time": [
+                0,
+                0,
+                0
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0,
+                0,
+                0
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 1.5,
+              "value": [
+                1.0,
+                1.0,
+                0.1
+              ],
+              "interpolation": "linear",
+              "left_time": [
+                0,
+                0,
+                0
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0,
+                0,
+                0
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "faguang",
+        "pivot": [
+          8.0,
+          8.0,
+          8.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "parts": [],
+        "children": [],
+        "tracks": {}
+      },
+      {
+        "name": "动画2",
+        "pivot": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "parts": [
+          {
+            "model": "item/keyboard/folded_006",
+            "input": "",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "bdc6bfa8-ca97-6e0b-7e45-5e7747edf3cd",
+              "43a01be1-43d9-bc5d-6e4e-28faa109efd7",
+              "4ac02281-c913-5d2b-db4c-91b08081d85d",
+              "3161d409-80f7-e116-6eda-ba2c5906530c",
+              "8f30fb54-5bff-5427-239a-9234da858e0a",
+              "91162a9b-9be4-27fd-fd58-978522430afc"
+            ]
+          }
+        ],
+        "children": [],
+        "tracks": {
+          "position": [
+            {
+              "time": 0,
+              "value": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.5,
+              "value": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 1.5,
+              "value": [
+                0.0,
+                0.0,
+                4.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "scale": [
+            {
+              "time": 0,
+              "value": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.5,
+              "value": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 1.5,
+              "value": [
+                1.0,
+                1.0,
+                0.5
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "动画",
+        "pivot": [
+          2.975,
+          1.0,
+          8.0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "parts": [
+          {
+            "model": "item/keyboard/folded_008",
+            "input": "",
+            "depth": 0.3,
+            "glow": false,
+            "elements": [
+              "91e592bb-fc01-fa62-6826-11211b18bc2b"
+            ]
+          },
+          {
+            "model": "item/keyboard/folded_007",
+            "input": "",
+            "depth": 0.3,
+            "glow": true,
+            "elements": [
+              "ab8bed0b-2e7d-c66e-fe47-e679473c6b1e"
+            ]
+          }
+        ],
+        "children": [],
+        "tracks": {
+          "rotation": [
+            {
+              "time": 0,
+              "value": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.25,
+              "value": [
+                0.0,
+                0.0,
+                22.5
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "position": [
+            {
+              "time": 0,
+              "value": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.25,
+              "value": [
+                0.0,
+                -0.39,
+                0.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.5,
+              "value": [
+                0.0,
+                -0.39,
+                0.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 1.5,
+              "value": [
+                1.3,
+                -0.39,
+                0.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "scale": [
+            {
+              "time": 0,
+              "value": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.5,
+              "value": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "interpolation": "bezier",
+              "left_time": [
+                -0.1,
+                -0.1,
+                -0.1
+              ],
+              "left_value": [
+                0,
+                0,
+                0
+              ],
+              "right_time": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "right_value": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "length": 1.5
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": true,
+  "textures": {
+    "layer0": "create_fire_control:block/ztz99a_diesel_engine",
+    "particle": "create_fire_control:block/ztz99a_diesel_engine"
+  },
+  "loader": "neoforge:obj",
+  "flip_v": true,
+  "automatic_culling": false,
+  "shade_quads": true,
+  "model": "create_fire_control:models/block/ztz99a_diesel_engine/m1_p0_m2.obj"
+}

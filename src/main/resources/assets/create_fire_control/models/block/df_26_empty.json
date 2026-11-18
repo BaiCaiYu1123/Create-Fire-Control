@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "create_fire_control:block/df_26/df_26_green"
+  },
+  "elements": []
+}

@@ -35,6 +35,8 @@ public final class CannonProjectileInheritanceHandler {
             new ConcurrentHashMap<>();
     private static final Set<String> LOGGED_SUCCESSFUL_PROFILES =
             ConcurrentHashMap.newKeySet();
+    private static final Set<String> LOGGED_FAILURE_REASONS =
+            ConcurrentHashMap.newKeySet();
 
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         if (event.getLevel().isClientSide()) return;
@@ -48,7 +50,12 @@ public final class CannonProjectileInheritanceHandler {
         // show a round leaving the muzzle sideways. Wait for the world-space
         // entity instead of guessing which side of the addEntity hook ran.
         if (isInsideSablePlot(projectile)) {
-            APPLY_RETRIES.put(projectile.getUUID(), 4);
+            if (ControllerTracker.hasNearbyPodControlledCannon(projectile)) {
+                APPLY_RETRIES.put(projectile.getUUID(), 4);
+            }
+            return;
+        }
+        if (!ControllerTracker.hasNearbyPodControlledCannon(projectile)) {
             return;
         }
         if (applyDeterministicLaunch(projectile)) {
@@ -64,6 +71,7 @@ public final class CannonProjectileInheritanceHandler {
     public static void onEntityTickPre(EntityTickEvent.Pre event) {
         Entity projectile = event.getEntity();
         if (projectile.level().isClientSide()) return;
+        if (VERIFY_NEXT_TICK.isEmpty() && APPLY_RETRIES.isEmpty() && LAUNCH_GUARDS.isEmpty()) return;
         UUID id = projectile.getUUID();
         if (VERIFY_NEXT_TICK.remove(id)) {
             if (!applyDeterministicLaunch(projectile)) {
@@ -84,17 +92,14 @@ public final class CannonProjectileInheritanceHandler {
         if (retries <= 1) {
             APPLY_RETRIES.remove(id);
             String reason = LAST_FAILURE.remove(id);
-            StabilizedTurret.LOGGER.warn(
-                    "Unable to apply pod cannon zero-spread ballistics to CBC projectile {} "
-                            + "class={} level={} pos=({}, {}, {}) reason={}",
-                    id,
-                    projectile.getClass().getName(),
-                    projectile.level().getClass().getName(),
-                    format(projectile.getX()),
-                    format(projectile.getY()),
-                    format(projectile.getZ()),
-                    reason == null ? "unknown" : reason
-            );
+            String failureReason = reason == null ? "unknown" : reason;
+            if (LOGGED_FAILURE_REASONS.add(failureReason)) {
+                StabilizedTurret.LOGGER.warn(
+                        "Unable to apply pod cannon zero-spread ballistics; "
+                                + "further failures with reason={} are suppressed",
+                        failureReason
+                );
+            }
         } else {
             APPLY_RETRIES.put(id, retries - 1);
         }

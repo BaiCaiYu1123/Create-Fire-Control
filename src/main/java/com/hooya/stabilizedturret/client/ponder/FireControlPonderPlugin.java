@@ -30,6 +30,9 @@ public final class FireControlPonderPlugin implements PonderPlugin {
                 .title("Fire-control systems")
                 .description("Build, bind, configure and operate a complete vehicle fire-control system")
                 .register();
-        helper.addToTag(FIRE_CONTROL).add(ModBlocks.STABILIZER_CONTROLLER.getId());
+        helper.addToTag(FIRE_CONTROL)
+                .add(ModBlocks.STABILIZER_CONTROLLER.getId())
+                .add(ModBlocks.MZ_LOADER.getId())
+                .add(ModBlocks.CONNECTED_DISPLAY.getId());
     }
 }

@@ -36,12 +36,13 @@ public final class DriveByWireCompat {
         try {
             Class<?> type = Class.forName("edn.stratodonut.drivebywire.compat.ControllerSignalStore");
             method = type.getMethod("getSignals", Level.class, BlockPos.class);
-        } catch (ReflectiveOperationException ignored) {
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError ignored) {
         }
         GET_SIGNALS = method;
     }
 
     public static String[] keys(RemoteControllerCompat.Type type) {
+        if (type == RemoteControllerCompat.Type.WIRELESS) return com.hooya.stabilizedturret.content.remote.ControllerInput.CHANNELS.toArray(String[]::new);
         return (type == RemoteControllerCompat.Type.ADVANCED ? ADVANCED_KEYS : NORMAL_KEYS).clone();
     }
 
@@ -97,11 +98,17 @@ public final class DriveByWireCompat {
                 : "drivebywire.controller.button." + prefix;
     }
 
+    /** Localized controller key name used by the fire-control input screen. */
+    public static String displayTranslationKey(RemoteControllerCompat.Type type, String key) {
+        if (translationKey(type, key).isEmpty()) return "";
+        return descriptionKey(type, key).replace(".remote_key.", ".controller_key.");
+    }
+
     /** Localized explanation key used by the fire-control input screen. */
     public static String descriptionKey(RemoteControllerCompat.Type type, String key) {
         String translation = translationKey(type, key);
         if (translation.isEmpty()) {
-            return "screen.stabilized_turret.remote_key.unknown";
+            return "screen.create_fire_control.remote_key.unknown";
         }
         String prefix = "drivebywire.controller.";
         String suffix = translation.startsWith(prefix)
@@ -111,8 +118,8 @@ public final class DriveByWireCompat {
         } else if (suffix.startsWith("button.")) {
             suffix = suffix.substring("button.".length());
         }
-        return "screen.stabilized_turret.remote_key."
-                + (type == RemoteControllerCompat.Type.ADVANCED ? "advanced." : "normal.")
+        return "screen.create_fire_control.remote_key."
+                + (type == RemoteControllerCompat.Type.ADVANCED ? "advanced_" : "normal_")
                 + suffix.replace('.', '_');
     }
 
@@ -121,22 +128,35 @@ public final class DriveByWireCompat {
     }
 
     public static Map<?, ?> signals(Level level, BlockPos pos) {
-        if (GET_SIGNALS == null || level == null || pos == null) return Map.of();
+        return readSignals(level, pos).signals();
+    }
+
+    public record SignalRead(boolean available, Map<String, Integer> signals) { }
+
+    /** An empty idle map is healthy; a missing, incompatible or throwing bridge is not. */
+    public static SignalRead readSignals(Level level, BlockPos pos) {
+        if (GET_SIGNALS == null || level == null || pos == null) return new SignalRead(false, Map.of());
         try {
             Object result = GET_SIGNALS.invoke(null, level, pos);
-            return result instanceof Map<?, ?> signals ? signals : Map.of();
-        } catch (ReflectiveOperationException | RuntimeException ignored) {
-            return Map.of();
+            if (!(result instanceof Map<?, ?> signals)) return new SignalRead(false, Map.of());
+            Map<String, Integer> copy = new java.util.HashMap<>();
+            for (var entry : signals.entrySet()) {
+                if (!(entry.getKey() instanceof String key) || !(entry.getValue() instanceof Number value))
+                    return new SignalRead(false, Map.of());
+                copy.put(key, value.intValue());
+            }
+            return new SignalRead(true, Map.copyOf(copy));
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError ignored) {
+            return new SignalRead(false, Map.of());
         }
     }
 
     public static int signal(Map<?, ?> signals, String key) {
-        if (key == null || key.isEmpty()) return 0;
-        Object value = signals.get(key);
-        return value instanceof Number number ? number.intValue() : 0;
+        return com.hooya.stabilizedturret.content.remote.ControllerInput.signal(signals, key);
     }
 
     public static boolean accepts(RemoteControllerCompat.Type type, String key) {
+        if (type == RemoteControllerCompat.Type.WIRELESS) return !com.hooya.stabilizedturret.content.remote.ControllerInput.chordInputs(key).isEmpty();
         for (String allowed : type == RemoteControllerCompat.Type.ADVANCED ? ADVANCED_KEYS : NORMAL_KEYS) {
             if (allowed.equals(key)) return true;
         }

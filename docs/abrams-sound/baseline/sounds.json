@@ -1,0 +1,375 @@
+{
+  "engine.abrams.engine_00": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_00",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_33": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_33",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_66": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_66",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_99": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_99",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_00_load": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_00_load",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_33_load": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_33_load",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_66_load": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_66_load",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_99_load": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_99_load",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_start": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_start_load",
+        "attenuation_distance": 192
+      }
+    ]
+  },
+  "engine.abrams.engine_stop": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_stop_load",
+        "attenuation_distance": 192
+      }
+    ]
+  },
+  "mz_loader": {
+    "subtitle": "subtitles.create_fire_control.mz_loader",
+    "sounds": [
+      "create_fire_control:mz_loader"
+    ]
+  },
+  "az_loader": {
+    "subtitle": "subtitles.create_fire_control.az_loader",
+    "sounds": [
+      "create_fire_control:az_loader"
+    ]
+  },
+  "rwr_scan": {
+    "subtitle": "subtitles.create_fire_control.rwr_scan",
+    "sounds": [
+      "create_fire_control:rwr_scan"
+    ]
+  },
+  "connected_display_god_mode": {
+    "subtitle": "subtitles.create_fire_control.connected_display_god_mode",
+    "sounds": [
+      {
+        "name": "create_fire_control:connected_display/god_mode",
+        "stream": true,
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "maid_loading_complete": {
+    "subtitle": "subtitles.create_fire_control.maid_loading_complete",
+    "sounds": [
+      "create_fire_control:maid/loading_complete_1",
+      "create_fire_control:maid/loading_complete_2"
+    ]
+  },
+  "mianbao_autocannon_fire_half": {
+    "sounds": [
+      {
+        "name": "mianbaos_modernwarfare:xin_ji_pao_kai_huo_",
+        "volume": 0.5,
+        "attenuation_distance": 64,
+        "stream": false
+      }
+    ]
+  },
+  "mianbao_autocannon_fire_far_half": {
+    "sounds": [
+      {
+        "name": "mianbaos_modernwarfare:ji_pao_yuan_chu_kai_huo_",
+        "volume": 0.5,
+        "attenuation_distance": 512,
+        "stream": false
+      }
+    ]
+  },
+  "mianbao_machine_gun_fire_half": {
+    "sounds": [
+      {
+        "name": "mianbaos_modernwarfare:xin_ji_qiang_kai_huo_",
+        "volume": 0.5,
+        "attenuation_distance": 128,
+        "stream": false
+      }
+    ]
+  },
+  "mianbao_machine_gun_fire_far_half": {
+    "sounds": [
+      {
+        "name": "mianbaos_modernwarfare:ji_pao_yuan_chu_",
+        "volume": 0.5,
+        "attenuation_distance": 512,
+        "stream": false
+      }
+    ]
+  },
+  "engine.ztz99a.engine_00": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_00",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_33_load": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_33_load",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_66_load": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_66_load",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_99_load": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_99_load",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-001": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_blips-001",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-002": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_blips-002",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-003": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_blips-003",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-004": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_blips-004",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-005": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_blips-005",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-006": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_blips-006",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-007": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_blips-007",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-008": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_blips-008",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-001": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_release-001",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-002": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_release-002",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-003": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_release-003",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-004": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_release-004",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-005": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_release-005",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-006": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_release-006",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-007": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_release-007",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_revv-001": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_revv-001",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_revv-002": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_revv-002",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_revv-003": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_revv-003",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_revv-004": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_revv-004",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_revv-005": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_revv-005",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_start": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_start",
+        "stream": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_stop": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/engine_stop",
+        "stream": true
+      }
+    ]
+  }
+}

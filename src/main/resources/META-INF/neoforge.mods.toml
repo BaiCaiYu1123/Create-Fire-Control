@@ -6,14 +6,60 @@ license="${mod_license}"
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-authors="Hooya"
+authors="BaiCaiYu1123"
 description='''
-Adds a Sable-based tank fire-control computer with dual-axis stabilization,
-head aiming, cannon optics and thermal imaging.
+Adds a Sable-based vehicle fire-control system with dual-axis stabilization,
+head aiming, cannon optics, thermal imaging, radar, guided missiles and
+remote weapon control.
 '''
 
 [[mixins]]
-config="stabilized_turret.mixins.json"
+config="create_fire_control.mixins.json"
+
+# MIT component kept in third_party/copypoly; this does not relicense Fire Control.
+[[mods]]
+modId="copypoly"
+version="1.9.1"
+displayName="CopyPoly (bundled with Fire Control)"
+authors="caca"
+license="MIT"
+description='''
+CopyPoly 1.9.1 by caca, bundled under the MIT License.
+Full in-world polyhedron editor, material copying, topology and Sable physics.
+Only com.caca.copypoly and the identified CopyPoly resources are MIT licensed.
+See META-INF/licenses/copypoly-MIT.txt and META-INF/notices/copypoly.txt.
+'''
+
+[[mixins]]
+config="copypoly.mixins.json"
+
+[[dependencies.copypoly]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.125,21.2)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.copypoly]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.21.2)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.copypoly]]
+modId="create"
+type="required"
+versionRange="[6.0.0,6.1)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.copypoly]]
+modId="sable"
+type="optional"
+versionRange="[2.0.6,2.1)"
+ordering="AFTER"
+side="BOTH"
 
 [[dependencies.${mod_id}]]
 modId="neoforge"
@@ -39,28 +85,41 @@ side="BOTH"
 [[dependencies.${mod_id}]]
 modId="sable"
 type="required"
-versionRange="[1.2.2,1.2.3),[2.0.3,2.0.4)"
+versionRange="[2.0.6,2.0.7)"
 ordering="AFTER"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
 modId="aeronautics_bundled"
 type="required"
-versionRange="[1.2.1,1.2.2),[1.3.0,1.3.1)"
+versionRange="[1.2.1,1.2.2),[1.3.0,1.3.3)"
 ordering="AFTER"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
 modId="simulated"
 type="required"
-versionRange="[1.2.1,1.2.2),[1.3.0,1.3.1)"
+versionRange="[1.2.1,1.2.2),[1.3.0,1.3.3)"
 ordering="AFTER"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
+modId="geckolib"
+type="required"
+versionRange="[4.7,)"
+ordering="AFTER"
+side="BOTH"
+[[dependencies.${mod_id}]]
 modId="interiors"
 type="optional"
 versionRange="[0.6.1,0.6.2)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="drivebywire"
+type="optional"
+versionRange="[0.3.0,)"
 ordering="AFTER"
 side="BOTH"
 
@@ -101,8 +160,8 @@ side="BOTH"
 
 [[dependencies.${mod_id}]]
 modId="mianbaos_modernwarfare"
-type="optional"
-versionRange="[0,)"
+type="required"
+versionRange="[2.7.1,)"
 ordering="AFTER"
 side="BOTH"
 
@@ -110,5 +169,12 @@ side="BOTH"
 modId="sable_schematic_api"
 type="optional"
 versionRange="[0.4.0,)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="touhou_little_maid"
+type="optional"
+versionRange="[1.4.2,)"
 ordering="AFTER"
 side="BOTH"

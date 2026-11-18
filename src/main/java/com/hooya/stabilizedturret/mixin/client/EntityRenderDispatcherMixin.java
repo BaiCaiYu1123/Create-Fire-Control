@@ -1,11 +1,10 @@
 package com.hooya.stabilizedturret.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.hooya.stabilizedturret.client.ClientAimState;
 import com.hooya.stabilizedturret.client.MissileLongRangeEffects;
-import com.hooya.stabilizedturret.content.controller.MianbaoMissileCompat;
+import com.hooya.stabilizedturret.client.renderer.Df26BallisticMissileEntityVisualRenderer;
 import com.hooya.stabilizedturret.content.controller.MianbaoAirDefenseCompat;
-import net.minecraft.client.renderer.LightTexture;
+import com.hooya.stabilizedturret.content.controller.MianbaoCountermeasureCompat;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -16,19 +15,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * Scope visibility plus a narrowly-scoped distance override for the exact
- * Mianbao ATGM entity types supported by the fire-control integration.
- */
+/** Narrow distance override for supported Mianbao missiles. */
 @Mixin(value = EntityRenderDispatcher.class, priority = 2000)
 public abstract class EntityRenderDispatcherMixin {
-    /**
-     * Create contraptions can be submitted directly without first calling
-     * shouldRender. Cancelling the actual dispatcher entry point guarantees
-     * the bound CBC cannon cannot draw over a camera located inside its barrel.
-     */
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private <E extends Entity> void stabilizedTurret$hideScopedCannonRender(
+    private <E extends Entity> void stabilizedTurret$trackMissileRender(
             E entity,
             double x,
             double y,
@@ -40,29 +31,22 @@ public abstract class EntityRenderDispatcherMixin {
             int packedLight,
             CallbackInfo ci
     ) {
-        if (MissileLongRangeEffects.shouldSuppressNativeMissile(entity)) {
+        if (com.hooya.stabilizedturret.client.VirtualScopeVisibility.hides(entity)
+                || com.hooya.stabilizedturret.client.ClientWeaponViewState.suppressDuplicate(entity)
+                || MissileLongRangeEffects.shouldSuppressNativeMissile(entity)) {
             ci.cancel();
             return;
         }
         MissileLongRangeEffects.onMissileRendered(entity);
-        if (ClientAimState.shouldHideScopedEntity(entity)) {
+        if (MissileLongRangeEffects.isDf26Visual(entity)
+                && Df26BallisticMissileEntityVisualRenderer.render(
+                entity, x, y, z, poseStack, buffers, packedLight)) {
             ci.cancel();
         }
     }
 
-    @Inject(method = "getPackedLightCoords", at = @At("RETURN"), cancellable = true)
-    private <E extends Entity> void stabilizedTurret$fullBrightThermalEntity(
-            E entity,
-            float partialTick,
-            CallbackInfoReturnable<Integer> cir
-    ) {
-        if (ClientAimState.isThermal() && !ClientAimState.shouldHideScopedEntity(entity)) {
-            cir.setReturnValue(LightTexture.FULL_BRIGHT);
-        }
-    }
-
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
-    private <E extends Entity> void stabilizedTurret$hideScopedCannon(
+    private <E extends Entity> void stabilizedTurret$forceSupportedMissileVisibility(
             E entity,
             Frustum frustum,
             double cameraX,
@@ -70,11 +54,8 @@ public abstract class EntityRenderDispatcherMixin {
             double cameraZ,
             CallbackInfoReturnable<Boolean> cir
     ) {
-        if (ClientAimState.shouldHideScopedEntity(entity)) {
-            cir.setReturnValue(false);
-            return;
-        }
-        if (!MianbaoAirDefenseCompat.isAnyFireControlMissile(entity)) {
+        if (!MianbaoAirDefenseCompat.isAnyFireControlMissile(entity)
+                && !MianbaoCountermeasureCompat.isCountermeasure(entity)) {
             return;
         }
 

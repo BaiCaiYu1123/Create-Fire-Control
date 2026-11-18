@@ -39,6 +39,8 @@ public final class MediumCannonBreechRenderer extends SmartBlockEntityRenderer<M
     ) {
         BlockState state = blockEntity.getBlockState();
 
+        // Only the Blockbench group named "group" remains fixed. The dark recoil
+        // body and middle grey breech share recoil, but only the middle section opens.
         poseStack.pushPose();
         YuushyaCannonRecoilAnimation animation = blockEntity;
         Direction direction = animation.stabilizedTurret$getRecoilDirection();
@@ -49,9 +51,13 @@ public final class MediumCannonBreechRenderer extends SmartBlockEntityRenderer<M
                 -direction.getStepZ() * recoil
         );
         orientModel(poseStack, state.getValue(MediumcannonBreechBlock.FACING));
-        poseStack.translate(0.0, -OPEN_TRAVEL * blockEntity.getOpenProgress(partialTicks), 0.0);
 
         VertexConsumer vertices = buffer.getBuffer(RenderType.solid());
+        SuperByteBuffer recoilBody = CachedBuffers.partial(
+                MediumCannonBreechClient.RECOIL_BODY, state);
+        recoilBody.light(light).renderInto(poseStack, vertices);
+
+        poseStack.translate(0.0, -OPEN_TRAVEL * blockEntity.getOpenProgress(partialTicks), 0.0);
         SuperByteBuffer moving = CachedBuffers.partial(MediumCannonBreechClient.MOVING_BREECH, state);
         moving.light(light).renderInto(poseStack, vertices);
         poseStack.popPose();

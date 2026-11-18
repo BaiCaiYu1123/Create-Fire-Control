@@ -4,7 +4,7 @@
 > 显示名：**Create: Fire Control**（坦克火控系统）
 > 作者：Hooya
 > 适用平台：Minecraft 1.21.1 / NeoForge 21.1.230 / Java 21
-> 许可证：MIT
+> 许可证：混合许可。仅火控原创部分保留所有权利；CopyPoly 与 Drive-By-Wire 来源的代码及材质保留 MIT；其他第三方内容保留原许可。详见 LICENSE 与 THIRD_PARTY_NOTICES.md。
 
 ---
 
@@ -138,9 +138,9 @@ stabilized_turret/
 │
 ├── libs/                                   ← 锁定版本的依赖 jar
 │   ├── create-1.21.1-6.0.10.jar            ← 必需
-│   ├── sable-neoforge-1.21.1-1.2.2.jar     ← 必需（或 compat-latest/2.0.3）
-│   ├── create-aeronautics-bundled-1.21.1-1.2.1.jar
-│   ├── simulated-neoforge-1.21.1-1.2.1-compile.jar
+│   ├── compat-latest/sable-neoforge-1.21.1-2.0.5.jar     ← 必需
+│   ├── compat-latest/create-aeronautics-bundled-1.21.1-1.3.2.jar
+│   ├── compat-latest/simulated-neoforge-1.21.1-1.3.2.jar
 │   ├── interiors-1.21.1-neoforge-0.6.1.jar (可选)
 │   ├── cbcmodernwarfare-0.0.6v+mc.1.21.1-neoforge.jar (可选)
 │   ├── sable-schematic-api-0.4.0.jar (可选)
@@ -148,7 +148,7 @@ stabilized_turret/
 │   ├── flywheel-neoforge-1.21.1-1.0.6-compile.jar
 │   ├── ponder-neoforge-1.0.82-mc1.21.1-compile.jar
 │   ├── registrate-MC1.21-1.3.0+67-compile.jar
-│   ├── compat-latest/                     ← 升级路径预览（Sable 2.0.3 等）
+│   ├── compat-latest/                     ← Sable 2.x 构建环境
 │   └── extracted/                         ← CBC Neo Warfare 等 jar 解压
 │
 ├── reference/                             ← 第三方源码副本，仅供 IDE 代码补全参考
@@ -435,126 +435,113 @@ public static void calibrateElevationDirection(
     Vec3 measuredWorldDirection
 )
 
-// 服务端 tick 收尾：清理失效碰撞、刷新 CBC contraption
+// 服务端 tick 收尾：清理过期绑定、恢复拥有的重力标签与成对碰撞隔离
 public static void onServerTickPost(ServerTickEvent.Post event)
 
-// Sable 物理子步前回调：施加无碰撞/无重力 tag
+// Sable 求解前：更新每根轴承的关节和有限扭矩电机
 public static void maintainPhysicalProperties(SubLevelPhysicsSystem physicsSystem, double timeStep)
-
-// Sable 物理子步后回调：执行世界锁定
-public static void enforceWorldLocks(SubLevelPhysicsSystem physicsSystem)
 ```
 
-#### 内部状态机（4 个静态 Map）
+#### 轴承控制状态
 
-| Map | Key | Value | 用途 |
-|---|---|---|---|
-| `BOUND` | `SwivelBearingBlockEntity` | `BoundState(level, childId, yawAxis, decouplePhysics, lastHeartbeat)` | 跟踪所有"已被某控制器绑定"的轴承，供碰撞刷新判断 |
-| `ACTIVE` | `SwivelBearingBlockEntity` | `AxisLock` | 跟踪当前正在进行世界锁定的轴承，含目标姿态与限位 |
-| `COLLISION_DISABLED` | `UUID`（子层级 ID） | `CollisionState` | 维护已禁用碰撞的子层级，含 tag 与 removedSections |
-| `CONTRAPTION_COLLISION_DISABLED` | `KinematicContraption` | `ContraptionCollisionState` | 维护已禁用碰撞的 CBC contraption |
+| Map | 用途 |
+|---|---|
+| `BOUND` | 每根轴承的子体、控制路径和心跳，供生命周期与内部碰撞隔离使用 |
+| `ACTIVE` | 手动火控的独立 `AxisLock`、世界炮口方向、校准与子步指令 |
+| `CONSTRAINED` | 自动防御屏原生旋转伺服，沿用原有接口 |
+| `GRAVITY_OVERRIDDEN` | 仅保留自动防御路径的重力覆盖；手动物理路径恢复拥有的旧覆盖 |
+| `OWNED_NO_CONTACTS` | 本模组创建的结构对内部接触隔离，外部接触继续参与求解 |
 
-#### `AxisLock` 内部类（关键算法容器）
+#### 原生 HINGE 与伺服
 
-```java
-private static final class AxisLock {
-    // 目标姿态（父级 swing 已叠加）
-    Quaterniond targetOrientation;
-    Quaterniond lastParentOrientation;
-    Vector3d localOffset;          // 控制器配置的约束偏移
-    Vector3d constraintOffset;     // 当前物理约束的实际偏移
-    PhysicsConstraintHandle managedConstraint;
+`NativeBearingJoint` 在航空学的原有 handle 槽位管理两个关节：父子铰链负责连接、承重与限位，
+世界到子体的自由 Generic 关节只在驱动轴启用电机，不向父体写入驱动反向力矩。
+有效性检查、卸载和解散同时管理两者。铰链注册零力电机位，防止 Rapier 将其重排到 SIMD 桶；
+该零力配置不施加驱动冲量。`SwivelBearingMotorMixin` 阻止原生电机覆盖
+火控参数，普通轴承与自动防御路径继续使用原有实现。重连只保留几何、父子体
+均未改变的关节；蓝图或结构变化允许重建。
 
-    boolean yawAxis;
-    boolean stabilizeWorld = true;
-    boolean elevationSignInitialized;
-    double jointToElevationSign = 1.0;  // 关节角度到俯仰角的符号
+头瞄保存实测炮口在子体中的局部方向与请求的世界方向。每个物理子步只以配置
+转速推进操作者指令，中段恒速，起步和到位使用短加减速段；稳定时单独保留世界炮口方向，再投影
+到当前方向机/高低机的可达轴。车体偏航、俯仰和侧倾引起的补偿不受操作者
+转速限制。关闭稳定时继承父级完整旋转。世界电机的参考框架在一个原生物理步内固定，
+其目标只加入操作者速度前馈，不重复加入父体转动速度。
+每轴有独立的有界残差修正（最大 1°，误差超过 2° 时清空），用于补偿小的
+原生求解偏差；主动转动、到位制动、重建关节和限位恢复时清空，避免受限目标
+积累修正量。到位前馈使用子步末速度，电机目标预留半程制动余量，结束后
+0.15 秒恢复普通保持控制；先限制操作者行程，再完整加入车体预测，制动不裁小补偿。
 
-    // 限位
-    double depressionLimitDegrees = 90.0;
-    double elevationLimitDegrees = 90.0;
-    double zeroJointAngleDegrees;       // 关节零点（装配时的初始角度）
+`facing * Rz(π/2)` 将原生局部 Y 角度映射到 HINGE 局部 X。高低机从实际炮口
+方向校准左右安装的符号和水平零位，同时设置原生角度止挡。偏移以每秒一个
+局部方块的速度移动父端锚点。子体惯量包含串联轴承和固定焊接后代，电机采用
+锚点处的子体及串联负载惯量与有限最大扭矩，
+刚度为 `I_eff * 240²`、阻尼 `I_eff * 480`、有限扭矩为 `I_eff * 3600`。
+底层使用 Rapier 默认 AccelerationBased 模型，上述刚度/阻尼是经过原生闭环
+验证的载荷相关增益，不应理解为 ForceBased 弹簧单位。
+自由方向机每步重设局部扭转基准，避免 ±180° 处的原生电机梯度精度下降。
+必要时唤醒休眠结构。没有子体瞬移、清速度或人工反作用冲量。
 
-    // 伺服收敛
-    boolean aimSettled;
-    int aimStableTicks;
-    double filteredAimErrorDegrees;
-    double previousAimErrorDegrees;
+所有目标、关节与参数均按轴承隔离，沿用火控计算机的多炮塔分组、收敛、
+反转和绑定接口。普通嵌套轴承和固定焊接后代由原生求解器跟随；旧
+`NestedBearingConstraintFollower` 后步修正已移除。
 
-    // 核心方法
-    boolean initialize(SwivelBearingBlockEntity bearing); // 初始化目标姿态
-    void aimAtDirection(bearing, measured, requested, maxAxisDegrees); // 头瞄伺服
-    void rotateMechanically(bearing, angleDegrees);        // 机械输入
-    void rotateWithLimit(bearing, axis, requestedDegrees); // 应用俯仰硬限位
-    void enforce(SwivelBearingBlockEntity, physicsSystem); // 每物理子步执行
-    void applyConstraintServo(bearing, handle);              // 通过 Sable servo 施加目标角度
-}
-```
+`SimulatedPhysicsStaffCompat` 读取真实手杖拖拽会话，先沿固定焊接和父轴承找到
+受控祖先，再向下展开让控分支。抓受控炮塔时该分支及相关祖先轴让控，保留
+铰链；抓外部车体时其所有炮塔继续补偿。兄弟炮塔保持独立，释放后按配置速度回稳。
+头瞄射线未命中时直接保持相机方向；有命中时用真实炮口及受控关节的世界保持
+运动学计算名义速度，保留平移、轴心移动和滚转，消除车体旋转造成的虚构长杆
+速度。联合预测每次尝试都按预测后的真实炮口位置与完整速度重算逆弹道，实际
+落点标记也使用炮口完整速度。逐组弹道包独占客户端落点标记的
+插值状态，避免普通会话包交替覆盖。空射线且没有有限/锁定目标时，分组包
+改发实测炮口直线，重新命中恢复弹道；模式切换使同 tick 缓存失效，客户端
+同时重置主标记与分组标记的跨类型插值。协议仍为 16。
 
-#### 伺服算法（`aimAtDirection`）
+有限目标与空射线的控制历史分别管理。`AxisLock.aimAtDirection` 在有限目标列表
+从非空变空或从空变非空时调用 `resetFiniteModeHistory()`；`refreshFiniteDirection`
+发现有限瞄准命令不属于当前游戏 tick，或世界稳定已关闭时，也先调用同一清理方法，
+再清除过期有限目标、操作者视线记录及有限补偿标记。该方法只重置
+`motorResidual` 的残差、`motorTarget` 的速度/车体预测历史和 `aimVelocity` 的
+炮管方向测速历史，避免上一种模式的前馈或积分修正在新模式首步继续生效。
+它不修改真实刚体位置、姿态、线速度或角速度，也不清除当前保持方向。
 
-```java
-// 1. 投影到 joint 平面
-currentProjected = current - axis * current.dot(axis)
-desiredProjected = desired - axis * desired.dot(axis)
+清理同时设置 `finiteModeRecoveryRemaining = 0.5` 秒，每个物理步按 `timeStep`
+递减。恢复窗口内即使车体速度很小，也继续检查自有电机目标相对真实关节坐标的
+待执行校正，防止模式切换或命令过期的首步误入休眠。窗口结束后，普通固定射线的
+稳定静载荷偏置可以走原生休眠路径；有限瞄准、尚存车体预测、真实操作者运动和
+机械转动命令仍检查待执行校正。恢复窗口维持已取得的世界保持方向，
+主动新头瞄输入继续受配置转速限制。
 
-// 2. 计算角度误差
-sine = axis.dot(currentProjected × desiredProjected)
-cosine = clamp(currentProjected · desiredProjected, -1, 1)
-errorDegrees = toDegrees(atan2(sine, cosine))
+2026-10-03 加入关节组件联合预测：全部物理 actors 排队指令后，在原生求解前读取
+同一快照，预测铰链、世界 FreeConstraint、有限扭矩和原 fork 的陀螺更新。
+`ArticulatedServoSolver.solveIndependent` 按轴调用单变量反解，每次只试探、修改自身电机，
+其余电机目标固定；最多六轮独立反馈，保持 `1e-5 rad` 残差和 0.15 rad 总修正边界。
+方向机局部保持基准校准后不随炮管俯仰重写。`AzimuthObservation` 只读取实际炮管横向误差，
+不传递高低机的保持方向、速度或电机目标；有限头瞄每次试算读取真实炮口与弹道。
+`SableServoConstraints` 只读记录真实命令、可变 Generic 关节的两侧 frame/锚点，
+并镜像原生关节图的 swap-remove 和刚体删除
+邻接顺序；连接载荷仍由现有 Sable 求解，驱动电机直接作用于子体。图边记录独立于弱引用 handle 保留，
+Sable 内部绳索关节等不可观测变化使该维度保留原控制，并释放可选预测记录。
+共同减去车体质心以保持坐标精度，单次预测内部复用工作缓冲区降低临时内存分配。
 
-// 3. 滞回判定（防抖动）
-if (aimSettled && |error| <= 0.35°) return;  // 锁定后稍宽
-if (!aimSettled && |error| <= 0.12°)         // 收敛判定，需连续 3 tick
-    aimStableTicks++; if (>= 3) aimSettled = true;
+同车主动瞄准轴保留原电机目标参与预测，静止瞄准的兄弟轴继续获得联合补偿。
+共用方向机仍平均各炮管的瞄准观测，独立高低机分别保持，并使用各自的俯仰设置。每组件最多 8 轴、17 刚体；
+未知连接、模型失败、限位迁移和缺失质量快照回退原伺服。只有车体及炮管没有
+显著运动、世界支撑目标没有待执行变化，且上述有限瞄准、恢复窗口或运动预测等
+条件要求检查的自有电机命令没有待执行校正时才进入休眠路径，
+避免停车后将旧前馈电机命令重新施加，同时保留普通固定射线的原生静载荷休眠。
+同来源、同命中点或同视线输入的名义目标变化运输尚未完成的取得方向，
+平台补偿不会被误认成头瞄输入。实际鼠标变化仍按配置限速；来源由刚体、
+绑定位置及炮体 UUID 共同识别，换炮或重装炮体重新取得目标。
+支持场景的默认服务端精度断言仍为 `< 0.05°`，不使用 characterization 参数放行。
 
-// 4. 低通滤波 + 比例收敛
-filteredAimErrorDegrees += (error - filtered) * 0.45;
-commandDegrees = filtered * 0.55;
+新预测、原生陀螺、持续旋转、部分电机校正和共享方向机严格检查均接入 `check`。
+旧简化基本伺服的自由偏心重载检查尚未接入联合规划，保留精度 FAIL，默认构建仍失败；
+`-PcharacterizeCarrierHold=true` 仅允许完成其余功能回归，不能代表该重载精度通过。
+任意接触、第三方外力与超出电机能力的载荷仍不能保证零误差。
 
-// 5. 反向阻尼（< 1° 时弱化）
-if (sign(error) != sign(prevError) && |error| < 1°)
-    commandDegrees *= 0.35;
-
-// 6. 应用限位 + 通过 rotateWithLimit 写入 targetOrientation
-```
-
-#### 世界锁定算法（`enforce`）
-
-```java
-void enforce(bearing, physicsSystem) {
-    if (stabilizeWorld)
-        inheritParentSwing(bearing);     // 仅继承 swing，丢弃 twist
-    else
-        inheritFullParentRotation(bearing); // 全继承父级旋转
-
-    projectTargetOntoJoint(bearing);    // 投影到合法 joint 流形
-    enforceRigidPitchLimit(bearing);    // 硬限位
-    ensureConstraintOffset(bearing, child, pipeline); // 必要时重建约束
-    enforcePhysicalPitchStop(bearing, child, pipeline); // 超限时取消轴向速度
-    applyBoundServo(bearing);            // 写入 motor
-}
-```
-
-#### Sable API 跨版本反射桥
-
-```java
-// Sable 1.x 的 RotaryConstraintHandle 在 2.x 移到了不同包，但 PhysicsConstraintHandle 接口二进制兼容
-private static PhysicsConstraintHandle constraintHandle(SwivelBearingBlockEntity bearing) {
-    // 反射读取 SwivelBearingBlockEntity.handle 私有字段
-    // 缓存 Field 对象，失败后置 swivelConstraintHandleUnavailable = true 永久跳过
-}
-
-// 替换约束时反射调用 PhysicsPipeline.addConstraint，因为 1.x 与 2.x 的 config 类路径不同
-private static PhysicsConstraintHandle replaceOffsetConstraint(...) {
-    // 尝试两个类名：
-    //   dev.ryanhcode.sable.api.physics.constraint.RotaryConstraintConfiguration (1.x)
-    //   dev.ryanhcode.sable.api.physics.constraint.rotary.RotaryConstraintConfiguration (2.x)
-    // 取第一个构造器反射实例化
-    // 在 pipeline 的方法列表中按参数类型匹配 addConstraint 重载
-}
-```
-
+详细实现、原生闭环测试与专用服务端检查见 [稳定器重做记录](docs/STABILIZER_REBUILD.md)。
+本轮拆轴、无直接驱动反向力矩和真实中口径地面落点验收见 [独立轴修复](docs/STABILIZER_INDEPENDENT_AXES_2026-10-03.md)。
+上一轮有限命中点验收保留在 [历史记录](docs/STABILIZER_FINITE_AIM_2026-10-03.md)。
 ### 5.3 `StabilizerControllerBlockEntity`（火控计算机）
 
 #### 关键状态字段
@@ -958,12 +945,13 @@ public static void renderAfterIris(RenderGuiEvent.Pre event) {
 | `neoforge` | required | `[21.1.230,)` | 模组加载器 |
 | `minecraft` | required | `[1.21.1]` | 游戏版本 |
 | `create` | required | `[6.0.10, 6.0.11)` | 红石链接网络、扳手、座椅 |
-| `sable` | required | `[1.2.2, 1.2.3), [2.0.3, 2.0.4)` | Rapier 物理引擎、子层级 |
-| `aeronautics_bundled` | required | `[1.2.1, 1.2.2), [1.3.0, 1.3.1)` | Create Aeronautics 物理载具 |
-| `simulated` | required | `[1.2.1, 1.2.2), [1.3.0, 1.3.1)` | swivel bearing 等机械部件 |
+| `sable` | required | `[2.0.3, 2.0.6)` | Rapier 物理引擎、子层级；不接受 Sable 1.x |
+| `aeronautics_bundled` | required | `[1.2.1, 1.2.2), [1.3.0, 1.3.3)` | Create Aeronautics 物理载具 |
+| `simulated` | required | `[1.2.1, 1.2.2), [1.3.0, 1.3.3)` | swivel bearing 等机械部件 |
 | `interiors` | optional | `[0.6.1, 0.6.2)` | 内饰座椅（额外座椅类型） |
 | `createbigcannons` | optional | `[5.11.6, 5.11.8)` | CBC 火炮 + 火炮底座 |
 | `cbcmodernwarfare` | optional | `[0.0.6v+mc.1.21.1-neoforge]` | CBC 现代战争扩展（compact_mount） |
+| `mianbaos_modernwarfare` | required | `[2.7.1,)` | 面包军火库（发射器/挂架/弹药 ID 来源） |
 | `sable_schematic_api` | optional | `[0.4.0, 0.5.0)` | 蓝图保存/放置时迁移绑定 |
 
 ### 9.2 编译时 Jar 依赖（来自 `build.gradle`）
@@ -971,10 +959,10 @@ public static void renderAfterIris(RenderGuiEvent.Pre event) {
 ```
 libs/
 ├── create-1.21.1-6.0.10.jar                 (implementation + localRuntime)
-├── sable-neoforge-1.21.1-1.2.2.jar         (implementation + localRuntime)
-│   └── 或 compat-latest/sable-neoforge-1.21.1-2.0.3.jar  (当 -PcompatLatest=true)
-├── create-aeronautics-bundled-1.21.1-1.2.1.jar (implementation + localRuntime)
-├── simulated-neoforge-1.21.1-1.2.1-compile.jar (compileOnly)
+├── compat-latest/sable-neoforge-1.21.1-2.0.5.jar (implementation + localRuntime)
+├── compat-latest/create-aeronautics-bundled-1.21.1-1.3.2.jar (implementation + localRuntime)
+├── compat-latest/simulated-neoforge-1.21.1-1.3.2.jar (compileOnly)
+├── compat-latest/sable-rapier-1.21.1-2.0.5.jar (compileOnly)
 ├── sable-companion-common-1.21.1-1.6.0-compile.jar (compileOnly)
 ├── ponder-neoforge-1.0.82-mc1.21.1-compile.jar (compileOnly)
 ├── registrate-MC1.21-1.3.0+67-compile.jar  (compileOnly)
@@ -1053,7 +1041,7 @@ libs/
 # 输出：build/libs/create-fire-control-0.1.0.jar
 ```
 
-构建产物 `archivesName` 为 `create-fire-control`，版本来自 `gradle.properties` 的 `mod_version=0.1.0`。
+构建产物 `archivesName` 为 `create-fire-control`，版本来自 `gradle.properties` 的 `mod_version=1.0.4`。
 
 ### 10.3 开发运行
 
@@ -1069,13 +1057,13 @@ libs/
 
 项目根目录已有多个验证运行目录（`run_verify*/`, `run_anchor_verify/`, `run_absolute_aim_verify/` 等），每个都包含完整的 server 启动配置、world 存档与日志，可用于复现特定 bug。
 
-### 10.4 兼容构建（最新依赖）
+### 10.4 Sable 2.x 构建
 
 ```powershell
-.\gradlew.bat build -PcompatLatest=true
+.\gradlew.bat build
 ```
 
-`compatLatest=true` 时切换到 `libs/compat-latest/` 目录下的 Sable 2.0.3 / Simulated 1.3.0 / Aeronautics 1.3.0 jar 编译，并额外引入 `sable-rapier-1.21.1-2.0.3.jar` 作为 compileOnly 依赖。
+构建固定使用 `libs/compat-latest/` 目录下的 Sable 2.0.5 / Simulated 1.3.2 / Aeronautics 1.3.2，并引入 `sable-rapier-1.21.1-2.0.5.jar` 作为 compileOnly 依赖；不再提供 Sable 1.x 构建开关。
 
 ### 10.5 部署到游戏
 
@@ -1083,9 +1071,9 @@ libs/
 2. 将 `build/libs/create-fire-control-0.1.0.jar` 放入 `.minecraft/mods/`
 3. 同时放入以下依赖 mod：
    - `create-1.21.1-6.0.10.jar`
-   - `sable-neoforge-1.21.1-1.2.2.jar`（或 2.0.3）
-   - `create-aeronautics-bundled-1.21.1-1.2.1.jar`（或 1.3.0）
-   - `simulated-neoforge-1.21.1-1.2.1.jar`（或 1.3.0）
+   - `sable-neoforge-1.21.1-2.0.5.jar`
+   - `create-aeronautics-bundled-1.21.1-1.3.2.jar`
+   - `simulated-neoforge-1.21.1-1.3.2.jar`
    - 可选：`interiors`, `createbigcannons`, `cbcmodernwarfare`, `sable_schematic_api`
 4. 启动 Minecraft 1.21.1 + NeoForge 21.1.230
 
@@ -1164,8 +1152,8 @@ if (sign(error) != sign(prevError) && absoluteError < 1.0)
 
 ### 11.5 俯仰硬限位（两层防护）
 
-1. **目标姿态限位**（`enforceRigidPitchLimit`）：每物理子步长重新投影 `targetOrientation` 到合法 joint 流形，超出 ±depression/elevation 的部分被夹紧
-2. **物理速度限位**（`enforcePhysicalPitchStop`）：若实际物理 joint 已超出限位（被外部冲量推过），取消轴向角速度，让 Sable native servo 把它拉回
+1. **目标姿态限位**（`clampTargetPitch`）：每个物理子步将预测炮口方向钳制到合法俯仰范围。
+2. **原生关节止挡**（`BearingServoMath.PitchStops`）：由求解器约束实际关节角，不手动清除速度。收窄限位时按每秒 60° 推进止挡与电机恢复目标，避免超限炮身突然被拉回。
 
 ### 11.6 状态集中化
 
@@ -1296,7 +1284,7 @@ private static Vec3 projectPhysicalHitToWorld(Minecraft minecraft, Vec3 worldOri
 ## 文档版本
 
 - 生成日期：2026-07-20
-- 适用代码版本：`mod_version=0.1.0`（gradle.properties）
+- 适用代码版本：`mod_version=1.0.4`（gradle.properties）
 - 对应构建：`stabilized_turret-2026-07-20-0102.jar`（reference/ 目录中存放）
 
 > 本文档基于源码静态分析生成，部分行为描述（如 Sable 内部物理步进顺序、CBC 火炮实体生命周期）可能随依赖升级而变化。如发现行为不一致，请以源码为准。

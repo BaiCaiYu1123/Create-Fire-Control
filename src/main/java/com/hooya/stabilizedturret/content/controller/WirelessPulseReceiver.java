@@ -83,6 +83,10 @@ final class WirelessPulseReceiver implements IRedstoneLinkable {
         return !first.getStack().isEmpty() || !second.getStack().isEmpty();
     }
 
+    boolean isPowered() {
+        return hasConfiguredFrequency() && receivedStrength > 0;
+    }
+
     ItemStack getFrequency(boolean getFirst) {
         return (getFirst ? first : second).getStack();
     }

@@ -4,6 +4,8 @@ import com.hooya.stabilizedturret.content.controller.FireControlMissileCommandGu
 import com.hooya.stabilizedturret.content.controller.MianbaoMissileGuidanceHandler;
 import com.hooya.stabilizedturret.content.controller.MianbaoAirDefenseGuidanceHandler;
 import com.hooya.stabilizedturret.content.controller.MianbaoAircraftGuidanceHandler;
+import com.hooya.stabilizedturret.content.controller.MianbaoRocketPodProjectileHandler;
+import com.hooya.stabilizedturret.content.display.CruiseMissileGuidance;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,7 +37,9 @@ public abstract class CommandsMixin {
         if (FireControlMissileCommandGuard.isLaunching()
                 || MianbaoMissileGuidanceHandler.hasAnyGuidedMissile()
                 || MianbaoAircraftGuidanceHandler.hasAnyGuidedMissile()
-                || MianbaoAirDefenseGuidanceHandler.hasAnyGuidedMissile()) {
+                || MianbaoAirDefenseGuidanceHandler.hasAnyGuidedMissile()
+                || MianbaoRocketPodProjectileHandler.hasAnyActiveRocket()
+                || CruiseMissileGuidance.hasAnyGuidedMissile()) {
             ci.cancel();
         }
     }

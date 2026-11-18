@@ -1,0 +1,21 @@
+// Isolated decoder/OpenAL checks using the existing opt-in diesel source set.
+gradle.projectsEvaluated {
+    rootProject.runs.configureEach {
+        systemProperty 'create_fire_control.dieselClientChecks', 'false'
+        systemProperty 'create_fire_control.ztz99aAudioChecks', 'true'
+    }
+    rootProject.tasks.register('testZtz99aAudioOnlyRelease', JavaExec) {
+        dependsOn rootProject.tasks.named('testClasses')
+        classpath = rootProject.sourceSets.test.output +
+                rootProject.files('build/dist/ztz99a-transition/create-fire-control-0.8.1-ztz99a.3.jar') +
+                rootProject.configurations.testRuntimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.client.Ztz99aDieselResourceChecks'
+    }
+    rootProject.tasks.register('testZtz99a150hbRelease', JavaExec) {
+        dependsOn rootProject.tasks.named('testClasses')
+        classpath = rootProject.sourceSets.test.output +
+                rootProject.files('build/dist/ztz99a-150hb/create-fire-control-0.8.1-ztz99a.4.jar') +
+                rootProject.configurations.testRuntimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.client.Ztz99aDieselResourceChecks'
+    }
+}

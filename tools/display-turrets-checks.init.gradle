@@ -1,0 +1,24 @@
+gradle.projectsEvaluated {
+    def p=rootProject
+    def fixture=p.sourceSets.create('displayTurretsIntegration') {
+        java.srcDirs=['src/displayTurretsIntegration/java']
+        compileClasspath+=p.sourceSets.main.output+p.sourceSets.main.compileClasspath
+        runtimeClasspath+=p.sourceSets.main.output+p.sourceSets.main.runtimeClasspath
+    }
+    p.dependencies.add('localRuntime',p.files('libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar','libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar'))
+    p.runs.server { modSource fixture }
+    def runDir=p.file(p.providers.gradleProperty('runRoot').get()+'/server')
+    if(p.providers.gradleProperty('displaySnapshotJar').isPresent()) {
+        def snapshot=new File(runDir,'mod-snapshot')
+        p.copy { from p.zipTree(p.file(p.providers.gradleProperty('displaySnapshotJar').get()));into snapshot }
+        p.sourceSets.main.output.classesDirs.setFrom(snapshot)
+        p.sourceSets.main.output.resourcesDir=new File(runDir,'empty-resources')
+    }
+    p.tasks.named('runServer').configure {
+        doFirst { runDir.mkdirs();new File(runDir,'display-turrets-result.txt').text='RUNNING' }
+        doLast {
+            def result=new File(runDir,'display-turrets-result.txt')
+            if(!result.exists()||!result.text.startsWith('PASS:'))throw new GradleException('Display turrets failed: '+(result.exists()?result.text:'missing'))
+        }
+    }
+}

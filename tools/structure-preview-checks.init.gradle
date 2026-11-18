@@ -1,0 +1,42 @@
+gradle.projectsEvaluated {
+    def p = rootProject
+    def fixture = p.sourceSets.create('structurePreviewIntegration') {
+        java.srcDirs = ['src/structurePreviewIntegration/java']
+        compileClasspath += p.sourceSets.main.output + p.sourceSets.main.compileClasspath
+        runtimeClasspath += p.sourceSets.main.output + p.sourceSets.main.runtimeClasspath
+    }
+    p.dependencies.add('localRuntime', p.files('libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+            'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar'))
+    ['previewQModelJar','previewLittleTilesJar','previewCreativeCoreJar'].each { key ->
+        if(p.providers.gradleProperty(key).isPresent())p.dependencies.add('localRuntime',p.files(p.providers.gradleProperty(key).get()))
+    }
+    p.runs.client {
+        modSource fixture
+        argument '--width'; argument '1440'
+        argument '--height'; argument '960'
+        if(p.providers.gradleProperty('previewLargeOnly').isPresent())systemProperty 'createFireControl.previewLargeOnly','true'
+    }
+    def runDir = p.layout.projectDirectory.dir(p.providers.gradleProperty('runRoot').get()).dir('client').asFile
+    // Run the exact assembled artifact when other builds share build/classes/java/main.
+    // Never let a concurrent incremental compile remove classes from a live game's class path.
+    if (p.providers.gradleProperty('previewSnapshotJar').isPresent()) {
+        def snapshotJar = p.file(p.providers.gradleProperty('previewSnapshotJar').get())
+        def snapshot = new File(runDir, 'mod-snapshot')
+        p.copy { from p.zipTree(snapshotJar); into snapshot }
+        p.sourceSets.main.output.classesDirs.setFrom(snapshot)
+        p.sourceSets.main.output.resourcesDir = new File(runDir, 'empty-resources')
+    }
+    p.tasks.named('runClient').configure {
+        doFirst {
+            runDir.mkdirs()
+            new File(runDir, 'structure-preview-result.txt').text = 'RUNNING'
+            def options = new File(runDir, 'options.txt')
+            if (!options.exists()) options.text = 'lang:zh_cn\nguiScale:2\nrenderDistance:4\nsimulationDistance:5\nmaxFps:60\n'
+        }
+        doLast {
+            def result = new File(runDir, 'structure-preview-result.txt')
+            if (!result.isFile() || !result.text.startsWith('PASS'))
+                throw new GradleException('Structure preview checks failed: ' + (result.isFile() ? result.text : 'missing result'))
+        }
+    }
+}

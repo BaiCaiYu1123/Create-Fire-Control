@@ -1,0 +1,19 @@
+allprojects {
+    afterEvaluate {
+        runs.server.systemProperty 'create_fire_control.nativeInputChecks',
+                providers.gradleProperty('nativeInputChecks').getOrElse('true')
+        dependencies {
+            localRuntime files('libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+                    'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar')
+        }
+        def result = layout.projectDirectory.dir(providers.gradleProperty('runRoot').get())
+                .file('server/controller-integration-result.txt').asFile
+        tasks.matching { it.name == 'runServer' }.configureEach {
+            doFirst { result.parentFile.mkdirs(); result.text = 'RUNNING' }
+            doLast {
+                if (!result.isFile() || result.text.trim() != 'PASS')
+                    throw new GradleException('Native input checks failed: ' + (result.isFile() ? result.text : 'missing result'))
+            }
+        }
+    }
+}

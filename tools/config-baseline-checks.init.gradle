@@ -1,0 +1,10 @@
+gradle.projectsEvaluated {
+    def p = rootProject
+    p.tasks.register('testConfigurationBaseline', JavaExec) {
+        dependsOn p.tasks.named('testClasses')
+        classpath = p.sourceSets.test.runtimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.config.ConfigurationBaselineChecks'
+        args p.file('deliverables/idle-performance-20261113-1.0.4/create-fire-control-1.0.4.jar').absolutePath,
+                p.file(p.providers.gradleProperty('mianbaoJar').get()).absolutePath
+    }
+}

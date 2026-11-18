@@ -1,0 +1,2813 @@
+{
+  "parameter": "loadswitch",
+  "snapshots": [
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9681452512741089,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-002",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9765955805778503,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-005",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9478563070297241,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-004",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.31702756881713867,
+            "relativeAudibility": 0.9986572453223029
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 1.050305724143982,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-003",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9391925930976868,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-001",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3173472583293915,
+            "relativeAudibility": 0.9996642878607673
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 1.0351957082748413,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-003",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9904301762580872,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-004",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.31702756881713867,
+            "relativeAudibility": 0.9986572453223029
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9571146965026855,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-002",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 1.0526293516159058,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-005",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9736188054084778,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-004",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.31702756881713867,
+            "relativeAudibility": 0.9986572453223029
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 1.0219707489013672,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-003",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 1.0301955938339233,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-002",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9642320275306702,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-001",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3173472583293915,
+            "relativeAudibility": 0.9996642878607673
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 1.000626564025879,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-005",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.958532452583313,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-002",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 1.0677239894866943,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-004",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.31702756881713867,
+            "relativeAudibility": 0.9986572453223029
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 1.0213192701339722,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-003",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 1.0116647481918335,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-002",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9916189908981323,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-004",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.31702756881713867,
+            "relativeAudibility": 0.9986572453223029
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9747951626777649,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-005",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9782038331031799,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-001",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3173472583293915,
+            "relativeAudibility": 0.9996642878607673
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 0.9689474701881409,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-005",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 1.0440353155136108,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-002",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ],
+    [
+      {
+        "path": "Master Bus",
+        "volume": 1.258925437927246,
+        "pitch": 1.0,
+        "audibility": 0.07943282276391983,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.7943282127380371,
+        "pitch": 1.0,
+        "audibility": 0.12638065218925476,
+        "voices": [
+          {
+            "sample": "slow_not_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.10272703319787979,
+            "relativeAudibility": 0.8128382898677107
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.9952623844146729,
+        "pitch": 1.0,
+        "audibility": 0.31745389103889465,
+        "voices": [
+          {
+            "sample": "slow_load",
+            "volume": 1.0,
+            "pitch": 1.0640000104904175,
+            "audibility": 0.1478060632944107,
+            "relativeAudibility": 0.4655985245942423
+          },
+          {
+            "sample": "med_load",
+            "volume": 1.0,
+            "pitch": 0.8159999847412109,
+            "audibility": 0.18568050861358643,
+            "relativeAudibility": 0.5849054425067253
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/Master Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.15910382568836212,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.3174538314342499,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus/PlaylistInstrument",
+        "volume": 1.0,
+        "pitch": 1.029943823814392,
+        "audibility": 0.3174538314342499,
+        "voices": [
+          {
+            "sample": "revv-003",
+            "volume": 1.0,
+            "pitch": 1.0,
+            "audibility": 0.3174150884151459,
+            "relativeAudibility": 0.999877956996364
+          }
+        ]
+      },
+      {
+        "path": "Master Bus/Group Bus/Group Bus",
+        "volume": 1.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      },
+      {
+        "path": "Master Bus/ReturnBus",
+        "volume": 0.0,
+        "pitch": 1.0,
+        "audibility": 0.0,
+        "voices": []
+      }
+    ]
+  ]
+}

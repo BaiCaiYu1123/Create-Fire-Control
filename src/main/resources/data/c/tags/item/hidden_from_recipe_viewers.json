@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "create_fire_control:annihilation_medium_cannon_round",
+      "required": false
+    }
+  ]
+}

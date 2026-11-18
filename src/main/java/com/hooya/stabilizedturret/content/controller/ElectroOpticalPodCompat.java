@@ -10,36 +10,83 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.Set;
 
 /** Optional bridge to Mianbao's public electro-optical pod API. */
 public final class ElectroOpticalPodCompat {
     private static final ResourceLocation POD_ID = ResourceLocation.fromNamespaceAndPath(
             "mianbaos_modernwarfare", "electroopticalpod"
     );
+    private static final Set<ResourceLocation> POD_IDS = Set.of(
+            POD_ID,
+            ResourceLocation.fromNamespaceAndPath("mianbaos_modernwarfare", "electroopticalpod_2"),
+            ResourceLocation.fromNamespaceAndPath("mianbaos_modernwarfare", "electroopticalpod_3")
+    );
     private static final String API_CLASS = "net.mcreator.myfirstmod.api.ElectroOpticalPodApi";
 
     public static boolean isPod(Level level, BlockPos pos) {
-        return POD_ID.equals(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock()));
+        return level != null && isPod(level.getBlockState(pos));
+    }
+
+    public static boolean isPod(BlockState state) {
+        return state != null
+                && POD_IDS.contains(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
+    }
+
+    /** The original pod exposes a movable optical head; the reskinned variants are fixed. */
+    private static boolean hasMovableHead(BlockEntity pod) {
+        return POD_ID.equals(BuiltInRegistries.BLOCK.getKey(pod.getBlockState().getBlock()));
     }
 
     public static @Nullable Vec3 worldPosition(Level level, BindingRef ref) {
+        if (level == null || ref == null || !ref.isSameTarget(level)
+                || !isPod(level.getBlockState(ref.pos()))) return null;
         BlockEntity pod = resolvePod(level, ref);
-        if (pod == null || pod.getLevel() == null) return null;
-        return Sable.HELPER.projectOutOfSubLevel(
-                pod.getLevel(), Vec3.atCenterOf(pod.getBlockPos())
-        );
+        return pod == null
+                ? cameraWorldPosition(level, ref.pos(), level.getBlockState(ref.pos()))
+                : cameraWorldPosition(pod);
+    }
+
+    /** Camera anchor for a bound pod; static reskins sit one block in front of the base. */
+    public static @Nullable Vec3 cameraWorldPosition(BlockEntity pod) {
+        if (pod == null || pod.getLevel() == null || !POD_IDS.contains(
+                BuiltInRegistries.BLOCK.getKey(pod.getBlockState().getBlock()))) {
+            return null;
+        }
+        return cameraWorldPosition(pod.getLevel(), pod.getBlockPos(), pod.getBlockState());
+    }
+
+    private static Vec3 cameraWorldPosition(Level level, BlockPos pos, BlockState state) {
+        Vec3 localPosition = Vec3.atCenterOf(pos);
+        if (!POD_ID.equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()))) {
+            Direction facing = baseFacing(state);
+            localPosition = localPosition.add(facing.getStepX(), 0.0, facing.getStepZ());
+        }
+        return Sable.HELPER.projectOutOfSubLevel(level, localPosition);
     }
 
     /** Physical pod base direction, intentionally excluding its animated model angles. */
     public static @Nullable Vec3 baseWorldDirection(Level level, BindingRef ref) {
         BlockEntity pod = resolvePod(level, ref);
-        if (pod == null) return null;
+        if (pod == null) {
+            if (level == null || ref == null || !ref.isSameTarget(level)
+                    || !isPod(level.getBlockState(ref.pos()))) return null;
+            BlockState state = level.getBlockState(ref.pos());
+            Direction facing = baseFacing(state);
+            Vec3 localOrigin = Vec3.atCenterOf(ref.pos());
+            Vec3 localForward = localOrigin.add(facing.getStepX(), 0.0, facing.getStepZ());
+            Vec3 worldOrigin = Sable.HELPER.projectOutOfSubLevel(level, localOrigin);
+            Vec3 worldForward = Sable.HELPER.projectOutOfSubLevel(level, localForward);
+            Vec3 direction = worldForward.subtract(worldOrigin);
+            return direction.lengthSqr() < 1.0e-8 ? null : direction.normalize();
+        }
         Direction facing = baseFacing(pod);
         Vec3 localOrigin = Vec3.atCenterOf(pod.getBlockPos());
         Vec3 localForward = localOrigin.add(facing.getStepX(), 0.0, facing.getStepZ());
@@ -52,7 +99,9 @@ public final class ElectroOpticalPodCompat {
     /** Complete optical direction including the pod model's saved yaw and pitch. */
     public static @Nullable Vec3 modelWorldDirection(Level level, BindingRef ref) {
         BlockEntity pod = resolvePod(level, ref);
-        if (pod == null || pod.getLevel() == null) return null;
+        if (pod == null) return baseWorldDirection(level, ref);
+        if (pod.getLevel() == null) return null;
+        if (!hasMovableHead(pod)) return baseWorldDirection(level, ref);
         try {
             Object controller = findController(pod.getLevel(), pod.getBlockPos());
             if (controller == null) return baseWorldDirection(level, ref);
@@ -81,6 +130,7 @@ public final class ElectroOpticalPodCompat {
         if (worldDirection.lengthSqr() < 1.0e-8) return;
         BlockEntity pod = resolvePod(level, ref);
         if (pod == null || pod.getLevel() == null) return;
+        if (!hasMovableHead(pod)) return;
         try {
             Object controller = findController(pod.getLevel(), pod.getBlockPos());
             if (controller == null) return;
@@ -156,16 +206,17 @@ public final class ElectroOpticalPodCompat {
             }
         } catch (ReflectiveOperationException | RuntimeException | LinkageError ignored) {
         }
-        if (pod.getBlockState().hasProperty(HorizontalDirectionalBlock.FACING)) {
-            return pod.getBlockState().getValue(HorizontalDirectionalBlock.FACING);
-        }
-        return Direction.NORTH;
+        return baseFacing(pod.getBlockState());
+    }
+
+    private static Direction baseFacing(BlockState state) {
+        return state.hasProperty(HorizontalDirectionalBlock.FACING)
+                ? state.getValue(HorizontalDirectionalBlock.FACING) : Direction.NORTH;
     }
 
     private static @Nullable BlockEntity resolvePod(Level level, BindingRef ref) {
         BlockEntity blockEntity = ref.resolve(level);
-        return blockEntity != null
-                && POD_ID.equals(BuiltInRegistries.BLOCK.getKey(blockEntity.getBlockState().getBlock()))
+        return blockEntity != null && isPod(blockEntity.getBlockState())
                 ? blockEntity
                 : null;
     }

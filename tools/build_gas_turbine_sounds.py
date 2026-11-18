@@ -8,7 +8,7 @@ import soundfile as sf
 
 ROOT = Path(__file__).resolve().parents[1]
 PREVIEW = ROOT / "sound_preview_m1a2" / "preview"
-OUTPUT = ROOT / "src" / "main" / "resources" / "assets" / "stabilized_turret" / "sounds" / "gas_turbine"
+OUTPUT = ROOT / "src" / "main" / "resources" / "assets" / "create_fire_control" / "sounds" / "gas_turbine"
 USER_START_IDLE = PREVIEW / "M1A2_user_start_idle.mp3"
 TARGET_LOUDNESS = -22.0
 MAX_PEAK = 0.89

@@ -1,10 +1,13 @@
 package com.hooya.stabilizedturret.mixin.client;
 
 import com.hooya.stabilizedturret.client.ClientAimState;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11C;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,6 +27,8 @@ public abstract class LevelRendererThermalMixin {
             CallbackInfo ci
     ) {
         if (ClientAimState.isThermal()) {
+            RenderSystem.clearColor(0.12F, 0.12F, 0.12F, 1.0F);
+            RenderSystem.clear(GL11C.GL_COLOR_BUFFER_BIT, Minecraft.ON_OSX);
             ci.cancel();
         }
     }

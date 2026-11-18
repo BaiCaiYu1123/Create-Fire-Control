@@ -27,6 +27,10 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid = StabilizedTurret.MOD_ID, value = Dist.CLIENT)
 public final class ConnectedDisplayInteractionHandler {
     private static double lastSentRange = Double.NaN;
+    private static double lastSentDefenseRange = Double.NaN;
+    private static double lastSentProximityRange = Double.NaN;
+    private static boolean lastSliderWasDefense;
+    private static boolean lastSliderWasProximity;
     private static long lastSentAt = Long.MIN_VALUE;
 
     @SubscribeEvent
@@ -42,6 +46,8 @@ public final class ConnectedDisplayInteractionHandler {
                 GLFW.GLFW_MOUSE_BUTTON_RIGHT) != GLFW.GLFW_PRESS
                 || !(minecraft.hitResult instanceof BlockHitResult hit)) {
             lastSentRange = Double.NaN;
+            lastSentDefenseRange = Double.NaN;
+            lastSentProximityRange = Double.NaN;
             return;
         }
         Level hitLevel = minecraft.level;
@@ -60,19 +66,46 @@ public final class ConnectedDisplayInteractionHandler {
         ConnectedDisplayLayout.ScreenHit screen =
                 ConnectedDisplayLayout.locate(
                         hitLevel, hit.getBlockPos(), hit.getLocation());
-        if (screen == null || !ConnectedDisplayLayout.inside(
-                screen.canvasX(), screen.canvasY(),
-                ConnectedDisplayLayout.SLIDER_X1,
-                ConnectedDisplayLayout.SLIDER_Y1,
-                ConnectedDisplayLayout.SLIDER_X2,
-                ConnectedDisplayLayout.SLIDER_Y2
-        )) {
+        if (screen == null) {
             return;
         }
-        double range = ConnectedDisplayLayout.sliderRange(screen.canvasX());
+        boolean defenseSlider = ConnectedDisplayLayout.inside(
+                screen.canvasX(), screen.canvasY(), ConnectedDisplayLayout.SLIDER_X1,
+                ConnectedDisplayLayout.DEFENSE_SLIDER_Y1, ConnectedDisplayLayout.SLIDER_X2,
+                ConnectedDisplayLayout.DEFENSE_SLIDER_Y2);
+        boolean radarSlider = ConnectedDisplayLayout.inside(
+                screen.canvasX(), screen.canvasY(), ConnectedDisplayLayout.SLIDER_X1,
+                ConnectedDisplayLayout.RADAR_SLIDER_Y1, ConnectedDisplayLayout.SLIDER_X2,
+                ConnectedDisplayLayout.RADAR_SLIDER_Y2);
+        boolean proximitySlider = ConnectedDisplayLayout.inside(
+                screen.canvasX(), screen.canvasY(), ConnectedDisplayLayout.SLIDER_X1,
+                ConnectedDisplayLayout.PROXIMITY_SLIDER_Y1,
+                ConnectedDisplayLayout.SLIDER_X2,
+                ConnectedDisplayLayout.PROXIMITY_SLIDER_Y2);
+        if (!defenseSlider && !radarSlider && !proximitySlider) {
+            lastSentRange = Double.NaN;
+            lastSentDefenseRange = Double.NaN;
+            lastSentProximityRange = Double.NaN;
+            return;
+        }
+        double range = radarSlider
+                ? ConnectedDisplayLayout.sliderRange(screen.canvasX())
+                : screen.controller().getRadarRange();
+        double defenseRange = defenseSlider
+                ? ConnectedDisplayLayout.defenseSliderRange(screen.canvasX())
+                : screen.controller().getAutomaticMissileDefenseRange();
+        double proximityRange = proximitySlider
+                ? ConnectedDisplayLayout.proximitySliderRange(screen.canvasX())
+                : screen.controller().getMissileProximityRange();
         long now = minecraft.level.getGameTime();
-        if (Double.isFinite(lastSentRange)
-                && Math.abs(range - lastSentRange) < 9.9
+        double previous = proximitySlider ? lastSentProximityRange
+                : defenseSlider ? lastSentDefenseRange : lastSentRange;
+        double current = proximitySlider ? proximityRange
+                : defenseSlider ? defenseRange : range;
+        if (lastSliderWasDefense == defenseSlider
+                && lastSliderWasProximity == proximitySlider
+                && Double.isFinite(previous)
+                && Math.abs(current - previous) < (proximitySlider ? 0.49 : 9.9)
                 && now - lastSentAt < 4L) {
             return;
         }
@@ -83,6 +116,12 @@ public final class ConnectedDisplayInteractionHandler {
                 display.getBlockPos(),
                 reference.subLevelId(),
                 display.isAutomaticAttack(),
+                display.isScanningStructures(),
+                display.isScanningLiving(),
+                display.isScanningMissiles(),
+                display.isAutomaticMissileDefense(),
+                defenseRange,
+                proximityRange,
                 range,
                 display.getYawSpeed(),
                 display.getPitchSpeed(),
@@ -90,9 +129,16 @@ public final class ConnectedDisplayInteractionHandler {
                 display.getElevationLimit(),
                 display.isYawReversed(),
                 display.isPitchReversed(),
-                display.getCannonFireRange()
+                display.getCannonFireRange(),
+                display.getCannonFirePower(),
+                display.getMapUpdateIntervalSeconds(),
+                display.getMapResolution()
         ));
-        lastSentRange = range;
+        if (defenseSlider) lastSentDefenseRange = defenseRange;
+        else if (proximitySlider) lastSentProximityRange = proximityRange;
+        else lastSentRange = range;
+        lastSliderWasDefense = defenseSlider;
+        lastSliderWasProximity = proximitySlider;
         lastSentAt = now;
     }
 

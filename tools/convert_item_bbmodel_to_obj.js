@@ -23,7 +23,7 @@ const assetRoot = path.join(
     "main",
     "resources",
     "assets",
-    "stabilized_turret"
+    "create_fire_control"
 );
 const modelDirectory = path.join(assetRoot, "models", "item");
 const textureDirectory = path.join(assetRoot, "textures", "item");
@@ -34,11 +34,19 @@ const source = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
 if (source?.meta?.model_format !== "java_block") {
     throw new Error(`Expected java_block model: ${sourcePath}`);
 }
-if (!Array.isArray(source.textures) || source.textures.length !== 1) {
-    throw new Error(`Expected exactly one embedded texture: ${sourcePath}`);
+const usedTextures = new Set((source.elements ?? [])
+    .filter(element => element.type === "cube" && element.export !== false)
+    .flatMap(element => Object.values(element.faces ?? {}))
+    .map(face => face.texture)
+    .filter(index => index !== null && index !== undefined));
+if (!Array.isArray(source.textures) || usedTextures.size !== 1) {
+    throw new Error(`Expected exactly one used embedded texture: ${sourcePath}`);
 }
 
-const texture = source.textures[0];
+// Blockbench may retain unused reference textures. Faces index the texture array,
+// rather than the editable texture id field or the first embedded image.
+const texture = source.textures[[...usedTextures][0]];
+if (!texture) throw new Error(`Used texture is missing: ${sourcePath}`);
 const textureMatch = /^data:image\/png;base64,(.+)$/.exec(texture.source);
 if (!textureMatch) {
     throw new Error(`Texture is not an embedded PNG: ${sourcePath}`);
@@ -222,17 +230,25 @@ function rotateDisplayPoint(point, rotation) {
     return [x, y, z];
 }
 
-function fittedGuiTransform(rotation, translation, targetSpan) {
+function fittedGuiTransform(rotation, translation, targetSpan, centerInSlot = false) {
     const rotated = convertedVertices.map(point => rotateDisplayPoint(point, rotation));
     const minX = Math.min(...rotated.map(point => point[0]));
     const maxX = Math.max(...rotated.map(point => point[0]));
     const minY = Math.min(...rotated.map(point => point[1]));
     const maxY = Math.max(...rotated.map(point => point[1]));
-    const scale = targetSpan / Math.max(maxX - minX, maxY - minY);
+    const scale = Number((targetSpan / Math.max(maxX - minX, maxY - minY)).toFixed(4));
+    if (centerInSlot) {
+        // ItemRenderer applies the GUI transform before translating vertices by
+        // (-.5, -.5, -.5). Center that rotated, scaled mesh in the 16px item slot.
+        const pivot = rotateDisplayPoint([.5, .5, .5], rotation);
+        translation = [
+            -16 * scale * ((minX + maxX) * .5 - pivot[0]),
+            -16 * scale * ((minY + maxY) * .5 - pivot[1]),
+            translation[2]
+        ].map(value => Number(value.toFixed(6)));
+    }
     return {
         rotation,
-        // Match CBC-MW's proven inventory transforms. The OBJ coordinates are
-        // now in the same 0..1 block space as its vanilla JSON elements.
         translation,
         scale: [scale, scale, scale].map(value => Number(value.toFixed(4)))
     };
@@ -303,7 +319,8 @@ const projectileDisplay = {
         translation: [0, 0, 2.5],
         scale: [0.55, 0.55, 0.55]
     },
-    gui: fittedGuiTransform([50, 40, -30], [-3.75, 3.75, 0], 0.9),
+    gui: fittedGuiTransform([50, 40, -30], [-3.75, 3.75, 0], 0.9,
+            modelName === "apfsds_medium_cannon_round"),
     fixed: {
         rotation: [90, 0, 0],
         scale: [0.8, 0.8, 0.8]
@@ -314,14 +331,14 @@ const model = {
     parent: "minecraft:block/block",
     ambientocclusion: false,
     textures: {
-        layer0: `stabilized_turret:item/${textureName}`,
-        particle: `stabilized_turret:item/${textureName}`
+        layer0: `create_fire_control:item/${textureName}`,
+        particle: `create_fire_control:item/${textureName}`
     },
     loader: "neoforge:obj",
     flip_v: true,
     automatic_culling: false,
     shade_quads: true,
-    model: `stabilized_turret:models/item/${modelName}.obj`,
+    model: `create_fire_control:models/item/${modelName}.obj`,
     display: mode === "projectile" ? projectileDisplay : verticalDisplay
 };
 

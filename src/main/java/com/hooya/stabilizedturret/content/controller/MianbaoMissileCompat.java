@@ -40,11 +40,12 @@ public final class MianbaoMissileCompat {
             id("antitankmissilelaunchererxing_right"),
             id("antitankmissilelaunchererxing_left"),
             id("antitankmissilelaunchersixing"),
-            id("antitankmissilelaunchersanxing")
-    );
-    private static final Set<ResourceLocation> DESIGNATORS = Set.of(
-            id("laserpointerblock"),
-            id("laserpointerblockshase")
+            id("antitankmissilelaunchersanxing"),
+            id("antitank_missile_launcher_type_1"),
+            id("antitank_missile_launcher_type_2_left"),
+            id("antitank_missile_launcher_type_2_right"),
+            id("antitank_missile_launcher_type_3"),
+            id("antitank_missile_launcher_type_4")
     );
     private static final Set<ResourceLocation> GUIDED_MISSILES = Set.of(
             id("antitankmissile_1tanshe"),
@@ -59,10 +60,6 @@ public final class MianbaoMissileCompat {
         return LAUNCHERS.contains(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
     }
 
-    public static boolean isDesignator(BlockState state) {
-        return DESIGNATORS.contains(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
-    }
-
     public static boolean isSameAdjustableLauncherVariant(
             ResourceLocation first,
             ResourceLocation second
@@ -70,6 +67,7 @@ public final class MianbaoMissileCompat {
         if (first == null || second == null || first.equals(second)) {
             return false;
         }
+        if (MianbaoLauncherIdMigration.isRenamedLauncher(first, second)) return true;
         return (first.equals(id("antitankemissilelauncher"))
                 && second.equals(id("antitankemissilelauncherh_2")))
                 || (first.equals(id("antitankemissilelauncherh_2"))
@@ -90,9 +88,7 @@ public final class MianbaoMissileCompat {
         if (context == null) {
             return 0;
         }
-        int first = Math.max(0, (int) Math.floor(context.blockEntity().getPersistentData().getDouble("missile1ammo")));
-        int second = Math.max(0, (int) Math.floor(context.blockEntity().getPersistentData().getDouble("missile2ammo")));
-        return first + second;
+        return MianbaoLauncherAmmo.antiTank(context.blockEntity(), context.blockId().getPath());
     }
 
     /**
@@ -136,47 +132,6 @@ public final class MianbaoMissileCompat {
         }
     }
 
-    public static @Nullable Vec3 getDesignatorDirection(Level level, BindingRef ref) {
-        if (!ref.isSameTarget(level)) {
-            return null;
-        }
-        BlockState state = level.getBlockState(ref.pos());
-        if (!isDesignator(state)) {
-            return null;
-        }
-        Direction facing = state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)
-                ? state.getValue(BlockStateProperties.HORIZONTAL_FACING)
-                : Direction.NORTH;
-        Vector3d direction = new Vector3d(
-                facing.getStepX(),
-                facing.getStepY(),
-                facing.getStepZ()
-        );
-        SubLevel subLevel = Sable.HELPER.getContaining(level, ref.pos());
-        if (subLevel != null && !subLevel.isRemoved()) {
-            subLevel.logicalPose().transformNormal(direction);
-        }
-        if (direction.lengthSquared() < 1.0e-8) {
-            return null;
-        }
-        direction.normalize();
-        return new Vec3(direction.x, direction.y, direction.z);
-    }
-
-    public static @Nullable Vec3 getDesignatorOrigin(Level level, BindingRef ref) {
-        Vec3 direction = getDesignatorDirection(level, ref);
-        if (direction == null) {
-            return null;
-        }
-        Direction facing = level.getBlockState(ref.pos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
-        Vec3 localOrigin = Vec3.atCenterOf(ref.pos()).add(0.0, 0.5, 0.0).add(
-                facing.getStepX() * 1.6,
-                facing.getStepY() * 1.6,
-                facing.getStepZ() * 1.6
-        );
-        return Sable.HELPER.projectOutOfSubLevel(level, localOrigin);
-    }
-
     /**
      * The four launchers create their missile 2.6 blocks in front of the base.
      * Returning that exact muzzle point makes spawn association unambiguous
@@ -200,6 +155,23 @@ public final class MianbaoMissileCompat {
                 facing.getStepZ() * muzzleOffset
         );
         return Sable.HELPER.projectOutOfSubLevel(level, localMuzzle);
+    }
+
+    /** World-space forward direction of a bound anti-tank launcher. */
+    public static @Nullable Vec3 getLauncherDirection(Level level, BindingRef ref) {
+        if (!ref.isSameTarget(level)) return null;
+        BlockState state = level.getBlockState(ref.pos());
+        if (!isLauncher(state)) return null;
+        Direction facing = state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)
+                ? state.getValue(BlockStateProperties.HORIZONTAL_FACING)
+                : Direction.NORTH;
+        Vec3 localOrigin = Vec3.atCenterOf(ref.pos());
+        Vec3 localForward = localOrigin.add(
+                facing.getStepX(), facing.getStepY(), facing.getStepZ());
+        Vec3 worldOrigin = Sable.HELPER.projectOutOfSubLevel(level, localOrigin);
+        Vec3 worldForward = Sable.HELPER.projectOutOfSubLevel(level, localForward);
+        Vec3 direction = worldForward.subtract(worldOrigin);
+        return direction.lengthSqr() < 1.0e-8 ? null : direction.normalize();
     }
 
     /**
@@ -229,11 +201,43 @@ public final class MianbaoMissileCompat {
         );
     }
     public static Vec3 getWorldPosition(Entity entity) {
+        if (MathematicalMissileManager.contains(entity)) return entity.position();
         return Sable.HELPER.projectOutOfSubLevel(entity.level(), entity.position());
+    }
+
+    public static Vec3 getWorldPosition(Entity entity, Vec3 localPosition) {
+        if (MathematicalMissileManager.contains(entity)) return localPosition;
+        return Sable.HELPER.projectOutOfSubLevel(entity.level(), localPosition);
+    }
+
+    /**
+     * Restores a root-world position even when the entity happens to live in a
+     * Sable sublevel. This is only used to recover a guided projectile from a
+     * bad third-party flight calculation before Minecraft discards it.
+     */
+    public static boolean setWorldPosition(Entity entity, Vec3 worldPosition) {
+        if (entity == null || !isFinite(worldPosition)) return false;
+        if (MathematicalMissileManager.contains(entity)) {
+            entity.setPos(worldPosition.x, worldPosition.y, worldPosition.z);
+            return true;
+        }
+        SubLevel subLevel = Sable.HELPER.getContaining(entity);
+        if (subLevel == null) {
+            entity.setPos(worldPosition.x, worldPosition.y, worldPosition.z);
+            return true;
+        }
+        Vector3d localPosition = new Vector3d(worldPosition.x, worldPosition.y, worldPosition.z);
+        subLevel.logicalPose().transformPositionInverse(localPosition);
+        if (!Double.isFinite(localPosition.x)
+                || !Double.isFinite(localPosition.y)
+                || !Double.isFinite(localPosition.z)) return false;
+        entity.setPos(localPosition.x, localPosition.y, localPosition.z);
+        return true;
     }
 
     public static Vec3 getWorldVelocity(Entity entity) {
         Vec3 velocity = entity.getDeltaMovement();
+        if (MathematicalMissileManager.contains(entity)) return velocity;
         SubLevel subLevel = Sable.HELPER.getContaining(entity);
         return subLevel == null
                 ? velocity
@@ -241,13 +245,26 @@ public final class MianbaoMissileCompat {
     }
 
     public static void setWorldVelocity(Entity entity, Vec3 worldVelocity) {
+        if (entity == null || !isFinite(worldVelocity)) return;
+        if (MathematicalMissileManager.contains(entity)) {
+            entity.setDeltaMovement(worldVelocity);
+            return;
+        }
         SubLevel subLevel = Sable.HELPER.getContaining(entity);
         entity.setDeltaMovement(subLevel == null
                 ? worldVelocity
                 : subLevel.logicalPose().transformNormalInverse(worldVelocity));
     }
 
+    private static boolean isFinite(Vec3 vector) {
+        return vector != null
+                && Double.isFinite(vector.x)
+                && Double.isFinite(vector.y)
+                && Double.isFinite(vector.z);
+    }
+
     public static @Nullable ServerLevel getRootServerLevel(Entity entity) {
+        if (MathematicalMissileManager.contains(entity)) return MathematicalMissileManager.root(entity);
         SubLevel subLevel = Sable.HELPER.getContaining(entity);
         if (subLevel != null && subLevel.getLevel() instanceof ServerLevel root) {
             return root;
@@ -256,6 +273,8 @@ public final class MianbaoMissileCompat {
     }
 
     private static final String SERVER_TICK_MARKER = "CreateFireControlNativeTick";
+    private static final String CRUISE_TRAIL_MISSED_MARKER =
+            "CreateFireControlCruiseTrailMissed";
 
     /** Records that vanilla actually ticked this projectile during this server tick. */
     public static void noteNativeMissileTick(Entity entity) {
@@ -265,6 +284,24 @@ public final class MianbaoMissileCompat {
         }
     }
 
+    /** Marks a cruise tick skipped while its next root chunk is loading. */
+    public static void markCruiseTrailMissed(Entity entity) {
+        ServerLevel root = getRootServerLevel(entity);
+        if (root != null) {
+            entity.getPersistentData().putLong(CRUISE_TRAIL_MISSED_MARKER,
+                    root.getGameTime());
+        }
+    }
+
+    public static boolean consumeCruiseTrailMissed(Entity entity) {
+        ServerLevel root = getRootServerLevel(entity);
+        if (root == null) return false;
+        var data = entity.getPersistentData();
+        if (data.getLong(CRUISE_TRAIL_MISSED_MARKER) != root.getGameTime()) return false;
+        data.remove(CRUISE_TRAIL_MISSED_MARKER);
+        return true;
+    }
+
     /**
      * Advances a guided missile without collision when its root-world terrain
      * is unavailable. Coordinates stay local to the entity's own level, so
@@ -272,23 +309,55 @@ public final class MianbaoMissileCompat {
      */
     public static void advanceWithoutRootChunkCollision(Entity entity) {
         Vec3 localMovement = entity.getDeltaMovement();
+        if (!isFinite(localMovement)) {
+            // Do not turn one bad third-party guidance calculation into a
+            // permanent NaN position while a remote chunk is still loading.
+            // CruiseMissileGuidance restores its last valid commanded vector
+            // during the same server tick.
+            entity.setDeltaMovement(Vec3.ZERO);
+            entity.hasImpulse = true;
+            noteNativeMissileTick(entity);
+            return;
+        }
         entity.setPos(
                 entity.getX() + localMovement.x,
                 entity.getY() + localMovement.y,
                 entity.getZ() + localMovement.z
         );
+        if (MianbaoRocketPodCompat.isRocket(entity)) {
+            MianbaoRocketPodCompat.applyPostMovePhysics(entity);
+        }
         entity.hasImpulse = true;
         noteNativeMissileTick(entity);
     }
 
     /** Advances missiles whose entity chunk did not receive a native tick. */
-    public static void advanceIfNativeTickMissed(Entity entity) {
+    public static boolean advanceIfNativeTickMissed(Entity entity) {
+        return advanceIfNativeTickMissed(entity, true);
+    }
+
+    /** Managed flares batch their own visual updates instead of broadcasting here. */
+    static boolean advanceIfNativeTickMissed(Entity entity, boolean broadcast) {
+        if (MathematicalMissileManager.contains(entity)) return MathematicalMissileManager.advance(entity);
         ServerLevel root = getRootServerLevel(entity);
-        if (root == null) return;
+        if (root == null) return false;
+        boolean advanced = false;
         if (entity.getPersistentData().getLong(SERVER_TICK_MARKER) != root.getGameTime()) {
             advanceWithoutRootChunkCollision(entity);
+            if (MianbaoRocketPodCompat.isRocket(entity)) {
+                // The entire entity tick was skipped, including its native
+                // cached-velocity procedure. Run it before broadcasting velocity.
+                MianbaoRocketPodCompat.runNativeFlight(entity);
+            }
+            advanced = true;
         }
-        MianbaoMissileRemoteSync.broadcast(entity);
+        // Low cruise broadcasts after its yaw/pitch command is finalized.
+        if (broadcast && (MianbaoCruiseMissileCompat.missileType(entity)
+                != MianbaoCruiseMissileCompat.Type.LOW_ALTITUDE_CRUISE
+                || !entity.getPersistentData().getBoolean("CreateFireControlCruiseGuided"))) {
+            MianbaoMissileRemoteSync.broadcast(entity);
+        }
+        return advanced;
     }
 
     /**
@@ -327,13 +396,14 @@ public final class MianbaoMissileCompat {
 
     private static Optional<Method> findFireMethod(ResourceLocation launcherId) {
         String procedure = switch (launcherId.getPath()) {
-            case "antitankemissilelauncher", "antitankemissilelauncherh_2" ->
+            case "antitankemissilelauncher", "antitankemissilelauncherh_2", "antitank_missile_launcher_type_1" ->
                     "net.mcreator.myfirstmod.procedures.AntitankMissilelaunchergoProcedure";
-            case "antitankmissilelaunchererxing_right", "antitankmissilelaunchererxing_left" ->
+            case "antitankmissilelaunchererxing_right", "antitankmissilelaunchererxing_left",
+                    "antitank_missile_launcher_type_2_right", "antitank_missile_launcher_type_2_left" ->
                     "net.mcreator.myfirstmod.procedures.AntitankmissilelaunchererxingWORKProcedure";
-            case "antitankmissilelaunchersanxing" ->
+            case "antitankmissilelaunchersanxing", "antitank_missile_launcher_type_3" ->
                     "net.mcreator.myfirstmod.procedures.AntitankmissilelaunchersanxingworkProcedure";
-            case "antitankmissilelaunchersixing" ->
+            case "antitankmissilelaunchersixing", "antitank_missile_launcher_type_4" ->
                     "net.mcreator.myfirstmod.procedures.Antitankmissilelauncher_sixing_fireProcedure";
             default -> null;
         };
@@ -362,7 +432,8 @@ public final class MianbaoMissileCompat {
         // The adjustable-height single launcher spawns its projectile one
         // block farther forward than the four fixed rack variants.
         return launcherId.getPath().equals("antitankemissilelauncher")
-                || launcherId.getPath().equals("antitankemissilelauncherh_2") ? 3.6 : 2.6;
+                || launcherId.getPath().equals("antitankemissilelauncherh_2")
+                || launcherId.getPath().equals("antitank_missile_launcher_type_1") ? 3.6 : 2.6;
     }
 
 

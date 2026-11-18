@@ -1,0 +1,11 @@
+newmtl texture_0
+map_Kd #df_26_green
+
+newmtl texture_1
+map_Kd #df_26_red
+
+newmtl texture_2
+map_Kd #df_26_black
+
+newmtl texture_3
+map_Kd #df_26_basalt

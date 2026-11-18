@@ -3,6 +3,8 @@ package com.hooya.stabilizedturret.mixin;
 import com.hooya.stabilizedturret.StabilizedTurret;
 import com.hooya.stabilizedturret.compat.yuushya.YuushyaCannonCompat;
 import com.hooya.stabilizedturret.compat.yuushya.YuushyaCannonRecoilAnimation;
+import com.hooya.stabilizedturret.compat.yuushya.MediumCannonRecoilOverride;
+import com.hooya.stabilizedturret.registry.ModCbcContent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -20,12 +22,91 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import riftyboi.cbcmodernwarfare.cannon_control.contraption.MountedMediumcannonContraption;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MediumcannonBlock;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.material.MediumcannonMaterial;
+import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MovesWithMediumcannonRecoilBarrel;
+import riftyboi.cbcmodernwarfare.cannons.medium_cannon.recoil_barrel.MediumcannonRecoilBarrelBlockEntity;
 import rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption;
 
 import java.util.Map;
 
 @Mixin(MountedMediumcannonContraption.class)
 public abstract class YuushyaMountedMediumcannonContraptionMixin {
+    @Inject(method = "collectCannonBlocks", at = @At("RETURN"))
+    private void stabilizedTurret$replaceModernWarfareRecoil(
+            Level level,
+            BlockPos assemblyOrigin,
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        if (!cir.getReturnValueZ()) return;
+
+        MountedMediumcannonContraption cannon =
+                (MountedMediumcannonContraption) (Object) this;
+        stabilizedTurret$applyModernWarfareRecoilOverride(cannon, level);
+    }
+
+    @Inject(method = "readNBT", at = @At("TAIL"))
+    private void stabilizedTurret$upgradeSavedModernWarfareRecoil(
+            Level level,
+            CompoundTag tag,
+            boolean spawnData,
+            CallbackInfo ci
+    ) {
+        MountedMediumcannonContraption cannon =
+                (MountedMediumcannonContraption) (Object) this;
+        stabilizedTurret$applyModernWarfareRecoilOverride(cannon, level);
+    }
+
+    private static void stabilizedTurret$applyModernWarfareRecoilOverride(
+            MountedMediumcannonContraption cannon,
+            Level level
+    ) {
+        BlockPos breechPos = cannon.getStartPos();
+        if (breechPos == null) return;
+        StructureTemplate.StructureBlockInfo breechInfo = cannon.getBlocks().get(breechPos);
+        if (breechInfo == null || !stabilizedTurret$isCustomBreech(breechInfo.state())) {
+            return;
+        }
+
+        if (breechInfo.state().getBlock() instanceof MovesWithMediumcannonRecoilBarrel moving) {
+            cannon.getBlocks().put(
+                    breechPos,
+                    new StructureTemplate.StructureBlockInfo(
+                            breechPos,
+                            moving.getMovingState(breechInfo.state()),
+                            breechInfo.nbt()
+                    )
+            );
+        }
+
+        for (var entry : cannon.presentBlockEntities.entrySet()) {
+            if (!(entry.getValue() instanceof MediumcannonRecoilBarrelBlockEntity recoilBarrel)
+                    || !(recoilBarrel instanceof MediumCannonRecoilOverride override)) {
+                continue;
+            }
+            override.stabilizedTurret$setRecoilOverride(true);
+            recoilBarrel.toAnimate.remove(breechPos.subtract(entry.getKey()));
+
+            StructureTemplate.StructureBlockInfo springInfo =
+                    cannon.getBlocks().get(entry.getKey());
+            if (springInfo == null) continue;
+            CompoundTag springTag = recoilBarrel.saveWithFullMetadata(level.registryAccess());
+            springTag.remove("x");
+            springTag.remove("y");
+            springTag.remove("z");
+            cannon.getBlocks().put(
+                    entry.getKey(),
+                    new StructureTemplate.StructureBlockInfo(
+                            entry.getKey(), springInfo.state(), springTag)
+            );
+        }
+    }
+
+    private static boolean stabilizedTurret$isCustomBreech(BlockState state) {
+        return state.is(ModCbcContent.MEDIUM_CANNON_BREECH.get())
+                || state.is(ModCbcContent.MZ_CANNON_BREECH.get())
+                || state.is(ModCbcContent.AZ_CANNON_BREECH.get())
+                || state.is(ModCbcContent.TYPE_10_CANNON_BREECH.get());
+    }
+
     @Inject(method = "collectCannonBlocks", at = @At("RETURN"))
     private void stabilizedTurret$includeXMuzzleEndpoint(
             Level level,

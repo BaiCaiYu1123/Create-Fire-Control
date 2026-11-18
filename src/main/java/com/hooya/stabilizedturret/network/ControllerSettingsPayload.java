@@ -2,7 +2,7 @@ package com.hooya.stabilizedturret.network;
 
 import com.hooya.stabilizedturret.StabilizedTurret;
 import com.hooya.stabilizedturret.content.controller.StabilizerControllerBlockEntity;
-import dev.ryanhcode.sable.Sable;
+import com.hooya.stabilizedturret.content.controller.ScopePreset;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -12,14 +12,19 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import java.util.UUID;
+
 public record ControllerSettingsPayload(
         BlockPos pos,
+        UUID controllerSubLevelId,
         double depression,
         double elevation,
         double yawSpeed,
         double pitchSpeed,
         boolean yawReversed,
         boolean pitchReversed,
+        boolean yawBearingHeadHidden,
+        boolean pitchBearingHeadHidden,
         double thirdPersonHeight,
         double viewAimOffsetX,
         double viewAimOffsetY,
@@ -32,7 +37,11 @@ public record ControllerSettingsPayload(
         double scopeOffsetX,
         double scopeOffsetY,
         double scopeOffsetZ,
+        int scopePreset,
         boolean stabilizerEnabled,
+        boolean stabilizerReactionEnabled,
+        double cannonRecoilMagnitude,
+        boolean mobileShotCompensationEnabled,
         boolean headAimEnabled,
         boolean remoteHeadAimEnabled,
         double radarRange,
@@ -50,7 +59,11 @@ public record ControllerSettingsPayload(
         double aircraftRadarMinimumTargetSpeed,
         double aircraftRadarHudScale,
         double aircraftRadarHudX,
-        double aircraftRadarHudY
+        double aircraftRadarHudY,
+        double rwrRange,
+        double rwrScale,
+        boolean aircraftRocketSalvoMode,
+        boolean virtualScopeEnabled
 ) implements CustomPacketPayload {
     public static final Type<ControllerSettingsPayload> TYPE = new Type<>(
             ResourceLocation.fromNamespaceAndPath(StabilizedTurret.MOD_ID, "controller_settings")
@@ -58,12 +71,18 @@ public record ControllerSettingsPayload(
     public static final StreamCodec<RegistryFriendlyByteBuf, ControllerSettingsPayload> STREAM_CODEC = StreamCodec.of(
             (buffer, payload) -> {
                 buffer.writeBlockPos(payload.pos);
+                buffer.writeBoolean(payload.controllerSubLevelId != null);
+                if (payload.controllerSubLevelId != null) {
+                    buffer.writeUUID(payload.controllerSubLevelId);
+                }
                 buffer.writeDouble(payload.depression);
                 buffer.writeDouble(payload.elevation);
                 buffer.writeDouble(payload.yawSpeed);
                 buffer.writeDouble(payload.pitchSpeed);
                 buffer.writeBoolean(payload.yawReversed);
                 buffer.writeBoolean(payload.pitchReversed);
+                buffer.writeBoolean(payload.yawBearingHeadHidden);
+                buffer.writeBoolean(payload.pitchBearingHeadHidden);
                 buffer.writeDouble(payload.thirdPersonHeight);
                 buffer.writeDouble(payload.viewAimOffsetX);
                 buffer.writeDouble(payload.viewAimOffsetY);
@@ -76,7 +95,11 @@ public record ControllerSettingsPayload(
                 buffer.writeDouble(payload.scopeOffsetX);
                 buffer.writeDouble(payload.scopeOffsetY);
                 buffer.writeDouble(payload.scopeOffsetZ);
+                buffer.writeVarInt(payload.scopePreset);
                 buffer.writeBoolean(payload.stabilizerEnabled);
+                buffer.writeBoolean(payload.stabilizerReactionEnabled);
+                buffer.writeDouble(payload.cannonRecoilMagnitude);
+                buffer.writeBoolean(payload.mobileShotCompensationEnabled);
                 buffer.writeBoolean(payload.headAimEnabled);
                 buffer.writeBoolean(payload.remoteHeadAimEnabled);
                 buffer.writeDouble(payload.radarRange);
@@ -95,15 +118,22 @@ public record ControllerSettingsPayload(
                 buffer.writeDouble(payload.aircraftRadarHudScale);
                 buffer.writeDouble(payload.aircraftRadarHudX);
                 buffer.writeDouble(payload.aircraftRadarHudY);
+                buffer.writeDouble(payload.rwrRange);
+                buffer.writeDouble(payload.rwrScale);
+                buffer.writeBoolean(payload.aircraftRocketSalvoMode);
+                buffer.writeBoolean(payload.virtualScopeEnabled);
             },
             buffer -> new ControllerSettingsPayload(
                     buffer.readBlockPos(), // pos
+                    buffer.readBoolean() ? buffer.readUUID() : null, // controllerSubLevelId
                     buffer.readDouble(), // depression
                     buffer.readDouble(), // elevation
                     buffer.readDouble(), // yawSpeed
                     buffer.readDouble(), // pitchSpeed
                     buffer.readBoolean(), // yawReversed
                     buffer.readBoolean(), // pitchReversed
+                    buffer.readBoolean(), // yawBearingHeadHidden
+                    buffer.readBoolean(), // pitchBearingHeadHidden
                     buffer.readDouble(), // thirdPersonHeight
                     buffer.readDouble(), // viewAimOffsetX
                     buffer.readDouble(), // viewAimOffsetY
@@ -116,7 +146,11 @@ public record ControllerSettingsPayload(
                     buffer.readDouble(), // scopeOffsetX
                     buffer.readDouble(), // scopeOffsetY
                     buffer.readDouble(), // scopeOffsetZ
+                    buffer.readVarInt(), // scopePreset
                     buffer.readBoolean(), // stabilizerEnabled
+                    buffer.readBoolean(), // stabilizerReactionEnabled
+                    buffer.readDouble(), // cannonRecoilMagnitude
+                    buffer.readBoolean(), // mobileShotCompensationEnabled
                     buffer.readBoolean(), // headAimEnabled
                     buffer.readBoolean(), // remoteHeadAimEnabled
                     buffer.readDouble(), // radarRange
@@ -134,7 +168,11 @@ public record ControllerSettingsPayload(
                     buffer.readDouble(), // aircraftRadarMinimumTargetSpeed
                     buffer.readDouble(), // aircraftRadarHudScale
                     buffer.readDouble(), // aircraftRadarHudX
-                    buffer.readDouble() // aircraftRadarHudY
+                    buffer.readDouble(), // aircraftRadarHudY
+                    buffer.readDouble(), // rwrRange
+                    buffer.readDouble(), // rwrScale
+                    buffer.readBoolean(), // aircraftRocketSalvoMode
+                    buffer.readBoolean() // virtualScopeEnabled
             )
     );
 
@@ -144,6 +182,7 @@ public record ControllerSettingsPayload(
                 return;
             }
             if (!Double.isFinite(payload.depression)
+                    || !Double.isFinite(payload.cannonRecoilMagnitude)
                     || !Double.isFinite(payload.elevation)
                     || !Double.isFinite(payload.yawSpeed)
                     || !Double.isFinite(payload.pitchSpeed)
@@ -174,19 +213,24 @@ public record ControllerSettingsPayload(
                     || !Double.isFinite(payload.aircraftRadarMinimumTargetSpeed)
                     || !Double.isFinite(payload.aircraftRadarHudScale)
                     || !Double.isFinite(payload.aircraftRadarHudX)
-                    || !Double.isFinite(payload.aircraftRadarHudY)) {
+                    || !Double.isFinite(payload.aircraftRadarHudY)
+                    || !Double.isFinite(payload.rwrRange)
+                    || !Double.isFinite(payload.rwrScale)) {
                 return;
             }
-            Vec3 controllerCenter = Vec3.atCenterOf(payload.pos);
-            if (Sable.HELPER.distanceSquaredWithSubLevels(player.level(), player.position(), controllerCenter) > 64.0) {
+            StabilizerControllerBlockEntity controller =
+                    com.hooya.stabilizedturret.content.controller.ControllerTracker
+                            .findLoadedForSettings(
+                                    player, payload.pos, payload.controllerSubLevelId);
+            if (controller == null || !C2SWriteAuthorization.canEditNearby(player, controller)) {
                 return;
             }
-            if (player.level().getBlockEntity(payload.pos) instanceof StabilizerControllerBlockEntity controller) {
+            {
                 boolean remoteHeadAim = payload.remoteHeadAimEnabled && controller.hasRemoteTerminal();
                 if (payload.remoteHeadAimEnabled && !remoteHeadAim) {
                     player.displayClientMessage(
                             net.minecraft.network.chat.Component.translatable(
-                                    "message.stabilized_turret.remote_terminal_missing"
+                                    "message.create_fire_control.remote_terminal_missing"
                             ),
                             true
                     );
@@ -198,13 +242,19 @@ public record ControllerSettingsPayload(
                         payload.pitchSpeed,
                         payload.yawReversed,
                         payload.pitchReversed,
+                        payload.yawBearingHeadHidden,
+                        payload.pitchBearingHeadHidden,
                         payload.thirdPersonHeight,
                         payload.viewAimOffsetX,
                         payload.viewAimOffsetY,
                         new Vec3(payload.yawOffsetX, payload.yawOffsetY, payload.yawOffsetZ),
                         new Vec3(payload.pitchOffsetX, payload.pitchOffsetY, payload.pitchOffsetZ),
                         new Vec3(payload.scopeOffsetX, payload.scopeOffsetY, payload.scopeOffsetZ),
+                        ScopePreset.fromNetworkId(payload.scopePreset),
                         payload.stabilizerEnabled,
+                        payload.stabilizerReactionEnabled,
+                        payload.cannonRecoilMagnitude,
+                        payload.mobileShotCompensationEnabled,
                         payload.headAimEnabled,
                         remoteHeadAim,
                         payload.radarRange,
@@ -222,8 +272,15 @@ public record ControllerSettingsPayload(
                         payload.aircraftRadarMinimumTargetSpeed,
                         payload.aircraftRadarHudScale,
                         payload.aircraftRadarHudX,
-                        payload.aircraftRadarHudY
+                        payload.aircraftRadarHudY,
+                        payload.rwrRange,
+                        payload.rwrScale,
+                        payload.aircraftRocketSalvoMode
                 );
+                if (!controller.setVirtualScopeEnabled(payload.virtualScopeEnabled)) {
+                    player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                            "message.create_fire_control." + controller.virtualScopeUnavailableReason()), true);
+                }
             }
         });
     }

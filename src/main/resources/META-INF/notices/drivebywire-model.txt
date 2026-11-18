@@ -1,0 +1,28 @@
+Drive-By-Wire controller hub model, texture and connection sounds
+
+Copyright (c) 2023 endalion
+Upstream: https://github.com/Endalion/drivebywire
+License: MIT; full text in META-INF/licenses/drivebywire-model-MIT.txt
+Upstream license: https://github.com/Endalion/drivebywire/blob/master/LICENSE.txt
+Upstream model: src/main/resources/assets/drivebywire/models/block/hub.json
+Upstream texture: src/main/resources/assets/drivebywire/textures/block/hub.png
+Upstream sounds: src/main/resources/assets/drivebywire/sounds/plug_in.ogg
+                src/main/resources/assets/drivebywire/sounds/plug_out.ogg
+Upstream README credits textures and models derived from Create Mod:
+https://github.com/Creators-of-Create/Create
+
+Bundled assets:
+assets/create_fire_control/models/block/wireless_signal_processor.json
+assets/create_fire_control/textures/block/wireless_signal_processor.png
+assets/create_fire_control/sounds/controller/plug_in.ogg
+assets/create_fire_control/sounds/controller/plug_out.ogg
+
+Extracted from the local Drive By Wire 0.3.0 port JAR.
+Source JAR SHA-256: 256600adcd4c811dba480752d76048a053760038ff0a45b37d5d3a0164145f8f
+Texture SHA-256: 175687acb317fb02611311c41219434a800956e7c384ae4fd072c765654fe11b
+Plug-in sound SHA-256: 228958ec3876c518746d6202c0ba05f3acbec3349b7e8e5b868f393419ede2df
+Plug-out sound SHA-256: 02cdee5474c740df9f6005896e7a6b300ef7de053125fddecba953b82289defa
+The extracted model matches the upstream hub model. Only the texture resource
+locations are changed to create_fire_control:block/wireless_signal_processor.
+Geometry, UVs and display transforms are preserved; the texture and sounds are unmodified.
+No Drive By Wire runtime model lookup or asset dependency is required.

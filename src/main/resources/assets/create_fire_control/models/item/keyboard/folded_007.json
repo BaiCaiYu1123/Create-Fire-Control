@@ -1,0 +1,87 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "all": "create_fire_control:item/keyboard_folded",
+    "particle": "create_fire_control:item/keyboard_folded"
+  },
+  "elements": [
+    {
+      "from": [
+        1.875,
+        1.7,
+        5.4
+      ],
+      "to": [
+        3.175,
+        1.75,
+        10.6
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.0,
+            13.0,
+            6.5,
+            13.5
+          ],
+          "texture": "#all"
+        },
+        "east": {
+          "uv": [
+            6.0,
+            13.0,
+            6.5,
+            13.5
+          ],
+          "texture": "#all"
+        },
+        "south": {
+          "uv": [
+            6.0,
+            13.0,
+            6.5,
+            13.5
+          ],
+          "texture": "#all"
+        },
+        "west": {
+          "uv": [
+            6.0,
+            13.0,
+            6.5,
+            13.5
+          ],
+          "texture": "#all"
+        },
+        "up": {
+          "uv": [
+            6.0,
+            13.0,
+            6.5,
+            13.5
+          ],
+          "texture": "#all"
+        },
+        "down": {
+          "uv": [
+            6.0,
+            13.0,
+            6.5,
+            13.5
+          ],
+          "texture": "#all"
+        }
+      },
+      "rotation": {
+        "origin": [
+          2.975,
+          1.0,
+          8.0
+        ],
+        "axis": "z",
+        "angle": -22.5,
+        "rescale": false
+      }
+    }
+  ]
+}

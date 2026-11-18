@@ -1,0 +1,292 @@
+{
+  "variants": {
+    "facing=north,part=m1_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_m2",
+      "y": 0
+    },
+    "facing=east,part=m1_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_m2",
+      "y": 90
+    },
+    "facing=south,part=m1_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_m2",
+      "y": 180
+    },
+    "facing=west,part=m1_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_m2",
+      "y": 270
+    },
+    "facing=north,part=p0_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_m2",
+      "y": 0
+    },
+    "facing=east,part=p0_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_m2",
+      "y": 90
+    },
+    "facing=south,part=p0_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_m2",
+      "y": 180
+    },
+    "facing=west,part=p0_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_m2",
+      "y": 270
+    },
+    "facing=north,part=p1_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_m2",
+      "y": 0
+    },
+    "facing=east,part=p1_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_m2",
+      "y": 90
+    },
+    "facing=south,part=p1_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_m2",
+      "y": 180
+    },
+    "facing=west,part=p1_p0_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_m2",
+      "y": 270
+    },
+    "facing=north,part=m1_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_m1",
+      "y": 0
+    },
+    "facing=east,part=m1_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_m1",
+      "y": 90
+    },
+    "facing=south,part=m1_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_m1",
+      "y": 180
+    },
+    "facing=west,part=m1_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_m1",
+      "y": 270
+    },
+    "facing=north,part=p0_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_m1",
+      "y": 0
+    },
+    "facing=east,part=p0_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_m1",
+      "y": 90
+    },
+    "facing=south,part=p0_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_m1",
+      "y": 180
+    },
+    "facing=west,part=p0_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_m1",
+      "y": 270
+    },
+    "facing=north,part=p1_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_m1",
+      "y": 0
+    },
+    "facing=east,part=p1_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_m1",
+      "y": 90
+    },
+    "facing=south,part=p1_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_m1",
+      "y": 180
+    },
+    "facing=west,part=p1_p0_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_m1",
+      "y": 270
+    },
+    "facing=north,part=m1_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_p0",
+      "y": 0
+    },
+    "facing=east,part=m1_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_p0",
+      "y": 90
+    },
+    "facing=south,part=m1_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_p0",
+      "y": 180
+    },
+    "facing=west,part=m1_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p0_p0",
+      "y": 270
+    },
+    "facing=north,part=p0_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_p0",
+      "y": 0
+    },
+    "facing=east,part=p0_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_p0",
+      "y": 90
+    },
+    "facing=south,part=p0_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_p0",
+      "y": 180
+    },
+    "facing=west,part=p0_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p0_p0",
+      "y": 270
+    },
+    "facing=north,part=p1_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_p0",
+      "y": 0
+    },
+    "facing=east,part=p1_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_p0",
+      "y": 90
+    },
+    "facing=south,part=p1_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_p0",
+      "y": 180
+    },
+    "facing=west,part=p1_p0_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p0_p0",
+      "y": 270
+    },
+    "facing=north,part=m1_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_m2",
+      "y": 0
+    },
+    "facing=east,part=m1_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_m2",
+      "y": 90
+    },
+    "facing=south,part=m1_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_m2",
+      "y": 180
+    },
+    "facing=west,part=m1_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_m2",
+      "y": 270
+    },
+    "facing=north,part=p0_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_m2",
+      "y": 0
+    },
+    "facing=east,part=p0_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_m2",
+      "y": 90
+    },
+    "facing=south,part=p0_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_m2",
+      "y": 180
+    },
+    "facing=west,part=p0_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_m2",
+      "y": 270
+    },
+    "facing=north,part=p1_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_m2",
+      "y": 0
+    },
+    "facing=east,part=p1_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_m2",
+      "y": 90
+    },
+    "facing=south,part=p1_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_m2",
+      "y": 180
+    },
+    "facing=west,part=p1_p1_m2": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_m2",
+      "y": 270
+    },
+    "facing=north,part=m1_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_m1",
+      "y": 0
+    },
+    "facing=east,part=m1_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_m1",
+      "y": 90
+    },
+    "facing=south,part=m1_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_m1",
+      "y": 180
+    },
+    "facing=west,part=m1_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_m1",
+      "y": 270
+    },
+    "facing=north,part=p0_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_m1",
+      "y": 0
+    },
+    "facing=east,part=p0_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_m1",
+      "y": 90
+    },
+    "facing=south,part=p0_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_m1",
+      "y": 180
+    },
+    "facing=west,part=p0_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_m1",
+      "y": 270
+    },
+    "facing=north,part=p1_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_m1",
+      "y": 0
+    },
+    "facing=east,part=p1_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_m1",
+      "y": 90
+    },
+    "facing=south,part=p1_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_m1",
+      "y": 180
+    },
+    "facing=west,part=p1_p1_m1": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_m1",
+      "y": 270
+    },
+    "facing=north,part=m1_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_p0",
+      "y": 0
+    },
+    "facing=east,part=m1_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_p0",
+      "y": 90
+    },
+    "facing=south,part=m1_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_p0",
+      "y": 180
+    },
+    "facing=west,part=m1_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/m1_p1_p0",
+      "y": 270
+    },
+    "facing=north,part=p0_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_p0",
+      "y": 0
+    },
+    "facing=east,part=p0_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_p0",
+      "y": 90
+    },
+    "facing=south,part=p0_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_p0",
+      "y": 180
+    },
+    "facing=west,part=p0_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p0_p1_p0",
+      "y": 270
+    },
+    "facing=north,part=p1_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_p0",
+      "y": 0
+    },
+    "facing=east,part=p1_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_p0",
+      "y": 90
+    },
+    "facing=south,part=p1_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_p0",
+      "y": 180
+    },
+    "facing=west,part=p1_p1_p0": {
+      "model": "create_fire_control:block/ztz99a_diesel_engine/p1_p1_p0",
+      "y": 270
+    }
+  }
+}

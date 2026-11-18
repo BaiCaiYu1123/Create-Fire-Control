@@ -80,7 +80,7 @@ public final class PodAimController {
         // Below the nadir the video image is upside down. Reverse only the
         // mouse mapping so screen-left remains screen-left; yaw itself stays
         // continuous and never changes Euler branches.
-        float yawSign = Mth.cos(pitch * Mth.DEG_TO_RAD) < 0.0F
+        float yawSign = Math.cos(Math.toRadians(pitch)) < 0.0
                 ? -1.0F : 1.0F;
         yaw += yawDelta * yawSign;
         pitch = requestedPitch;
@@ -180,13 +180,16 @@ public final class PodAimController {
     }
 
     private static Vec3 directionFromAngles(float yaw, float pitch) {
-        float pitchRadians = -pitch * Mth.DEG_TO_RAD;
-        float yawRadians = -yaw * Mth.DEG_TO_RAD;
-        float horizontal = Mth.cos(pitchRadians);
+        // This direction is fed back through atan2 by acceptTarget/stabilize.
+        // Mth's truncated sine-table indices bias that round trip and erase
+        // small mouse deltas, causing direction-dependent drift or stalling.
+        double pitchRadians = Math.toRadians(-pitch);
+        double yawRadians = Math.toRadians(-yaw);
+        double horizontal = Math.cos(pitchRadians);
         return new Vec3(
-                Mth.sin(yawRadians) * horizontal,
-                Mth.sin(pitchRadians),
-                Mth.cos(yawRadians) * horizontal
+                Math.sin(yawRadians) * horizontal,
+                Math.sin(pitchRadians),
+                Math.cos(yawRadians) * horizontal
         ).normalize();
     }
 

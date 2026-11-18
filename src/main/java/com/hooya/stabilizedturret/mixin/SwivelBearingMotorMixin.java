@@ -7,12 +7,27 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Restores the fire-control servo after Simulated updates the same joint. */
+/** Keeps a fire-control hinge in the bearing's native lifetime and handle slot. */
 @Mixin(value = SwivelBearingBlockEntity.class, remap = false)
 public abstract class SwivelBearingMotorMixin {
+    @Inject(method = "updateServoCoefficients", at = @At("HEAD"), cancellable = true)
+    private void stabilizedTurret$preserveBoundServo(CallbackInfo ci) {
+        if (BearingStabilizer.ownsJoint((SwivelBearingBlockEntity) (Object) this)) ci.cancel();
+    }
+
     @Inject(method = "updateServoCoefficients", at = @At("TAIL"))
-    private void stabilizedTurret$restoreBoundServo(CallbackInfo ci) {
-        BearingStabilizer.suppressMotor((SwivelBearingBlockEntity) (Object) this);
+    private void stabilizedTurret$restoreLegacyLock(CallbackInfo ci) {
+        BearingStabilizer.suppressMotor((SwivelBearingBlockEntity)(Object)this);
+    }
+
+    @Inject(method = "reattachConstraint", at = @At("HEAD"), cancellable = true)
+    private void stabilizedTurret$preserveBoundJoint(
+            dev.ryanhcode.sable.sublevel.ServerSubLevel child, boolean updatePlate, CallbackInfo ci) {
+        SwivelBearingBlockEntity bearing = (SwivelBearingBlockEntity) (Object) this;
+        if (BearingStabilizer.preserveOwnedJoint(bearing, child)) {
+            if (updatePlate) bearing.associatePlateWithParent();
+            ci.cancel();
+        }
     }
 
     @Inject(method = "assemble", at = @At("TAIL"))

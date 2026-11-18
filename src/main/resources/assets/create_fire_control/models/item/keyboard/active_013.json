@@ -1,0 +1,77 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "all": "create_fire_control:item/keyboard_active",
+    "particle": "create_fire_control:item/keyboard_active"
+  },
+  "elements": [
+    {
+      "from": [
+        4.5,
+        1.1,
+        9.525
+      ],
+      "to": [
+        5.2,
+        1.8,
+        10.225
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.0,
+            8.5,
+            12.5,
+            9.0
+          ],
+          "texture": "#all"
+        },
+        "east": {
+          "uv": [
+            12.0,
+            8.5,
+            12.5,
+            9.0
+          ],
+          "texture": "#all"
+        },
+        "south": {
+          "uv": [
+            12.0,
+            8.5,
+            12.5,
+            9.0
+          ],
+          "texture": "#all"
+        },
+        "west": {
+          "uv": [
+            12.0,
+            8.5,
+            12.5,
+            9.0
+          ],
+          "texture": "#all"
+        },
+        "up": {
+          "uv": [
+            12.0,
+            8.5,
+            12.5,
+            9.0
+          ],
+          "texture": "#all"
+        },
+        "down": {
+          "uv": [
+            12.0,
+            8.5,
+            12.5,
+            9.0
+          ],
+          "texture": "#all"
+        }
+      }
+    }
+  ]
+}

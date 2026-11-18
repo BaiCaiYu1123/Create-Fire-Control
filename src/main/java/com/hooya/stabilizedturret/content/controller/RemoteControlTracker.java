@@ -17,17 +17,20 @@ public final class RemoteControlTracker {
             RemoteControllerCompat.Type type,
             BlockPos hubPos
     ) {
+        if (type != RemoteControllerCompat.Type.WIRELESS
+                && SESSIONS.containsKey(player.getUUID()) && SESSIONS.get(player.getUUID()).type == RemoteControllerCompat.Type.WIRELESS) return;
         if (!active) {
             Session previous = SESSIONS.remove(player.getUUID());
             closePreviousViews(player, previous);
             return;
         }
-        if (!RemoteControllerCompat.isHoldingBoundController(player, type, hubPos)
+        if (!hasLiveController(player, type, hubPos)
                 || !RemoteControllerCompat.isTerminal(player.level(), hubPos, type)) {
             Session previous = SESSIONS.remove(player.getUUID());
             closePreviousViews(player, previous);
             return;
         }
+        RemoteControllerCompat.rememberCurrentDimension(player, type, hubPos);
         Session next = new Session(
                 player.level().dimension().location().toString(),
                 hubPos.immutable(),
@@ -51,7 +54,7 @@ public final class RemoteControlTracker {
         if (session == null
                 || session.expiresAt < player.level().getGameTime()
                 || !session.dimension.equals(player.level().dimension().location().toString())
-                || !RemoteControllerCompat.isHoldingBoundController(player, session.type, session.hubPos)
+                || !hasLiveController(player, session.type, session.hubPos)
                 || !RemoteControllerCompat.isTerminal(player.level(), session.hubPos, session.type)) {
             Session removed = SESSIONS.remove(player.getUUID());
             closePreviousViews(player, removed);
@@ -61,6 +64,32 @@ public final class RemoteControlTracker {
                 player.level(), session.hubPos, session.type
         );
         return controller;
+    }
+
+    public static boolean matchesActiveSession(
+            ServerPlayer player, RemoteControllerCompat.Type type, BlockPos hubPos
+    ) {
+        return matchesActiveHubSession(player, type, hubPos)
+                && findInputController(player) != null;
+    }
+
+    /**
+     * Validates a live controller-to-terminal session without requiring that
+     * terminal to also be assigned to a fire-control computer. Consumers such
+     * as the gas turbine bind directly to the terminal itself.
+     */
+    public static boolean matchesActiveHubSession(
+            ServerPlayer player, RemoteControllerCompat.Type type, BlockPos hubPos
+    ) {
+        Session session = SESSIONS.get(player.getUUID());
+        if (session == null || session.type != type || !session.hubPos.equals(hubPos)
+                || session.expiresAt < player.level().getGameTime()
+                || !session.dimension.equals(player.level().dimension().location().toString())
+                || !hasLiveController(player, type, hubPos)
+                || !RemoteControllerCompat.isTerminal(player.level(), hubPos, type)) {
+            return false;
+        }
+        return true;
     }
 
     public static java.util.List<ServerPlayer> findActivePlayers(
@@ -93,7 +122,14 @@ public final class RemoteControlTracker {
         closePreviousViews(player, previous);
     }
 
+    private static boolean hasLiveController(ServerPlayer player, RemoteControllerCompat.Type type, BlockPos hub) {
+        return player.isAlive() && !player.hasDisconnected() && !player.isSpectator()
+                && player.level().hasChunkAt(hub) && (type == RemoteControllerCompat.Type.WIRELESS
+                ? com.hooya.stabilizedturret.content.remote.ControllerSessions.controls(player, hub)
+                : RemoteControllerCompat.isHoldingBoundController(player, type, hub));
+    }
     private static void closePreviousViews(ServerPlayer player, Session session) {
+        RemoteInputTracker.clear(player);
         if (session == null
                 || !session.dimension.equals(player.level().dimension().location().toString())) {
             return;
@@ -101,7 +137,11 @@ public final class RemoteControlTracker {
         StabilizerControllerBlockEntity controller = ControllerTracker.findForRemoteTerminal(
                 player.level(), session.hubPos, session.type
         );
-        if (controller != null) controller.releaseViews(player);
+        if (controller != null) {
+            // Ending remote input still leaves a seated gunner qualified for the scope.
+            if (!controller.canUseScope(player)) controller.closeScope(player);
+            controller.closePodView(player);
+        }
     }
 
     private record Session(

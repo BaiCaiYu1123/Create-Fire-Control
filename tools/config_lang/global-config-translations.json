@@ -1,0 +1,22 @@
+{
+  "zh_cn": {
+    "create_fire_control.configuration.radar": "雷达",
+    "create_fire_control.configuration.radar.raycast": "雷达射线检测（方块遮挡）",
+    "create_fire_control.configuration.general": "界面设置",
+    "create_fire_control.configuration.general.showPauseButton": "显示暂停菜单配置按钮",
+    "config.create_fire_control.radar": "雷达",
+    "config.create_fire_control.general": "界面设置",
+    "config.create_fire_control.radar.raycast": "雷达射线检测（方块遮挡）",
+    "config.create_fire_control.general.showPauseButton": "显示暂停菜单配置按钮"
+  },
+  "en_us": {
+    "create_fire_control.configuration.radar": "Radar",
+    "create_fire_control.configuration.radar.raycast": "Radar Block Occlusion",
+    "create_fire_control.configuration.general": "Interface",
+    "create_fire_control.configuration.general.showPauseButton": "Show Pause Menu Config Button",
+    "config.create_fire_control.radar": "Radar",
+    "config.create_fire_control.general": "Interface",
+    "config.create_fire_control.radar.raycast": "Radar Block Occlusion",
+    "config.create_fire_control.general.showPauseButton": "Show Pause Menu Config Button"
+  }
+}

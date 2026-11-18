@@ -25,12 +25,8 @@ import net.minecraft.world.phys.Vec3;
  * the installation order without reading the full settings GUI first.
  */
 public final class FireControlPonderScenes {
-    private static final ResourceLocation ARCHITECTURE_TEMPLATE = createTemplate("mechanical_bearing/anchor");
-    private static final ResourceLocation BINDING_TEMPLATE = createTemplate("mechanical_bearing/modes");
-    private static final ResourceLocation CONFIGURATION_TEMPLATE = createTemplate("mechanical_bearing/stabilized");
-    private static final ResourceLocation OPERATION_TEMPLATE = createTemplate("speed_controller");
-    private static final ResourceLocation OPTICS_TEMPLATE = createTemplate("gearbox");
-    private static final ResourceLocation TROUBLESHOOTING_TEMPLATE = createTemplate("clutch");
+    /* Ponder requires a template even though these scenes build their rig in code. */
+    static final ResourceLocation BASE_TEMPLATE = createTemplate("empty_blaze_burner");
     private static final BlockPos COMPUTER = new BlockPos(2, 1, 2);
     private static final BlockPos YAW = new BlockPos(2, 1, 3);
     private static final BlockPos PITCH = new BlockPos(2, 2, 3);
@@ -39,18 +35,21 @@ public final class FireControlPonderScenes {
 
     public static void register(PonderSceneRegistrationHelper<ResourceLocation> helper) {
         helper.forComponents(ModBlocks.STABILIZER_CONTROLLER.getId())
-                .addStoryBoard(ARCHITECTURE_TEMPLATE, FireControlPonderScenes::architecture,
+                .addStoryBoard(BASE_TEMPLATE, FireControlPonderScenes::architecture,
                         FireControlPonderPlugin.FIRE_CONTROL)
-                .addStoryBoard(BINDING_TEMPLATE, FireControlPonderScenes::binding,
+                .addStoryBoard(BASE_TEMPLATE, FireControlPonderScenes::binding,
                         FireControlPonderPlugin.FIRE_CONTROL)
-                .addStoryBoard(CONFIGURATION_TEMPLATE, FireControlPonderScenes::configuration,
+                .addStoryBoard(BASE_TEMPLATE, FireControlPonderScenes::configuration,
                         FireControlPonderPlugin.FIRE_CONTROL)
-                .addStoryBoard(OPERATION_TEMPLATE, FireControlPonderScenes::operation,
+                .addStoryBoard(BASE_TEMPLATE, FireControlPonderScenes::operation,
                         FireControlPonderPlugin.FIRE_CONTROL)
-                .addStoryBoard(OPTICS_TEMPLATE, FireControlPonderScenes::optics,
+                .addStoryBoard(BASE_TEMPLATE, FireControlPonderScenes::optics,
                         FireControlPonderPlugin.FIRE_CONTROL)
-                .addStoryBoard(TROUBLESHOOTING_TEMPLATE, FireControlPonderScenes::troubleshooting,
+                .addStoryBoard(BASE_TEMPLATE, FireControlPonderScenes::troubleshooting,
                         FireControlPonderPlugin.FIRE_CONTROL);
+
+        MzLoaderPonderScenes.register(helper);
+        ConnectedDisplayPonderScenes.register(helper);
     }
 
     private static void architecture(SceneBuilder scene, SceneBuildingUtil util) {
@@ -115,7 +114,7 @@ public final class FireControlPonderScenes {
 
         scene.overlay().showText(80)
                 .attachKeyFrame()
-                .text("Bind at least: yaw bearing, pitch bearing, operator seat, and an assembled cannon mount or laser designator.");
+                .text("Bind at least: yaw bearing, pitch bearing, operator seat, and an assembled cannon mount or supported ground-vehicle missile launcher.");
         scene.idle(85);
     }
 
@@ -124,6 +123,9 @@ public final class FireControlPonderScenes {
         place(scene, util, YAW, swivelBearing());
         place(scene, util, PITCH, swivelBearing());
         scene.idle(10);
+
+        scene.overlay().showControls(util.vector().topOf(COMPUTER), Pointing.DOWN, 40)
+                .rightClick();
 
         explain(scene, util, COMPUTER, 80, PonderPalette.WHITE,
                 "Open the computer GUI. Use Yaw Settings for traverse speed/offset and Pitch Settings for depression, elevation, speed and offset.");
@@ -209,7 +211,7 @@ public final class FireControlPonderScenes {
                 "Pitch runs away or reverses: verify the hierarchy, then toggle Pitch Reverse. Do not compensate by swapping depression/elevation signs.");
         scene.idle(75);
         explain(scene, util, SIGHT, 75, PonderPalette.BLUE,
-                "Head Aim has no direction: bind an assembled cannon mount or laser designator and verify the operator is in the bound seat.");
+                "Head Aim has no direction: bind an assembled cannon mount or supported ground-vehicle missile launcher and verify the operator is in the bound seat.");
         scene.idle(80);
         scene.overlay().showText(90)
                 .colored(PonderPalette.GREEN)
@@ -225,8 +227,10 @@ public final class FireControlPonderScenes {
             String title
     ) {
         scene.title(id, title);
-        scene.configureBasePlate(0, 0, 5);
+        scene.configureBasePlate(0, 0, 6);
         scene.scaleSceneView(0.9F);
+        scene.world().setBlocks(util.select().fromTo(0, 1, 0, 7, 7, 7),
+                Blocks.AIR.defaultBlockState(), false);
         scene.showBasePlate();
         scene.world().setBlock(COMPUTER,
                 ModBlocks.STABILIZER_CONTROLLER.get().defaultBlockState(), false);

@@ -1,0 +1,5 @@
+gradle.projectsEvaluated {
+    rootProject.runs.configureEach {
+        systemProperty 'create_fire_control.dieselFootprintOnly', 'true'
+    }
+}

@@ -8,7 +8,7 @@ if (process.argv.length !== 3) {
 const sourcePath = path.resolve(process.argv[2]);
 const projectRoot = path.resolve(__dirname, "..");
 const assetRoot = path.join(
-    projectRoot, "src", "main", "resources", "assets", "stabilized_turret"
+    projectRoot, "src", "main", "resources", "assets", "create_fire_control"
 );
 const blockModelDirectory = path.join(assetRoot, "models", "block", "gas_turbine");
 const itemModelDirectory = path.join(assetRoot, "models", "item");
@@ -235,14 +235,14 @@ function blockModel(name) {
         parent: "minecraft:block/block",
         ambientocclusion: true,
         textures: {
-            layer0: "stabilized_turret:block/gas_turbine",
-            particle: "stabilized_turret:block/gas_turbine_particle"
+            layer0: "create_fire_control:block/gas_turbine",
+            particle: "create_fire_control:block/gas_turbine_particle"
         },
         loader: "neoforge:obj",
         flip_v: true,
         automatic_culling: false,
         shade_quads: true,
-        model: `stabilized_turret:models/block/gas_turbine/${name}.obj`
+        model: `create_fire_control:models/block/gas_turbine/${name}.obj`
     };
 }
 
@@ -261,14 +261,14 @@ const itemModel = {
     parent: "minecraft:block/block",
     ambientocclusion: true,
     textures: {
-        layer0: "stabilized_turret:block/gas_turbine",
-        particle: "stabilized_turret:block/gas_turbine_particle"
+        layer0: "create_fire_control:block/gas_turbine",
+        particle: "create_fire_control:block/gas_turbine_particle"
     },
     loader: "neoforge:obj",
     flip_v: true,
     automatic_culling: false,
     shade_quads: true,
-    model: "stabilized_turret:models/block/gas_turbine/item.obj",
+    model: "create_fire_control:models/block/gas_turbine/item.obj",
     display: {
         thirdperson_righthand: {
             rotation: [0, 45, 0],

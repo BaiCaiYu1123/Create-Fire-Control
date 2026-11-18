@@ -1,0 +1,456 @@
+{
+  "scope": "Independent working copy; other chat may separately edit primary checkout",
+  "changed_existing_src": [
+    "src\\main\\java\\com\\hooya\\stabilizedturret\\client\\GasTurbineSoundManager.java"
+  ],
+  "unchanged_protected_files": [
+    {
+      "path": "src\\dieselIntegration\\java\\com\\hooya\\stabilizedturret\\content\\diesel\\DieselIntegration.java",
+      "sha256": "A0B8BA94AA1AF24DAF750DA983E32CAB5AD6C26353380E37F3305A53295B7E36"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\client\\Ztz99aAudioCalibration.java",
+      "sha256": "8EC968694E4E4339C90EB39FC4CAD941D329F23D8185A43B9BA06941262EA377"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\client\\Ztz99aDieselGain.java",
+      "sha256": "59FE7AA095FCDBDA37663D82833A6DA42C73B532D4A164FFA105DE96859C10AC"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\client\\Ztz99aDieselSoundConfig.java",
+      "sha256": "3B0323DEE78A17C028C6CE25C1A3D66B9201E7CBB31D6293E1D572854DC29D3C"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\client\\Ztz99aDieselSoundManager.java",
+      "sha256": "8F3A97610C8614B5D5BE6EE5684FA7D1BB4E976867277501384C92D6A63D3025"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\client\\Ztz99aDieselSoundProfile.java",
+      "sha256": "7326C27872B7D16A074825E8E58903B6C64D13070148B1CB57601561D4FC2420"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\client\\renderer\\Ztz99aDieselEngineRenderer.java",
+      "sha256": "09A892FB53126269A7F22342B29464D4468E5F4EBC91C1CA5A102287F127875A"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\content\\diesel\\Ztz99aDieselEngineBlock.java",
+      "sha256": "FEA27E1DED5CA68FB71E82C9D79722C0B9BC32AE5C41766D2ACFFD66F7BB94E5"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\content\\diesel\\Ztz99aDieselEngineBlockEntity.java",
+      "sha256": "063D930EFE960A9D613933812032A2E9B5F61472677E65EDE651645BFCE1EDF1"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\content\\diesel\\Ztz99aDieselEngineCollisionShapes.java",
+      "sha256": "32A4066803E85BC09350C449802EEF1F25AAEF78697B62344854D46E7D438F33"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\content\\diesel\\Ztz99aDieselEnginePart.java",
+      "sha256": "F9A2E109BA376A590A91911CC7865BCE35FCAFE199395E9895A6E880E42A5173"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\content\\turbine\\GasTurbineBlockEntity.java",
+      "sha256": "ABB3577C6591C5CED718F264BBE0AADBBB5B55DF2EA6EA1545084C388B224DA4"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\network\\OpenZtz99aDieselEnginePayload.java",
+      "sha256": "DA37FEB4D0FF2E4435E438693C22BACDCBEBB011CC82527DF7589F8204D587D9"
+    },
+    {
+      "path": "src\\main\\java\\com\\hooya\\stabilizedturret\\network\\SetZtz99aDieselEngineSettingsPayload.java",
+      "sha256": "470D62A64D39DB52FBC421E903DAE9D5A4022F9C12DC384CB423802F1BD9D743"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\blockstates\\ztz99a_diesel_engine.json",
+      "sha256": "391D4B4CBECFB13E8F92586AFB79933DF363801E095CEA010B0F18BCD02B06F8"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\geometry_manifest.json",
+      "sha256": "5CA5D84596D8BBB96335BAA19160A46DA02F1DD000634FCAD862DD1043192B26"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\item.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\item.obj",
+      "sha256": "B5E2DF18B97D95DB3EB84D7E1198DF796CFD8AF1B05D6EA696C95EE2936DBB2B"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p0_m1.json",
+      "sha256": "2A019D29C92AC771A7F6DE1A6201B283D2939A3D239DB6E276B930B5F5903714"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p0_m1.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p0_m1.obj",
+      "sha256": "6AC25D3B9264C54A981AF57C9B6868D09558422DFB8D07965527896F46AF6ACC"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p0_m2.json",
+      "sha256": "2E1722A80424434CE5BAFCA3B87F5CCC30D1B880E7490B54ABFC272BA0462195"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p0_m2.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p0_m2.obj",
+      "sha256": "A9ED66ED69043B624438C10899654FCC5219B5746EE05C771CB2EC026835B913"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p0_p0.json",
+      "sha256": "744D73B66D5A08FE5150A09CFEF2382333DDF93E2D50E051CA92B9F9B43E9010"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p0_p0.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p0_p0.obj",
+      "sha256": "BE57ACE2414D6BC842E838F2B8747D5F278BC2F0DB862C34590D9B5FD690D61C"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p1_m1.json",
+      "sha256": "38CA065E7DDB9B7C70A7B1AD3A2413BCD6406A615F8F97C247AD8C04D8AEA74E"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p1_m1.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p1_m1.obj",
+      "sha256": "9547600174D26A103C977763F3FD221E85B3CF4A23905760F11EFADF86C70F56"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p1_m2.json",
+      "sha256": "3893155C652DBB395EF5C7F605C3C5C7B8E17558E4B5CDE8FF9A6BAE2AE92694"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p1_m2.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p1_m2.obj",
+      "sha256": "8AD31677593BAB3F5C3AF2D2358826B27E159B34022C8AF4B6FF168FFCB248EC"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p1_p0.json",
+      "sha256": "66C7874E9983F3450C9AA6A42A946B723E23421DBBBE876B2385930D45C25C70"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p1_p0.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\m1_p1_p0.obj",
+      "sha256": "563EA5A3F9F7D522ED13B3C55829327228B41BC57BED91238BF33D81F76C40E3"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p0_m1.json",
+      "sha256": "98BD0297CFECB71E75D89E789513FC88DDEF48D99C36C0916ADD5735F8273A82"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p0_m1.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p0_m1.obj",
+      "sha256": "3951C0D9FA1D8F994FA7ECF5A04D6C3C5BA2329A76FFE5F01F1663D57ED889FD"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p0_m2.json",
+      "sha256": "E9DE79018DF500125DC93FC6C7FA3080E1EC8A219F731516F380FAB9ABAACFAD"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p0_m2.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p0_m2.obj",
+      "sha256": "C227D3A26339C0D83DAC16D73331B008BD626DACBF7A63C6C4B8BD5B22A8E080"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p0_p0.json",
+      "sha256": "4D4909EE3FEE4EDCBFE2DE983D62597620CD81EB79743B50B493C6B1E472BA1F"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p0_p0.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p0_p0.obj",
+      "sha256": "8B60E4A07C9A8C4F27555B796B845F88D5A5DF4299E3C295A9F8D2CCB38ECBB3"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p1_m1.json",
+      "sha256": "5B7B251501C7688AADE605699BE6A4ADB3AC5E056AD19FD4735D397FB02DC96D"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p1_m1.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p1_m1.obj",
+      "sha256": "10ABBEE011F3DEE8C177BF659184250AE281FBD8EF7011B7433885D6B3D5B831"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p1_m2.json",
+      "sha256": "9EBB7A5D4083564331FCB5CA812DEC88F4BDC669D44F5874C6194DDAE9D12116"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p1_m2.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p1_m2.obj",
+      "sha256": "BB105150818773BDCC90D5BF52685A9E5DC54D7173A6EBC4836212799CD8A99C"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p1_p0.json",
+      "sha256": "B1D93A239E129B397E8C9C6F2FB440E68D53EA30FCED540F97B6E3293E19F074"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p1_p0.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p0_p1_p0.obj",
+      "sha256": "7CCE25BB510BA1FFE6BF2F058BE5451EA4107B6C8D6F22225C767F0FB098B327"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p0_m1.json",
+      "sha256": "6A35743C6912F986106A2D0402506E7A040B0ECFAB657E6365762FB3768A2BA6"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p0_m1.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p0_m1.obj",
+      "sha256": "971EBA42275567FCF34CF1529E5CA5984D7999276B8C490CC7EAAA083E2BB1E0"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p0_m2.json",
+      "sha256": "C14F47A8E11B675F737B30D85FD1253F083BC815C77828687202535C9A2FA1D7"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p0_m2.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p0_m2.obj",
+      "sha256": "B7A8AFA24495064686CF5CF9860BD119A7C60F7389AC228AB3AAD3E4EEE0A774"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p0_p0.json",
+      "sha256": "C2BD291F6258C4B51A8021908D6F29E81AC8D2C8B8051AE9246F8E9E6948177F"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p0_p0.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p0_p0.obj",
+      "sha256": "9EC8F8294EA5C7B0A4978AC3C2C73F78E50C2D37BECBE58B0031D6C9E753ED95"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p1_m1.json",
+      "sha256": "48831ACE51F9EFCFF3E5499EA334032C234B57A0412237C665F5B3D4171B5E58"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p1_m1.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p1_m1.obj",
+      "sha256": "E0A8163F2DC42C6AE57709053F95DFD6ECA02E18892B83CFD1AF1B6132100694"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p1_m2.json",
+      "sha256": "B69DB788D6D099B2FB8B134364417BE9117D8DEF9C90FB23713E2EE665E30A90"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p1_m2.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p1_m2.obj",
+      "sha256": "482539A132DF74A3C10ED9EA56A623321CAEE04106A7DB0348146E72C8379AC2"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p1_p0.json",
+      "sha256": "085FBF5C1F41DCF7BFA2B2742A05ABCE622F8E10C7E788128201FDB33A43D85B"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p1_p0.mtl",
+      "sha256": "4B5B9CFC8A83E0CACA353F473C412A9652784B23D294059E87B3E1BE88B62120"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\block\\ztz99a_diesel_engine\\p1_p1_p0.obj",
+      "sha256": "4385F1C13202F3A592BE65682B56C3795C52CB3DC04854B247F3DD6DE1ED37AD"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\models\\item\\ztz99a_diesel_engine.json",
+      "sha256": "15CCE2752C4039996E7BF72FAAE7958FD102551F210F14BBB155E71C30A72877"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\abrams\\engine_00_load.ogg",
+      "sha256": "7B94B00707D97211087C0180E71217B7001A40B102FF61315F7172A275217532"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\abrams\\engine_00.ogg",
+      "sha256": "8A522E599F52F387A3F260FB0DA91B68FCE6CA0DD326BA34214215E4018B5CD2"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\abrams\\engine_33_load.ogg",
+      "sha256": "EEEA3F9A28AF32FE0954D4E335C368C8DE0B2A6106C4875CD3CF3E3AE91CAE83"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\abrams\\engine_33.ogg",
+      "sha256": "16394E60ACB7F31621B4309E90925F8644494790639A5D7A892B04664EA5B1F3"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\abrams\\engine_66_load.ogg",
+      "sha256": "A2257A0243C30745B2028B2BEE15CDC46AC2E46B527D61A7CEDA3CE19881F17F"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\abrams\\engine_66.ogg",
+      "sha256": "A846928EA4A681EF01B92CE126F6A063375D24BFEBCA635F687B3F891EAEB886"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\abrams\\engine_99_load.ogg",
+      "sha256": "1A8ADD8D15891E297E5ACDC60910D57C449F35BB67C98FA8A0700C1995326C36"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\abrams\\engine_99.ogg",
+      "sha256": "7836F4E626B842CAEF310846401A5DD25D69723B2A0370FBADD498A6AB401917"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\abrams\\engine_start_load.ogg",
+      "sha256": "B4C234709A6E37266F120787E45F19A4F3FC440FFB4F0D662C0CC0FD78A87849"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\abrams\\engine_stop_load.ogg",
+      "sha256": "E2B035D3FE9E581BE8AB17AB54274425780E54A96F9381AA817831954BC54D24"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_00.ogg",
+      "sha256": "B26DDB75842E8732F369CE2E73A13FA3B6538F95B4AF3CD4BAF08A762F2AF07B"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_33_load.ogg",
+      "sha256": "DC572252650DAE03F8F522C5DC1080ED277F9D1E82D69A21DD4E588E2A65ADA5"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_66_load.ogg",
+      "sha256": "A10C971CBA7561C99811C522B1D7A4CBFFA61952A0408C1B76B38A35AF6E32C9"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_99_load.ogg",
+      "sha256": "8CEF89C3AD60E557AB7E7A468021784D1B443533E247F6B75B9A55B8AA0DA0B1"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_blips-001.ogg",
+      "sha256": "7CD249FB19C9FDDB03F21A8B1C253E18ECCB60682FDBF599011D3DE607644706"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_blips-002.ogg",
+      "sha256": "83F40EF1AF65A4654F150CCA098EDBEAAA6ACD606710297153AC06DCF72A0484"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_blips-003.ogg",
+      "sha256": "33C5BDB58424C2BA130EB0997EF3D9E7D95350D269B880DA9F236D1D5745F169"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_blips-004.ogg",
+      "sha256": "DF467803047CDEF415E6609C16F1A06B99B2FF3862D67E53BA56BCE4BC4705A5"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_blips-005.ogg",
+      "sha256": "FDA39BCC44406BB6247381F1E1B8207484495CFA1AE48B764F9D2FDD2EAC35ED"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_blips-006.ogg",
+      "sha256": "87385EA9C25C7CBAAADCA4051697F155BB245E18F35C3B5FF708452E89F4D251"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_blips-007.ogg",
+      "sha256": "A72845BF6D4084F1AD11079CF46AF7378A8BC2AE82972F26988661250A1AB39D"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_blips-008.ogg",
+      "sha256": "413E364AABDA6396D7963DD23B9534B62D0AAA6B36D387015E19F61D7287EE50"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_release-001.ogg",
+      "sha256": "962AB01D4ACE8ADEC4058300F994EF449761D48619C7E3F58071CD763AA53FD2"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_release-002.ogg",
+      "sha256": "0805668F82555CE12DB8F778265B703FA5B19FF7913A981AD5D13410E8CF5CD7"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_release-003.ogg",
+      "sha256": "1CA2841631585C567ACAB42B73CEF7B17777249B4F1703C8541D4AEE93BC5305"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_release-004.ogg",
+      "sha256": "7B3C4E333E8E89BAA04144D89A0ADD4F4E31A6685EF57C28ED1FB1348AF1F715"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_release-005.ogg",
+      "sha256": "4CEC9869BB509173726066160B0CD6D950FB096FC45B3AF8E81EF0918D90BF54"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_release-006.ogg",
+      "sha256": "A7CA5AE05BECE606F9B926368F1F371B78E586676FA0FE1DD30F2CAAB590DF75"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_release-007.ogg",
+      "sha256": "E1453CC3AAA68FF1D9010BCFD4FE5C14D2655717C18DBBBA0F6DC20EF3AE5548"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_revv-001.ogg",
+      "sha256": "269ED802BDBEDD6E69B2363AC07E0D624E202281E62F79B6AD154846DED39542"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_revv-002.ogg",
+      "sha256": "74EB64887550EA4F16B8BE343E1C9A0579F05FCE285B2EA5130058721A84682D"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_revv-003.ogg",
+      "sha256": "78A8C9C09920C1553F1AE90F0660E803EB675DFACC32F186DC9ED12D4C058183"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_revv-004.ogg",
+      "sha256": "D30648B8B72502E340187D0E2AC6AADE8C3452029D7E7D54C30D075F15764B60"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_revv-005.ogg",
+      "sha256": "FF76D101F8805A652A50657C877D4ADF8A272FB7CCB1E223AA58081B7A7D1FD5"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_start.ogg",
+      "sha256": "B7511B45196FC506F67F55F302A1A903EBC52334E77AD3DF7039FBE905B8E3F6"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\sounds\\engine\\ztz99a\\engine_stop.ogg",
+      "sha256": "4F9467327755B7F61AF71F2C1B05DD6CCB9B1629EBE1961DB59741709D93233A"
+    },
+    {
+      "path": "src\\main\\resources\\assets\\create_fire_control\\textures\\block\\ztz99a_diesel_engine.png",
+      "sha256": "61DD9EBB8834BB4FAFCED6FCDFE55617A33D34993336DA45C310F3F07EAD05E0"
+    },
+    {
+      "path": "src\\main\\resources\\data\\create_fire_control\\loot_table\\blocks\\ztz99a_diesel_engine.json",
+      "sha256": "0EBDCFC526DE1F021BAF90BCD88D6F1AC50B8FC8414E798A1E81A3D3B7E7F1EB"
+    },
+    {
+      "path": "src\\test\\java\\com\\hooya\\stabilizedturret\\client\\Ztz99aDieselResourceChecks.java",
+      "sha256": "AB9E27D28F0906DE161F68F32AE70C5A25512969717C5CE9FD8FC313DAD570D4"
+    }
+  ]
+}

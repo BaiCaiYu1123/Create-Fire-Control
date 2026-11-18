@@ -18,14 +18,16 @@ import java.util.UUID;
 @EventBusSubscriber(modid = StabilizedTurret.MOD_ID, value = Dist.CLIENT)
 public final class RadarKeyHandler {
     public static final KeyMapping RADAR_LOCK = new KeyMapping(
-            "key.stabilized_turret.radar_lock",
+            "key.create_fire_control.radar_lock",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_R,
-            "key.categories.stabilized_turret");
+            "key.categories.create_fire_control");
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
+        ClientTelevisionGuidanceState.tick();
         while (RADAR_LOCK.consumeClick()) {
+            if (AntiRadiationHudRenderer.selected()) continue;
             if (!ClientRadarState.isActive()) continue;
             UUID current = ClientRadarState.getLockedTarget();
             UUID target = current == null ? RadarHudRenderer.findNearestContactToReticle() : null;

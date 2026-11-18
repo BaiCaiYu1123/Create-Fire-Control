@@ -1,0 +1,28 @@
+// Real server verification in its own world; never include the fixture in the release JAR.
+gradle.projectsEvaluated {
+    def project = rootProject
+    def fixture = project.sourceSets.create('pitchCollisionIntegration') {
+        java.srcDirs = ['src/pitchCollisionIntegration/java']
+        compileClasspath += project.sourceSets.main.output + project.sourceSets.main.compileClasspath
+        runtimeClasspath += project.sourceSets.main.output + project.sourceSets.main.runtimeClasspath
+    }
+    project.dependencies.add('localRuntime', project.files(
+            'libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+            'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar'))
+    project.runs.configureEach { modSource fixture }
+    def runDir = project.layout.projectDirectory
+            .dir(project.providers.gradleProperty('runRoot').get()).dir('server').asFile
+    project.tasks.named('runServer').configure {
+        doFirst {
+            runDir.mkdirs()
+            new File(runDir, 'pitch-collision-integration-result.txt').text = 'RUNNING'
+        }
+        doLast {
+            def result = new File(runDir, 'pitch-collision-integration-result.txt')
+            if (!result.isFile() || !result.text.startsWith('PASS:')) {
+                throw new GradleException('Pitch collision integration failed: ' +
+                        (result.isFile() ? result.text : 'missing result'))
+            }
+        }
+    }
+}

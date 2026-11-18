@@ -1,0 +1,7 @@
+{
+  "parent": "create_fire_control:item/keyboard/active_009",
+  "textures": {
+    "all": "create_fire_control:item/keyboard_red",
+    "particle": "create_fire_control:item/keyboard_red"
+  }
+}

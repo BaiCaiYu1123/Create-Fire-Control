@@ -3,7 +3,11 @@ package com.hooya.stabilizedturret.content.turbine;
 import com.hooya.stabilizedturret.client.GasTurbineSoundManager;
 import com.hooya.stabilizedturret.content.controller.BindingRef;
 import com.hooya.stabilizedturret.content.controller.DriveByWireCompat;
+import com.hooya.stabilizedturret.content.remote.ControllerInput;
+import com.hooya.stabilizedturret.content.remote.ControllerSessions;
 import com.hooya.stabilizedturret.content.controller.RemoteControllerCompat;
+import com.hooya.stabilizedturret.content.controller.FireControlInputRouter;
+import com.hooya.stabilizedturret.network.EngineSettingsCodec;
 import com.hooya.stabilizedturret.registry.ModBlockEntities;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
@@ -13,41 +17,48 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public final class GasTurbineBlockEntity extends GeneratingKineticBlockEntity {
-    public static final int INPUT_FORWARD = 0;
-    public static final int INPUT_REVERSE = 1;
-    public static final int INPUT_LEFT = 2;
-    public static final int INPUT_RIGHT = 3;
-    public static final int INPUT_ENGINE_TOGGLE = 4;
-    public static final int INPUT_COUNT = 5;
-
+public class GasTurbineBlockEntity extends GeneratingKineticBlockEntity {
     public static final float MAX_SPEED = 1024.0F;
-    public static final float DEFAULT_FORWARD_SPEED = 256.0F;
-    public static final float DEFAULT_REVERSE_SPEED = 256.0F;
-    public static final float DEFAULT_TURN_SPEED = 128.0F;
-    public static final float DEFAULT_ACCELERATION = 128.0F;
-    public static final float DEFAULT_SOUND_VOLUME = 100.0F;
-    public static final float MAX_SOUND_VOLUME = 100.0F;
-    public static final float STRESS_CAPACITY = 64.0F;
-
+    public static final float DEFAULT_SOUND_VOLUME = 150.0F;
+    public static final float MAX_SOUND_VOLUME = 300.0F;
     private static final int KINETIC_UPDATE_INTERVAL = 2;
     private static final float EPSILON = 0.001F;
 
-    private final String[] advancedRemoteKeys = new String[INPUT_COUNT];
+    private EngineControlSettings controlSettings = EngineControlSettings.defaults();
+    private final EngineBehaviorController behaviorController = new EngineBehaviorController();
+    private final EngineSoundRpmController soundRpmController = new EngineSoundRpmController();
+    private float soundRpmTarget;
+    private int soundSyncTicks;
+    private boolean soundRpmInitialized;
     private @Nullable BindingRef advancedHub;
-    private float forwardSpeed = DEFAULT_FORWARD_SPEED;
-    private float reverseSpeed = DEFAULT_REVERSE_SPEED;
-    private float turnSpeed = DEFAULT_TURN_SPEED;
-    private float acceleration = DEFAULT_ACCELERATION;
-    private float soundVolume = DEFAULT_SOUND_VOLUME;
+    private RemoteControllerCompat.Type terminalType=RemoteControllerCompat.Type.WIRELESS;
+    private final EngineRedstoneInputs redstoneInputs = new EngineRedstoneInputs(this);
+    private static final java.util.Set<GasTurbineBlockEntity> LOADED=java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+    @Override public void onLoad(){super.onLoad();redstoneInputs.invalidate();synchronized(LOADED){LOADED.add(this);}}
+    @Override public void remove(){redstoneInputs.close();synchronized(LOADED){LOADED.remove(this);}super.remove();}
+    @Override public void invalidate(){redstoneInputs.close();super.invalidate();}
+    public RemoteControllerCompat.Type getTerminalType(){return terminalType;}
+    public static java.util.Set<String> channelsForTerminal(net.minecraft.world.level.Level world,BlockPos pos) {
+        java.util.Set<String> channels=new java.util.HashSet<>();
+        synchronized(LOADED) {
+            for(var engine:java.util.Set.copyOf(LOADED)) {
+                if(engine.isRemoved()||engine.level!=world||!engine.isControlPart()
+                        ||engine.terminalType!=RemoteControllerCompat.Type.WIRELESS||!engine.hasValidAdvancedHub()
+                        ||!engine.advancedHub.pos().equals(pos))continue;
+                channels.addAll(com.hooya.stabilizedturret.content.remote.ControllerInput.chordInputs(engine.controlSettings.engineToggleKey()));
+                for(var behavior:engine.controlSettings.behaviors())for(String key:behavior.keys())
+                    channels.addAll(com.hooya.stabilizedturret.content.remote.ControllerInput.chordInputs(key));
+            }
+        }
+        return java.util.Set.copyOf(channels);
+    }
     private boolean engineEnabled;
     private boolean engineTogglePressed;
     private float targetLeftSpeed;
@@ -57,122 +68,118 @@ public final class GasTurbineBlockEntity extends GeneratingKineticBlockEntity {
     private float appliedLeftSpeed;
     private float appliedRightSpeed;
     private int kineticUpdateTicks;
+    private int lastBehaviorIndex;
 
     public GasTurbineBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.GAS_TURBINE.get(), pos, state);
-        Arrays.fill(advancedRemoteKeys, "");
+        this(ModBlockEntities.GAS_TURBINE.get(), pos, state);
     }
-
-    @Override
-    public void initialize() {
+    protected GasTurbineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
+    }
+    protected boolean isControlPart() {
+        return getBlockState().getBlock() instanceof GasTurbineBlock
+                && getBlockState().getValue(GasTurbineBlock.PART) == GasTurbinePart.NEGATIVE;
+    }
+    protected void tickClientSound() { GasTurbineSoundManager.tick(this); }
+    @Override public void initialize() {
         super.initialize();
         if (!hasSource()) updateGeneratedRotation();
     }
-
-    @Override
-    public void tick() {
+    @Override public void tick() {
         super.tick();
         if (level == null) return;
         if (level.isClientSide) {
-            if (FMLEnvironment.dist == Dist.CLIENT) GasTurbineSoundManager.tick(this);
+            soundRpmController.tickClient(controlSettings, engineEnabled, 1.0F / 20);
+            if (FMLEnvironment.dist == Dist.CLIENT) tickClientSound();
             return;
         }
-        if (!(getBlockState().getBlock() instanceof GasTurbineBlock)
-                || getBlockState().getValue(GasTurbineBlock.PART) != GasTurbinePart.NEGATIVE) {
-            return;
-        }
-
+        if (!isControlPart()) return;
         updateTargetsFromRemote();
+        float previousSoundRpm = soundRpmController.rpm();
+        soundRpmController.tick(controlSettings, engineEnabled, soundRpmTarget, 1.0F / 20);
+        if (!nearlyEqual(previousSoundRpm, soundRpmController.rpm())) {
+            setChanged();
+            // Also sync when a behavior has zero output or the transmission is already settled.
+            if (++soundSyncTicks >= KINETIC_UPDATE_INTERVAL || nearlyEqual(soundRpmController.rpm(), soundRpmTarget)) {
+                soundSyncTicks = 0;
+                sendData();
+            }
+        }
         if (!engineEnabled) {
-            currentLeftSpeed = 0;
-            currentRightSpeed = 0;
+            behaviorController.completeTransition();
+            currentLeftSpeed = currentRightSpeed = 0;
             applyKineticSpeeds(0, 0);
             return;
         }
-        float step = acceleration / 20.0F;
-        currentLeftSpeed = moveTowards(currentLeftSpeed, targetLeftSpeed, step);
-        currentRightSpeed = moveTowards(currentRightSpeed, targetRightSpeed, step);
-
+        var behavior = behaviorController.motionBehavior();
+        currentLeftSpeed = EngineBehaviorController.advance(currentLeftSpeed, targetLeftSpeed,
+                behavior.leftAcceleration(), behavior.leftDeceleration(), 1.0F / 20);
+        currentRightSpeed = EngineBehaviorController.advance(currentRightSpeed, targetRightSpeed,
+                behavior.rightAcceleration(), behavior.rightDeceleration(), 1.0F / 20);
         kineticUpdateTicks++;
         boolean reachedTarget = nearlyEqual(currentLeftSpeed, targetLeftSpeed)
                 && nearlyEqual(currentRightSpeed, targetRightSpeed);
+        if (reachedTarget) behaviorController.completeTransition();
         if (kineticUpdateTicks >= KINETIC_UPDATE_INTERVAL || reachedTarget) {
             kineticUpdateTicks = 0;
             applyKineticSpeeds(currentLeftSpeed, currentRightSpeed);
         }
     }
-
     private void updateTargetsFromRemote() {
-        boolean forward = false;
-        boolean reverse = false;
-        boolean turnLeft = false;
-        boolean turnRight = false;
-        boolean engineToggle = false;
-        if (hasValidAdvancedHub() && DriveByWireCompat.isAvailable()) {
-            Map<?, ?> signals = DriveByWireCompat.signals(level, advancedHub.pos());
-            forward = isSignalPressed(signals, INPUT_FORWARD);
-            reverse = isSignalPressed(signals, INPUT_REVERSE);
-            turnLeft = isSignalPressed(signals, INPUT_LEFT);
-            turnRight = isSignalPressed(signals, INPUT_RIGHT);
-            engineToggle = isSignalPressed(signals, INPUT_ENGINE_TOGGLE);
-        }
-
-        boolean stateChanged = false;
-        if (engineToggle && !engineTogglePressed) {
+        redstoneInputs.tick();
+        boolean connected = hasValidAdvancedHub();
+        Map<?, ?> signals = connected ? FireControlInputRouter.signals(level, advancedHub.pos(), terminalType) : Map.of();
+        java.util.function.Predicate<String> pressed = key -> connected && isSignalPressed(signals, key);
+        boolean toggle = pressed.test(controlSettings.engineToggleKey()) || redstoneInputs.powered(0);
+        boolean changed = false;
+        if (toggle && !engineTogglePressed) {
             engineEnabled = !engineEnabled;
-            stateChanged = true;
+            changed = true;
         }
-        engineTogglePressed = engineToggle;
-
-        int driveDirection = (forward ? 1 : 0) - (reverse ? 1 : 0);
-        float leftTarget = 0;
-        float rightTarget = 0;
-        if (engineEnabled && driveDirection > 0) {
-            leftTarget = forwardSpeed;
-            rightTarget = forwardSpeed;
-            if (turnLeft != turnRight) {
-                if (turnLeft) leftTarget = 0;
-                else rightTarget = 0;
-            }
-        } else if (engineEnabled && driveDirection < 0) {
-            leftTarget = -reverseSpeed;
-            rightTarget = -reverseSpeed;
-            if (turnLeft != turnRight) {
-                // Reversing swaps the inside track required for the same
-                // vehicle-relative steering direction.
-                if (turnLeft) rightTarget = 0;
-                else leftTarget = 0;
-            }
-        } else if (engineEnabled && turnLeft != turnRight) {
-            if (turnLeft) {
-                leftTarget = -turnSpeed;
-                rightTarget = turnSpeed;
-            } else {
-                leftTarget = turnSpeed;
-                rightTarget = -turnSpeed;
-            }
+        engineTogglePressed = toggle;
+        int selected = behaviorController.select(controlSettings.behaviors(), pressed, index -> redstoneInputs.powered(index + 1));
+        if (selected >= 0 && selected != lastBehaviorIndex) {
+            lastBehaviorIndex = selected;
+            changed = true;
         }
-
-        if (stateChanged
-                || !nearlyEqual(targetLeftSpeed, leftTarget)
-                || !nearlyEqual(targetRightSpeed, rightTarget)) {
-            targetLeftSpeed = leftTarget;
-            targetRightSpeed = rightTarget;
+        var behavior = behaviorController.lastBehavior();
+        float left = engineEnabled && selected >= 0 ? behavior.leftSpeed() : 0;
+        float right = engineEnabled && selected >= 0 ? behavior.rightSpeed() : 0;
+        float audioTarget = EngineSoundRpmController.target(controlSettings, behavior, engineEnabled && selected >= 0);
+        if (changed || !nearlyEqual(targetLeftSpeed, left) || !nearlyEqual(targetRightSpeed, right)
+                || !nearlyEqual(soundRpmTarget, audioTarget)) {
+            targetLeftSpeed = left;
+            targetRightSpeed = right;
+            soundRpmTarget = audioTarget;
             setChanged();
             sendData();
         }
     }
-
-    private boolean isSignalPressed(Map<?, ?> signals, int action) {
-        String key = advancedRemoteKeys[action];
-        return !key.isEmpty() && DriveByWireCompat.signal(signals, key) > 0;
+    private boolean isSignalPressed(Map<?, ?> signals, String key) {
+        return !key.isEmpty() && ControllerInput.signal(signals, key) > 0;
     }
 
-    private void applyKineticSpeeds(float leftSpeed, float rightSpeed) {
-        if (nearlyEqual(appliedLeftSpeed, leftSpeed)
-                && nearlyEqual(appliedRightSpeed, rightSpeed)) return;
+    protected void applyKineticSpeeds(float leftSpeed, float rightSpeed) {
+        // This block is always a generator. During rapid differential-output
+        // rebuilds, Create can momentarily mark it as driven by a neighbouring
+        // shaft. GeneratingKineticBlockEntity then refuses to stop at 0 RPM
+        // and may destroy the block on the next reversal. Clear only this
+        // turbine's transient source before applying its authoritative speed.
+        boolean clearedTransientSource = hasSource();
+        if (clearedTransientSource) {
+            detachKinetics();
+            removeSource();
+        }
+        boolean speedsUnchanged = nearlyEqual(appliedLeftSpeed, leftSpeed)
+                && nearlyEqual(appliedRightSpeed, rightSpeed);
         float oldBase = generatedMagnitude(appliedLeftSpeed, appliedRightSpeed);
         float newBase = generatedMagnitude(leftSpeed, rightSpeed);
+        if (speedsUnchanged) {
+            if (clearedTransientSource && newBase > EPSILON) {
+                updateGeneratedRotation();
+            }
+            return;
+        }
         appliedLeftSpeed = leftSpeed;
         appliedRightSpeed = rightSpeed;
         if (!nearlyEqual(oldBase, newBase)) {
@@ -198,8 +205,9 @@ public final class GasTurbineBlockEntity extends GeneratingKineticBlockEntity {
 
     @Override
     public float calculateAddedStressCapacity() {
-        lastCapacityProvided = STRESS_CAPACITY;
-        return STRESS_CAPACITY;
+        lastCapacityProvided = (float) com.simibubi.create.api.stress.BlockStressValues.getCapacity(
+                com.simibubi.create.AllBlocks.CREATIVE_MOTOR.get());
+        return lastCapacityProvided;
     }
 
     public float getOutputModifier(Direction direction) {
@@ -226,155 +234,167 @@ public final class GasTurbineBlockEntity extends GeneratingKineticBlockEntity {
 
     public boolean bindAdvancedHub(BindingRef hub) {
         if (level == null || !RemoteControllerCompat.isTerminal(
-                level, hub.pos(), RemoteControllerCompat.Type.ADVANCED)) return false;
+                level, hub.pos(), RemoteControllerCompat.Type.ADVANCED)
+                && !RemoteControllerCompat.isTerminal(level,hub.pos(),RemoteControllerCompat.Type.WIRELESS)) return false;
+        BindingRef previousHub = advancedHub;
+        terminalType=RemoteControllerCompat.isTerminal(level,hub.pos(),RemoteControllerCompat.Type.WIRELESS)?RemoteControllerCompat.Type.WIRELESS:RemoteControllerCompat.Type.ADVANCED;
         advancedHub = hub;
+        controlSettings = compatibleSettings(controlSettings);
+        engineTogglePressed = false;
+        behaviorController.reset(controlSettings.behaviors().getFirst());
+        lastBehaviorIndex = 0;
+        if (!level.isClientSide) synchronized (LOADED) { LOADED.add(this); }
+        if (previousHub != null) ControllerSessions.mappingsChanged(level, previousHub.pos());
+        ControllerSessions.mappingsChanged(level, hub.pos());
         setChanged();
         sendData();
         return true;
     }
 
     public boolean hasValidAdvancedHub() {
+        getAdvancedHub();
         return level != null
                 && advancedHub != null
+                && level.hasChunkAt(advancedHub.pos())
                 && advancedHub.isSameTarget(level)
                 && RemoteControllerCompat.isTerminal(
-                level, advancedHub.pos(), RemoteControllerCompat.Type.ADVANCED);
+                level, advancedHub.pos(), terminalType);
     }
 
     public @Nullable BindingRef getAdvancedHub() {
-        return advancedHub;
-    }
-
-    public List<String> getAdvancedRemoteKeys() {
-        return List.of(advancedRemoteKeys.clone());
-    }
-
-    public boolean applySettings(
-            List<String> keys,
-            float requestedForwardSpeed,
-            float requestedReverseSpeed,
-            float requestedTurnSpeed,
-            float requestedAcceleration,
-            float requestedSoundVolume
-    ) {
-        if (keys.size() != INPUT_COUNT
-                || !Float.isFinite(requestedForwardSpeed)
-                || !Float.isFinite(requestedReverseSpeed)
-                || !Float.isFinite(requestedTurnSpeed)
-                || !Float.isFinite(requestedAcceleration)
-                || !Float.isFinite(requestedSoundVolume)) return false;
-        boolean hubValid = hasValidAdvancedHub();
-        for (String key : keys) {
-            if (key == null || (!key.isEmpty() && (!hubValid
-                    || !DriveByWireCompat.accepts(RemoteControllerCompat.Type.ADVANCED, key)))) {
-                return false;
+        if (level != null && !level.isClientSide && advancedHub != null
+                && terminalType == RemoteControllerCompat.Type.WIRELESS) {
+            BindingRef refreshed = advancedHub.refreshWirelessTerminal(level);
+            if (refreshed != advancedHub) {
+                advancedHub = refreshed;
+                setChanged();
+                sendData();
             }
         }
-        for (int index = 0; index < INPUT_COUNT; index++) advancedRemoteKeys[index] = keys.get(index);
-        forwardSpeed = Mth.clamp(requestedForwardSpeed, 0, MAX_SPEED);
-        reverseSpeed = Mth.clamp(requestedReverseSpeed, 0, MAX_SPEED);
-        turnSpeed = Mth.clamp(requestedTurnSpeed, 0, MAX_SPEED);
-        acceleration = Mth.clamp(requestedAcceleration, 1, MAX_SPEED);
-        soundVolume = Mth.clamp(requestedSoundVolume, 0, MAX_SOUND_VOLUME);
+        return advancedHub;
+    }
+    /** Functional terminal detach; control settings remain available for later rebinding. */
+    public void unbindAdvancedHub() {
+        BindingRef previousHub = advancedHub;
+        advancedHub=null;engineTogglePressed=false;setChanged();sendData();
+        if (previousHub != null) ControllerSessions.mappingsChanged(level, previousHub.pos());
+    }
+
+    public EngineControlSettings getControlSettings() { return controlSettings; }
+    public boolean applySettings(EngineControlSettings settings) {
+        if (!validKey(settings.engineToggleKey())) return false;
+        for (var behavior : settings.behaviors()) {
+            if (behavior.keys().stream().anyMatch(key -> !validKey(key))) return false;
+        }
+        controlSettings = settings;
+        redstoneInputs.invalidate();
+        lastBehaviorIndex = 0;
+        behaviorController.reset(settings.behaviors().getFirst());
+        if (advancedHub != null) ControllerSessions.mappingsChanged(level, advancedHub.pos());
         setChanged();
         sendData();
         return true;
     }
-
-    public float getForwardSpeed() { return forwardSpeed; }
-    public float getReverseSpeed() { return reverseSpeed; }
-    public float getTurnSpeed() { return turnSpeed; }
-    public float getAcceleration() { return acceleration; }
-    public float getSoundVolume() { return soundVolume; }
+    private boolean validKey(String key) {
+        return key.isEmpty() || (terminalType == RemoteControllerCompat.Type.WIRELESS
+                ? !ControllerInput.chordInputs(key).isEmpty() : DriveByWireCompat.accepts(terminalType, key));
+    }
+    private EngineControlSettings compatibleSettings(EngineControlSettings settings) {
+        return new EngineControlSettings(settings.soundVolume(), validKey(settings.engineToggleKey()) ? settings.engineToggleKey() : "",
+                settings.behaviors().stream().map(b -> b.keys().stream().allMatch(this::validKey) ? b
+                        : new EngineDriveBehavior(List.of(), b.leftSpeed(), b.leftAcceleration(), b.leftDeceleration(),
+                        b.rightSpeed(), b.rightAcceleration(), b.rightDeceleration(), b.enteringRates(), b.leavingRates(), b.redstoneChannel())).toList(),
+                settings.soundRpmEnabled(), settings.soundRpmAcceleration(), settings.soundRpmDeceleration(), settings.soundMaxRpm(), settings.toggleChannel());
+    }
+    public float getSoundVolume() { return controlSettings.soundVolume(); }
+    public float getSimulatedSoundRpm() { return soundRpmController.rpm(); }
+    public float getSoundRpmTarget() { return soundRpmTarget; }
+    public float getSoundRpmMagnitude() {
+        return controlSettings.soundRpmEnabled() ? Math.abs(soundRpmController.rpm()) : getCurrentMagnitude();
+    }
+    public float getSoundMaxRpm() {
+        return controlSettings.soundRpmEnabled() ? controlSettings.soundMaxRpm() : getConfiguredMaxSpeed();
+    }
+    public float getSoundRpmAcceleration() {
+        return controlSettings.soundRpmEnabled() ? controlSettings.soundRpmAcceleration() : getAcceleration();
+    }
+    public float getSoundRpmDeceleration() {
+        return controlSettings.soundRpmDeceleration();
+    }
+    public float getAcceleration() {
+        var behavior = controlSettings.behaviors().get(lastBehaviorIndex);
+        return Math.max(behavior.leftAcceleration(), behavior.rightAcceleration());
+    }
     public boolean isEngineEnabled() { return engineEnabled; }
     public float getTargetLeftSpeed() { return targetLeftSpeed; }
     public float getTargetRightSpeed() { return targetRightSpeed; }
     public float getCurrentLeftSpeed() { return appliedLeftSpeed; }
     public float getCurrentRightSpeed() { return appliedRightSpeed; }
-    public float getCurrentMagnitude() {
-        return generatedMagnitude(appliedLeftSpeed, appliedRightSpeed);
+    public float getCurrentMagnitude() { return generatedMagnitude(appliedLeftSpeed, appliedRightSpeed); }
+    public float getTargetMagnitude() { return generatedMagnitude(targetLeftSpeed, targetRightSpeed); }
+    public float getConfiguredMaxSpeed() {
+        float maximum = 0;
+        for (var behavior : controlSettings.behaviors()) maximum = Math.max(maximum, behavior.maximumMagnitude());
+        return maximum;
     }
-    public float getTargetMagnitude() {
-        return generatedMagnitude(targetLeftSpeed, targetRightSpeed);
+    /** Uses Create's synchronized stress/capacity totals for the connected kinetic network. */
+    public float calculateEngineLoad() {
+        if (!Float.isFinite(capacity) || !Float.isFinite(stress) || capacity <= EPSILON || stress <= 0) return 0;
+        return Mth.clamp(stress / capacity, 0, 1);
     }
-
-    @Override
-    protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
+    @Override protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
         super.write(tag, registries, clientPacket);
-        tag.putFloat("ForwardSpeed", forwardSpeed);
-        tag.putFloat("ReverseSpeed", reverseSpeed);
-        tag.putFloat("TurnSpeed", turnSpeed);
-        tag.putFloat("Acceleration", acceleration);
-        tag.putFloat("SoundVolume", soundVolume);
+        EngineSettingsCodec.save(tag, controlSettings, registries);
         tag.putBoolean("EngineEnabled", engineEnabled);
-        for (int index = 0; index < INPUT_COUNT; index++) {
-            tag.putString("AdvancedRemoteKey_" + index, advancedRemoteKeys[index]);
-        }
+        tag.putFloat("SimulatedSoundRpm", soundRpmController.rpm());
         if (advancedHub != null) tag.put("AdvancedHub", advancedHub.save());
+        tag.putString("ControlTerminalType",terminalType.name());
         if (clientPacket) {
+            tag.putInt("LastBehavior", lastBehaviorIndex);
+            tag.putFloat("SoundRpmTarget", soundRpmTarget);
             tag.putFloat("TargetLeftSpeed", targetLeftSpeed);
             tag.putFloat("TargetRightSpeed", targetRightSpeed);
             tag.putFloat("CurrentLeftSpeed", appliedLeftSpeed);
             tag.putFloat("CurrentRightSpeed", appliedRightSpeed);
         }
     }
-
-    @Override
-    protected void read(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
+    @Override protected void read(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
         super.read(tag, registries, clientPacket);
-        float legacyDriveSpeed = readClamped(
-                tag, "DriveSpeed", DEFAULT_FORWARD_SPEED, 0, MAX_SPEED);
-        forwardSpeed = readClamped(
-                tag, "ForwardSpeed", legacyDriveSpeed, 0, MAX_SPEED);
-        reverseSpeed = readClamped(
-                tag, "ReverseSpeed", legacyDriveSpeed, 0, MAX_SPEED);
-        turnSpeed = readClamped(tag, "TurnSpeed", DEFAULT_TURN_SPEED, 0, MAX_SPEED);
-        acceleration = readClamped(tag, "Acceleration", DEFAULT_ACCELERATION, 1, MAX_SPEED);
-        soundVolume = readClamped(
-                tag, "SoundVolume", DEFAULT_SOUND_VOLUME, 0, MAX_SOUND_VOLUME);
+        var loaded = EngineSettingsCodec.load(tag, registries);
+        // Keep legacy advanced-controller profiles; new/unbound engines capture native keyboard inputs.
+        boolean nativeProfile = "WIRELESS".equals(tag.getString("ControlTerminalType"))
+                || !tag.contains("AdvancedHub") && (loaded.engineToggleKey().isEmpty()
+                || !ControllerInput.chordInputs(loaded.engineToggleKey()).isEmpty())
+                && loaded.behaviors().stream().flatMap(behavior -> behavior.keys().stream())
+                .allMatch(key -> !ControllerInput.chordInputs(key).isEmpty());
+        terminalType = nativeProfile ? RemoteControllerCompat.Type.WIRELESS : RemoteControllerCompat.Type.ADVANCED;
+        controlSettings = compatibleSettings(loaded);
+        if (!clientPacket) redstoneInputs.invalidate();
+        behaviorController.reset(controlSettings.behaviors().getFirst());
+        lastBehaviorIndex = Mth.clamp(tag.getInt("LastBehavior"), 0, controlSettings.behaviors().size() - 1);
         engineEnabled = tag.getBoolean("EngineEnabled");
         engineTogglePressed = false;
-        for (int index = 0; index < INPUT_COUNT; index++) {
-            String key = tag.getString("AdvancedRemoteKey_" + index);
-            advancedRemoteKeys[index] = DriveByWireCompat.accepts(
-                    RemoteControllerCompat.Type.ADVANCED, key) ? key : "";
-        }
         advancedHub = BindingRef.load(tag, "AdvancedHub");
+        float synchronizedRpm = tag.getFloat("SimulatedSoundRpm");
+        // A held rising target must not turn into a falling audible RPM when the
+        // server lags behind the client. Only the first observation restores state;
+        // subsequent snapshots are followed continuously by the client simulation.
+        if (clientPacket) soundRpmController.synchronize(synchronizedRpm, !soundRpmInitialized);
+        else soundRpmController.restore(synchronizedRpm);
+        soundRpmInitialized = true;
+        soundSyncTicks = 0;
         if (clientPacket) {
+            float target = tag.getFloat("SoundRpmTarget");
+            soundRpmTarget = Float.isFinite(target) ? Mth.clamp(target, -1024, 1024) : 0;
             targetLeftSpeed = tag.getFloat("TargetLeftSpeed");
             targetRightSpeed = tag.getFloat("TargetRightSpeed");
-            currentLeftSpeed = tag.getFloat("CurrentLeftSpeed");
-            currentRightSpeed = tag.getFloat("CurrentRightSpeed");
-            appliedLeftSpeed = currentLeftSpeed;
-            appliedRightSpeed = currentRightSpeed;
+            currentLeftSpeed = appliedLeftSpeed = tag.getFloat("CurrentLeftSpeed");
+            currentRightSpeed = appliedRightSpeed = tag.getFloat("CurrentRightSpeed");
         } else {
-            targetLeftSpeed = 0;
-            targetRightSpeed = 0;
-            currentLeftSpeed = 0;
-            currentRightSpeed = 0;
-            appliedLeftSpeed = 0;
-            appliedRightSpeed = 0;
+            soundRpmTarget = 0;
+            targetLeftSpeed = targetRightSpeed = currentLeftSpeed = currentRightSpeed = appliedLeftSpeed = appliedRightSpeed = 0;
         }
     }
-
-    private static float readClamped(
-            CompoundTag tag, String key, float defaultValue, float minimum, float maximum) {
-        if (!tag.contains(key)) return defaultValue;
-        float value = tag.getFloat(key);
-        return Float.isFinite(value) ? Mth.clamp(value, minimum, maximum) : defaultValue;
-    }
-
-    private static float moveTowards(float current, float target, float amount) {
-        if (current < target) return Math.min(current + amount, target);
-        if (current > target) return Math.max(current - amount, target);
-        return target;
-    }
-
-    private static float generatedMagnitude(float left, float right) {
-        return Math.max(Math.abs(left), Math.abs(right));
-    }
-
-    private static boolean nearlyEqual(float first, float second) {
-        return Math.abs(first - second) <= EPSILON;
-    }
+    private static float generatedMagnitude(float left, float right) { return Math.max(Math.abs(left), Math.abs(right)); }
+    private static boolean nearlyEqual(float first, float second) { return Math.abs(first - second) <= EPSILON; }
 }

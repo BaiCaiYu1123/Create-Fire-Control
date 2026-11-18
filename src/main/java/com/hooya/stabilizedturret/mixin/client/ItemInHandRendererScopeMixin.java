@@ -1,6 +1,7 @@
 package com.hooya.stabilizedturret.mixin.client;
 
 import com.hooya.stabilizedturret.client.ClientAimState;
+import com.hooya.stabilizedturret.client.ClientTelevisionGuidanceState;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
@@ -22,7 +23,9 @@ public abstract class ItemInHandRendererScopeMixin {
             int combinedLight,
             CallbackInfo ci
     ) {
-        if (ClientAimState.isOpticalView()) {
+        if (ClientAimState.isOpticalView()
+                || ClientTelevisionGuidanceState.isActive()
+                || com.hooya.stabilizedturret.client.ClientWeaponViewState.isActive()) {
             ci.cancel();
         }
     }

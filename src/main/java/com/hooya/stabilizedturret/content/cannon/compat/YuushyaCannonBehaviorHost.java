@@ -1,7 +1,6 @@
 package com.hooya.stabilizedturret.content.cannon.compat;
 
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.yuushya.modelling.registries.BlockEntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -18,7 +17,7 @@ public final class YuushyaCannonBehaviorHost extends MediumcannonBlockEntity {
     private ItemCannonBehavior behavior;
 
     public YuushyaCannonBehaviorHost(BlockEntity owner) {
-        super(BlockEntityRegistry.ITEM_BLOCK_ENTITY.get(), owner.getBlockPos(), owner.getBlockState());
+        super(owner.getType(), owner.getBlockPos(), owner.getBlockState());
         this.owner = owner;
         if (owner.getLevel() != null) {
             setLevel(owner.getLevel());

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": ["ZPZ", "PZP", "ZPZ"],
+  "key": {
+    "Z": {"tag": "c:ingots/zinc"},
+    "P": {"item": "create_fire_control:composite_armor_plate"}
+  },
+  "result": {
+    "id": "create_fire_control:camouflaged_polyhedral_armor",
+    "count": 1
+  }
+}

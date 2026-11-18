@@ -1,0 +1,41 @@
+gradle.beforeProject { p ->
+    p.layout.buildDirectory.set(p.layout.projectDirectory.dir('build-missile-lock-toggle-verify'))
+}
+gradle.projectsEvaluated {
+    def p = rootProject
+    def fixture = p.sourceSets.create('missileLockToggleIntegration') {
+        java.srcDirs = ['src/radarScanIntegration/java']
+        compileClasspath += p.sourceSets.main.output + p.sourceSets.main.compileClasspath
+        runtimeClasspath += p.sourceSets.main.output + p.sourceSets.main.runtimeClasspath
+    }
+    p.dependencies.add('localRuntime', p.files('libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+            'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar'))
+    p.runs.server {
+        modSource fixture
+        systemProperty 'create_fire_control.missileLockToggleChecks', 'true'
+    }
+    def runDir = p.layout.projectDirectory.dir(p.providers.gradleProperty('runRoot')
+            .getOrElse('analysis/missile-lock-toggle-20261114')).dir('server').asFile
+    if (p.providers.gradleProperty('missileLockJar').isPresent()) {
+        // Freeze the delivered classes so another incremental build cannot remove a live class.
+        def snapshot = new File(runDir, 'mod-snapshot')
+        p.copy { from p.zipTree(p.file(p.providers.gradleProperty('missileLockJar').get())); into snapshot }
+        p.sourceSets.main.output.classesDirs.setFrom(snapshot)
+        p.sourceSets.main.output.resourcesDir = new File(runDir, 'empty-resources')
+        p.tasks.named('compileJava').configure { enabled = false }
+        p.tasks.named('processResources').configure { enabled = false }
+    }
+    p.tasks.named('runServer').configure {
+        doFirst {
+            runDir.mkdirs()
+            new File(runDir, 'radar-scan-result.txt').text = 'RUNNING'
+            new File(runDir, 'eula.txt').text = 'eula=true\n'
+            new File(runDir, 'server.properties').text = 'level-name=world\nonline-mode=false\nview-distance=2\nsimulation-distance=2\nspawn-protection=0\nserver-port=25587\n'
+        }
+        doLast {
+            def result = new File(runDir, 'radar-scan-result.txt')
+            if (!result.isFile() || !result.text.startsWith('PASS:'))
+                throw new GradleException('Missile lock toggle checks failed: ' + (result.isFile() ? result.text : 'missing result'))
+        }
+    }
+}

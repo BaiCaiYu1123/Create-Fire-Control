@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": true,
+  "textures": {
+    "layer0": "create_fire_control:block/tiger_i_engine",
+    "particle": "create_fire_control:block/tiger_i_engine"
+  },
+  "loader": "neoforge:obj",
+  "flip_v": true,
+  "automatic_culling": false,
+  "shade_quads": true,
+  "model": "create_fire_control:models/block/tiger_i_engine/center.obj"
+}

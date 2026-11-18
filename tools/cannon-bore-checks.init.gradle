@@ -1,0 +1,11 @@
+// Optional runtime-only addon fixtures. Never included in the distribution JAR.
+gradle.beforeProject { p ->
+    p.afterEvaluate {
+        def root=p.providers.gradleProperty('cannonBoreModsDir').orNull
+        if(root!=null) {
+            p.dependencies.add('localRuntime',p.files(p.fileTree(root) {
+                include '*CBC-Military-Supplement*.jar', 'Create-Big-Cannon-Autogun-Revolution.jar', 'shaolib*.jar', '*cbc_at*.jar'
+            }))
+        }
+    }
+}

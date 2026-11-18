@@ -1,0 +1,23 @@
+allprojects {
+    afterEvaluate {
+        runs.client {
+            modSource project.sourceSets.controllerIntegration
+            systemProperty 'create_fire_control.engineInputClientChecks', 'true'
+            argument '--width'; argument '1280'
+            argument '--height'; argument '720'
+        }
+        dependencies {
+            localRuntime files('libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+                    'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar')
+        }
+        def result = layout.projectDirectory.dir(providers.gradleProperty('runRoot').get())
+                .file('client/engine-input-client-result.txt').asFile
+        tasks.matching { it.name == 'runClient' }.configureEach {
+            doFirst { result.parentFile.mkdirs(); result.text = 'RUNNING' }
+            doLast {
+                if (!result.isFile() || !result.text.startsWith('PASS'))
+                    throw new GradleException('Engine input UI failed: ' + (result.isFile() ? result.text : 'missing result'))
+            }
+        }
+    }
+}

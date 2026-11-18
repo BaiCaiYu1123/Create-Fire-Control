@@ -1,0 +1,278 @@
+{
+  "blips-001": {
+    "source": "7d8d864e0293f048048621a7710890b2e1dfafb3c08c359602b449c1ad26cdbc",
+    "monoSha256": "4612318d3679ca3a6c2c6928e544f4eb5e08dd84ec7b251cba2c4261e0875403",
+    "channels": 1,
+    "frames": 52920,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "blips-002": {
+    "source": "51f14b7f0c94f4e72be5682ea5f99b9bcb1f5aca0635a750b404876b565e1604",
+    "monoSha256": "0ea677ca2f8a7633cb3b797f33559d10e8211f6ec53f53ab03caaf4bc0f5d1ca",
+    "channels": 1,
+    "frames": 52920,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "blips-003": {
+    "source": "9a0056d7e919ce065502fa4634d5d9ee5f2d92a2a5a50f56a08700298920a214",
+    "monoSha256": "6311233ad72ace2d8e4fdce7c50e4e1ead7968d195dd64d33b2a6850b01c03e5",
+    "channels": 1,
+    "frames": 52920,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "blips-004": {
+    "source": "ffa4238a2d7f7c7cac0d2873ef7cc0350aa9d8c731936941f9e6b567042330db",
+    "monoSha256": "9d56e583f894e1f671682c4e30384c9530f3780c3469abb572e79f4b20ddebe6",
+    "channels": 1,
+    "frames": 53168,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "blips-005": {
+    "source": "2042bd7d20a02fee89363dbba8a449f8efdae810afecdb2a29492565601d0e79",
+    "monoSha256": "fc70b021216ea94dac6f3941f27fbd6d97e2c68317a97db5f679c9bb950eecec",
+    "channels": 1,
+    "frames": 52672,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "blips-006": {
+    "source": "6262e2c1b529554625abc2a7bcd0db5cd721a26635bdbac9bc8d9c9634024c1e",
+    "monoSha256": "b6525ffecee36e593e5ba96128ba6ad399225bc0f72cf4b6a64d497fca872883",
+    "channels": 1,
+    "frames": 52920,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "blips-007": {
+    "source": "b7a7e9896be080d0c3abd34db14ba45eeb255704b5d8d5aa48727b0519d01f24",
+    "monoSha256": "40e0a3a31ac556fd17ca2b71ae15e301e5bf4ba3a9cedadc0bb730b399f13fa7",
+    "channels": 1,
+    "frames": 52920,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "blips-008": {
+    "source": "d34742e135cb2387019074c06a3ca0cb348077e8d6d9bf36981fe127e22b831c",
+    "monoSha256": "8248ec685ae3f94b281e469bfff0bbd2a8bb8732e8a9ff3c704196377c4caa37",
+    "channels": 1,
+    "frames": 52920,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "blips-009": {
+    "source": "2119843f0747f510f8fd7b20d0feb6878eb0830b85a6720c1b87bfac6722890b",
+    "monoSha256": "2ab522ad09913c6c6cc6e6cbac545ac53eee2a11036c6478a1fb713e9b579f39",
+    "channels": 1,
+    "frames": 52920,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "fast_load": {
+    "source": "dfa69f5a2c65f2f229526a15359949d4a18ae4a4df115d342db78e6acbd72c17",
+    "monoSha256": "146d99279952e11b48629d52c90f1e1d15ee75043cbb26691d461bfaa314a903",
+    "channels": 1,
+    "frames": 423360,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "fast_not_load": {
+    "source": "83cdc604ed1071994f3bd13c497204b21e254d771d455cf003da016f2c0fc3c3",
+    "monoSha256": "e1a4a2a775d25de26ade50d90d49173b50bc3df46816490181ec74d0ce09984f",
+    "channels": 1,
+    "frames": 423360,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "idle_load": {
+    "source": "9f18a0ad103eaeaa0ad267e27bf9799cdf9c6286dd10d7c7aa1788cae6ecdb0c",
+    "monoSha256": "3d5bee5ec1ae6b586ebbcce47fe15fe213ae82f69e41e2cdb263aeb2d1ab2fc2",
+    "channels": 1,
+    "frames": 423360,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "med_load": {
+    "source": "200565b60a2c24e1b944bf9772498952919c5ece30180ba6c33454650ba21d2d",
+    "monoSha256": "a6e876af6b0f1e83a75ac5765d5161612533a51fb7b528cad4561dd4fba23ba8",
+    "channels": 1,
+    "frames": 343980,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": {
+      "millisecondsPerEnd": 8,
+      "before": 0.24968013167381287,
+      "ordinaryP999": 0.13139194548130034,
+      "method": "smoothstep endpoint-to-common-midpoint repair in the mono derivative; no extra runtime voice",
+      "after": 0.0007085353136062622
+    }
+  },
+  "med_not_load": {
+    "source": "1c001b58cb8a1f5287627509f1606e9f2d590c6fffbda0d3c60aeab6c26dfc3f",
+    "monoSha256": "1cb116f5d576b35cabcb9e1e9eafe5084a2fc16dd4391daaebca479d1886d03c",
+    "channels": 1,
+    "frames": 343980,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "release-001": {
+    "source": "8112372ef9063089ed7f93f0d17683852b5a8995be3c1e5a0f0d7043663e2da3",
+    "monoSha256": "0e914493f6f59924c79e491cfd2a700211fd969f6841705976c450d17d044d1c",
+    "channels": 1,
+    "frames": 158760,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "release-002": {
+    "source": "a8a850c67a0f416e1d23583e10a98f69a95ecb137cc0b2bfc14d1c236c55abc8",
+    "monoSha256": "eb372af297425b6dabd066962beaacea473297177b57eeb2f27f538484aea1b6",
+    "channels": 1,
+    "frames": 158760,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "release-003": {
+    "source": "51c0fae71e7f5fdfa89432d8b6a71f5192d30fafcb8d173d913c7beb31d9ffcf",
+    "monoSha256": "bdbc9a3caebb0a37c297157919becb6fd9f87ceb9d8526a03f5f561209b853bb",
+    "channels": 1,
+    "frames": 158760,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "release-004": {
+    "source": "1616fb790829aff79c8f6e5e632a0c2a15e27a8ae19e3085f6e11b1f5c202bf9",
+    "monoSha256": "adda97ee86d3097d33600fce82ff67810d2b1f8879fe129558f0f49e17ba5b79",
+    "channels": 1,
+    "frames": 158760,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "release-005": {
+    "source": "ad03e235a00f9ce7723f2b3f4db5111032930d1e8a006c9c7b61817e2ff4f605",
+    "monoSha256": "daa1a3ca65cf0db943a1f32d0e637c0984e6c6829ae4ace813cc28231b7b4cb4",
+    "channels": 1,
+    "frames": 158760,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "release-006": {
+    "source": "4affe862143a58fb7fed4883ae1faf4d066d438ce8d18ef5265885eff39cf52c",
+    "monoSha256": "615ca16ca34591e4bac726b1081e5ac1cc90227058b029a5c1ad4f4480ebec58",
+    "channels": 1,
+    "frames": 158760,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "release-007": {
+    "source": "2fca168cc49358e013c765408507a12c24b02ff1770b01acaaa1df72a323f879",
+    "monoSha256": "d59ea92c9cf980dbbe9480478fdab77f3e07b06e9986705715cf9c16a31a2f6d",
+    "channels": 1,
+    "frames": 158760,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "revv-001": {
+    "source": "b927576330be33351a76084a89e4f4fb1854d01bd438e04531df8cac7ac293c9",
+    "monoSha256": "4425af6288da3a31d02e10fa903c5b5fd1feb3486fd5edbd3800dd415e4d3e66",
+    "channels": 1,
+    "frames": 132300,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "revv-002": {
+    "source": "7971b43b03be2debd36f8837aac359e1af6daef199ad769c67c852ca4f36e205",
+    "monoSha256": "15950c418d4b4b7746c316a47f101cbe6651a53cd848488d5059667146c4917f",
+    "channels": 1,
+    "frames": 132300,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "revv-003": {
+    "source": "bf6a438cc890f56066d0bf4c607d0be02fccafe1e7e03f0f3fb51882a2f54442",
+    "monoSha256": "623b6068a16608755172fcb42a48f6a025ae501355508b0a6a696e3fb22138ec",
+    "channels": 1,
+    "frames": 132300,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "revv-004": {
+    "source": "6c9efa81b2454784b7a7e61b3952c47b82972ee7357cce5ee26fa75e85e6c563",
+    "monoSha256": "d596936e087f2d83a058669ef08f2878e0808d441568255f81e37649c06d48fd",
+    "channels": 1,
+    "frames": 131859,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "revv-005": {
+    "source": "3d0c912c2e50954e48581fd4d1e28e824496d3abcfad86c771e349a321a7fb38",
+    "monoSha256": "5b6430d7229554d17c36b77a670591b57e1e686d310f4ecc8c2b67f4a1972aa0",
+    "channels": 1,
+    "frames": 132300,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "slow_load": {
+    "source": "66b3a5214895e114fd005167a18a68f76c586f36eedb9f270aa112a016bd8adb",
+    "monoSha256": "01e4dd453137a397d58ce63cce3a75413263a5a35cce62a1379ae79fce6f8242",
+    "channels": 1,
+    "frames": 423360,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "slow_not_load": {
+    "source": "0e219a19a810518f44ddf1bbca59f27cf7116080f4905c9f9ea49e866ff8551e",
+    "monoSha256": "17bcfb00fddd155e7b77c7f95541487592db2272bf96a7721813c6cb53aebd26",
+    "channels": 1,
+    "frames": 423360,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "start": {
+    "source": "51bb1fb1f28491b3a26f61f863e3ceca973822b013960770e43285acbc3b1c5f",
+    "monoSha256": "d655b2a1edbcbd230bdbb565c51c0d644790f7f3e47419c682303ddc5389b4fb",
+    "channels": 1,
+    "frames": 317520,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  },
+  "stop": {
+    "source": "c3134cb525aafb076ce0731ebea551f69f4ce8502f1bc8d2544cffbe2901854d",
+    "monoSha256": "a1b9623399a8dffd184d0c0d923881ab1eb168b391767e8629b8bca970e14a9e",
+    "channels": 1,
+    "frames": 423360,
+    "rate": 44100,
+    "method": "Minecraft-range PCM, arithmetic channel average, Vorbis quality 10; no loudness normalization; original preserved",
+    "seamRepair": null
+  }
+}

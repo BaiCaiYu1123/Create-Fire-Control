@@ -10,6 +10,10 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.MediumcannonProjectileRenderer;
 
 public final class MediumCannonBreechClient {
+    public static final PartialModel RECOIL_BODY = PartialModel.of(ResourceLocation.fromNamespaceAndPath(
+            StabilizedTurret.MOD_ID,
+            "block/medium_cannon_breech/recoil"
+    ));
     public static final PartialModel MOVING_BREECH = PartialModel.of(ResourceLocation.fromNamespaceAndPath(
             StabilizedTurret.MOD_ID,
             "block/medium_cannon_breech/moving"
@@ -26,6 +30,10 @@ public final class MediumCannonBreechClient {
         );
         event.registerEntityRenderer(
                 ModCbcContent.APFSDS_MEDIUM_CANNON_PROJECTILE.get(),
+                MediumcannonProjectileRenderer::new
+        );
+        event.registerEntityRenderer(
+                ModCbcContent.ANNIHILATION_MEDIUM_CANNON_PROJECTILE.get(),
                 MediumcannonProjectileRenderer::new
         );
     }

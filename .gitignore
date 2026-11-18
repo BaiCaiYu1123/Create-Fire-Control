@@ -2,12 +2,22 @@
 .gradle/
 build/
 out/
+bin/
 *.iml
 .idea/
+.vs/
+.vscode/
+__pycache__/
+*.pyc
 
 # Local Minecraft run directories, profiling data and crash material
 /run*/
 /.diagnostics/
+/.agents/
+/analysis/
+/diagnostics/
+/dist/
+/port-tools/
 /.tools/
 /backups/
 /sound_preview*/
@@ -24,6 +34,7 @@ out/
 /assets/
 /data/
 /META-INF/
+/shaders/
 
 # Local binary artifacts and extracted runtime files
 /*.jar
@@ -32,3 +43,7 @@ out/
 /createbigcannons.mixins.json
 /icon.png
 /pack.mcmeta
+
+# Local packaging notes; canonical documentation lives in docs/
+/PACKAGE_README.txt
+/DEPENDENCIES.md

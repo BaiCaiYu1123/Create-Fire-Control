@@ -3,14 +3,12 @@ package com.hooya.stabilizedturret.network;
 import com.hooya.stabilizedturret.StabilizedTurret;
 import com.hooya.stabilizedturret.content.controller.BindingSlot;
 import com.hooya.stabilizedturret.content.controller.StabilizerControllerBlockEntity;
-import dev.ryanhcode.sable.Sable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record AssignBearingRolePayload(
@@ -44,8 +42,7 @@ public record AssignBearingRolePayload(
     public static void handle(AssignBearingRolePayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (!(context.player() instanceof ServerPlayer player)
-                    || Sable.HELPER.distanceSquaredWithSubLevels(
-                    player.level(), player.position(), Vec3.atCenterOf(payload.controllerPos)) > 64.0) {
+                    || !C2SWriteAuthorization.canEditNearby(player, payload.controllerPos)) {
                 return;
             }
             BindingSlot sourceRole;

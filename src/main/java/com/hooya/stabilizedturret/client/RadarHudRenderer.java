@@ -1,15 +1,17 @@
 package com.hooya.stabilizedturret.client;
 
 import com.hooya.stabilizedturret.StabilizedTurret;
+import com.hooya.stabilizedturret.content.controller.MianbaoAircraftCompat;
 import com.hooya.stabilizedturret.mixin.client.GameRendererAccessor;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -22,20 +24,32 @@ import java.util.UUID;
 
 @EventBusSubscriber(modid = StabilizedTurret.MOD_ID, value = Dist.CLIENT)
 public final class RadarHudRenderer {
-    private static final int GREEN = 0xEE00FF22;
-    private static final int VIEW_GREEN = 0xFF72FF88;
+    // Circular radar palette follows the aircraft scope: low-luminance slate
+    // glass, desaturated cyan symbology, and amber target/lock accents.
+    // Keeping alpha in the colours is intentional so the world remains
+    // readable through the HUD instead of being covered by an opaque panel.
+    private static final int GREEN = 0xD06ED8C7;
+    private static final int VIEW_GREEN = 0xE5B5F3E3;
+    private static final int RADAR_CONTACT_CYAN = 0xE7B8F4E4;
+    private static final int RADAR_CONTACT_AMBER = 0xF2E4B56A;
+    private static final int RADAR_LOCK_AMBER = 0xF6F4B866;
+    // The world-space lock frame keeps the original bright radar green.  The
+    // circular HUD palette above is intentionally left unchanged.
+    private static final int LOCK_FRAME_GREEN = 0xFF00FF00;
+    private static final int RADAR_DISC = 0x70222E36;
     private static final ResourceLocation RADAR_GRID = ResourceLocation.fromNamespaceAndPath(
             StabilizedTurret.MOD_ID, "textures/gui/radar_grid.png");
-    private static final ResourceLocation RADAR_CONTACT = ResourceLocation.fromNamespaceAndPath(
-            StabilizedTurret.MOD_ID, "textures/gui/radar_contact.png");
+    private static final ResourceLocation RWR_DIAL = ResourceLocation.fromNamespaceAndPath(
+            StabilizedTurret.MOD_ID, "textures/gui/rwr_dial.png");
 
     @SubscribeEvent
     public static void render(RenderGuiEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (!ClientRadarState.isActive() || ClientAimState.isPodView()
+                || ClientTelevisionGuidanceState.isActive()
                 || minecraft.options.hideGui || minecraft.screen != null) return;
         GuiGraphics graphics = event.getGuiGraphics();
-        float partialTick = event.getPartialTick().getGameTimeDeltaTicks();
+        float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
         if (ClientRadarState.isAircraftMode()) renderAircraftScope(graphics, minecraft, partialTick);
         else renderRadarScope(graphics, minecraft);
         if (ClientRadarState.isAircraftMode()
@@ -56,8 +70,162 @@ public final class RadarHudRenderer {
         int left = Mth.clamp((int)Math.round(maxX * ClientRadarState.getAircraftHudX() / 100.0), 0, maxX);
         int top = Mth.clamp((int)Math.round(maxY * ClientRadarState.getAircraftHudY() / 100.0), 0, maxY);
         drawTwsPanel(graphics, minecraft, left, top, width, height, partialTick, false, 0.0, 0.0, 0.0);
+        renderRwr(graphics, minecraft);
         // Flight data is intentionally independent from the movable radar panel.
         renderAircraftFlightInfo(graphics, minecraft, 8, 8);
+    }
+
+    private static void renderRwr(GuiGraphics graphics, Minecraft minecraft) {
+        if (ClientRadarState.getThreats().isEmpty()) return;
+        int screenW = graphics.guiWidth();
+        int screenH = graphics.guiHeight();
+        double scale = Mth.clamp(ClientRadarState.getRwrScale(), 40.0, 180.0) / 100.0;
+        // Measured from the supplied 2048x864 reference: diameter 11.8% W,
+        // centre 8.2% W / 52.5% H. Width-based sizing preserves the same
+        // circular HUD proportions on every aspect ratio.
+        int diameter = Math.max(48, (int) Math.round(screenW * 0.118 * scale));
+        int radius = diameter / 2;
+        int cx = Mth.clamp((int) Math.round(screenW * 0.082), radius + 2,
+                Math.max(radius + 2, screenW - radius - 2));
+        int cy = Mth.clamp((int) Math.round(screenH * 0.525), radius + 2,
+                Math.max(radius + 2, screenH - radius - 2));
+        int innerRadius = Math.max(12, (int) Math.round(radius * 0.64));
+        int centreRadius = Math.max(5, (int) Math.round(radius * 0.115));
+        int detailScale = Mth.clamp(
+                (int) Math.ceil(minecraft.getWindow().getGuiScale()), 1, 6);
+        // Use the same ARGB fill path as the radar panel for the translucent
+        // background. Some GUI texture pipelines treat partial texture alpha
+        // as cutout, which made the previous baked background look opaque.
+        fillRwrBackground(graphics, cx, cy, radius, 0x304D5359);
+        // The rings and ticks remain a single filtered texture draw.
+        graphics.blit(RWR_DIAL, cx - radius, cy - radius,
+                diameter, diameter, 0.0F, 0.0F,
+                1024, 1024, 1024, 1024);
+
+        // The reference labels are about 6.7% of the dial diameter. Scaling
+        // from the dial instead of using the fixed GUI font size keeps that
+        // ratio at every Minecraft GUI scale and screen resolution.
+        float labelScale = Math.max(0.1F,
+                (float) (diameter * 0.067 / minecraft.font.lineHeight));
+
+        Vec3 up = ClientRadarState.getUp();
+        if (up.lengthSqr() < 1.0e-8) up = new Vec3(0.0, 1.0, 0.0);
+        else up = up.normalize();
+        Vec3 forward = ClientRadarState.getForward();
+        forward = forward.subtract(up.scale(forward.dot(up)));
+        if (forward.lengthSqr() < 1.0e-8) forward = new Vec3(0.0, 0.0, -1.0);
+        else forward = forward.normalize();
+        Vec3 right = forward.cross(up);
+        if (right.lengthSqr() < 1.0e-8) right = new Vec3(1.0, 0.0, 0.0);
+        else right = right.normalize();
+
+        Vec3 origin = ClientRadarState.getOrigin();
+        double warningRange = Math.max(1.0, ClientRadarState.getRwrRange());
+        boolean flash = minecraft.level == null
+                || ((minecraft.level.getGameTime() / 5L) & 1L) == 0L;
+        for (ClientRadarState.Threat threat : ClientRadarState.getThreats()) {
+            if (!threat.incoming() || !flash) continue;
+            ThreatPoint point = rwrThreatPoint(
+                    minecraft, threat, origin, forward, right,
+                    cx, cy, innerRadius, centreRadius, warningRange, labelScale);
+            drawHighResolutionDashedLine(graphics, cx, cy,
+                    point.x(), point.y(), 0xE8F2F2F2, detailScale);
+        }
+        for (ClientRadarState.Threat threat : ClientRadarState.getThreats()) {
+            ThreatPoint point = rwrThreatPoint(
+                    minecraft, threat, origin, forward, right,
+                    cx, cy, innerRadius, centreRadius, warningRange, labelScale);
+            String label = threat.type().name();
+            drawScaledCenteredString(graphics, minecraft, label,
+                    point.x(), point.y(), labelScale, 0xFFF4F4F4);
+        }
+    }
+
+    private static void drawHighResolutionDashedLine(
+            GuiGraphics graphics,
+            int x0,
+            int y0,
+            int x1,
+            int y1,
+            int color,
+            int detailScale
+    ) {
+        int dx = (x1 - x0) * detailScale;
+        int dy = (y1 - y0) * detailScale;
+        int length = (int) Math.round(Math.hypot(dx, dy));
+        if (length <= 0) return;
+        graphics.pose().pushPose();
+        graphics.pose().scale(1.0F / detailScale, 1.0F / detailScale, 1.0F);
+        graphics.pose().translate(x0 * detailScale, y0 * detailScale, 0.0F);
+        graphics.pose().mulPose(Axis.ZP.rotation((float) Math.atan2(dy, dx)));
+        int dashLength = 4 * detailScale;
+        int period = 7 * detailScale;
+        for (int start = 0; start < length; start += period) {
+            graphics.fill(start, 0, Math.min(start + dashLength, length), 1, color);
+        }
+        graphics.pose().popPose();
+    }
+
+    private static void drawScaledCenteredString(
+            GuiGraphics graphics,
+            Minecraft minecraft,
+            String text,
+            int x,
+            int y,
+            float scale,
+            int color
+    ) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(x, y, 0.0F);
+        graphics.pose().scale(scale, scale, 1.0F);
+        graphics.drawString(minecraft.font, text,
+                -minecraft.font.width(text) / 2,
+                -minecraft.font.lineHeight / 2,
+                color, false);
+        graphics.pose().popPose();
+    }
+
+    private static ThreatPoint rwrThreatPoint(
+            Minecraft minecraft,
+            ClientRadarState.Threat threat,
+            Vec3 origin,
+            Vec3 forward,
+            Vec3 right,
+            int cx,
+            int cy,
+            int innerRadius,
+            int centreRadius,
+            double warningRange,
+            float labelScale
+    ) {
+        Vec3 delta = threat.position().subtract(origin);
+        double bearing = Math.atan2(delta.dot(right), delta.dot(forward));
+        String label = threat.type().name();
+        double halfDiagonal = 0.5 * Math.hypot(
+                minecraft.font.width(label) * labelScale,
+                minecraft.font.lineHeight * labelScale);
+        double maximumRadius = Math.max(0.0, innerRadius - halfDiagonal - 2.0);
+        double minimumRadius = Math.min(maximumRadius,
+                centreRadius + minecraft.font.lineHeight * labelScale * 0.75);
+        double markerRadius = Mth.clamp(
+                delta.length() / warningRange * maximumRadius,
+                minimumRadius,
+                maximumRadius);
+        return new ThreatPoint(
+                cx + (int) Math.round(Math.sin(bearing) * markerRadius),
+                cy - (int) Math.round(Math.cos(bearing) * markerRadius));
+    }
+
+    private static void fillRwrBackground(
+            GuiGraphics graphics, int cx, int cy, int radius, int color
+    ) {
+        long radiusSquared = radius * (long) radius;
+        for (int y = -radius; y <= radius; y++) {
+            int halfWidth = (int) Math.floor(Math.sqrt(Math.max(
+                    0L, radiusSquared - y * (long) y)));
+            graphics.fill(cx - halfWidth, cy + y,
+                    cx + halfWidth + 1, cy + y + 1, color);
+        }
     }
 
     /** One renderer is shared by the live HUD and the controller preview. */
@@ -72,14 +240,12 @@ public final class RadarHudRenderer {
         int centerX = (plotLeft + plotRight) / 2;
         g.fill(plotLeft, plotTop, plotRight, plotBottom, 0xAA26343D);
 
-        g.drawCenteredString(mc.font, "TWS", x + width / 2, y + Math.round(height * 8F / 450F), white);
+        g.drawCenteredString(mc.font, Component.translatable("hud.create_fire_control.radar.tws"), x + width / 2, y + Math.round(height * 8F / 450F), white);
         double halfAngle = preview ? previewHalfAngle : ClientRadarState.getAircraftHorizontalHalfAngle();
         double vertical = preview ? previewVerticalAngle : ClientRadarState.getAircraftVerticalAngle();
         double radarRange = preview ? previewRange : ClientRadarState.getRange();
         String scan = String.format(Locale.ROOT, "%.0f°×%.0f° *", halfAngle, vertical);
-        String range = radarRange >= 1000.0
-                ? String.format(Locale.ROOT, radarRange < 10000.0 ? "%.1f km" : "%.0f km", radarRange / 1000.0)
-                : String.format(Locale.ROOT, "%.0f m", radarRange);
+        Component range = radarRangeText(radarRange, radarRange >= 10000.0);
         g.drawString(mc.font, scan, plotLeft, y + Math.round(height * 31F / 450F), white, false);
         g.drawString(mc.font, range, plotRight - mc.font.width(range),
                 y + Math.round(height * 31F / 450F), white, false);
@@ -102,8 +268,6 @@ public final class RadarHudRenderer {
             int gy = plotTop + (plotBottom - plotTop) * row / 4;
             g.fill(plotLeft, gy, plotRight, gy + 1, grid);
         }
-        g.fill(centerX - 1, plotTop, centerX + 2, plotBottom, 0xC9DCE4E7);
-
         // Triangle-wave sweep: left -> right -> left, with no wrap/jump.
         long time = mc.level == null ? 0L : mc.level.getGameTime();
         double phase = (time % 160L) / 80.0;
@@ -128,9 +292,9 @@ public final class RadarHudRenderer {
         if (preview) {
             int px = plotLeft + (plotRight - plotLeft) * 2 / 5;
             int py = plotBottom - (plotBottom - plotTop) / 5;
-            drawWhiteAircraftSymbol(g, px, py, Math.max(3, width / 55));
+            drawWhiteContactCircle(g, px, py, Math.max(3, width / 55));
             drawWhiteSelectionBars(g, px, py, Math.max(3, width / 55));
-            drawWhiteAircraftSymbol(g, centerX + (plotRight - plotLeft) / 5,
+            drawWhiteContactCircle(g, centerX + (plotRight - plotLeft) / 5,
                     plotBottom - (plotBottom - plotTop) / 3, Math.max(3, width / 55));
             return;
         }
@@ -149,36 +313,111 @@ public final class RadarHudRenderer {
             int px = centerX + (int)Math.round(azimuth / halfAngle * (plotRight - plotLeft) / 2.0);
             int py = plotBottom - (int)Math.round(distance / radarRange * (plotBottom - plotTop));
             int icon = Math.max(3, width / 55);
-            drawWhiteAircraftSymbol(g, px, py, icon);
-            if (selected != null && selected.id().equals(contact.id())) drawWhiteSelectionBars(g, px, py, icon);
+            int contactColor = ClientRadarMemory.controllerColor(contact.id(), 0xFFF2F5F6);
+            drawWhiteContactCircle(g, px, py, icon, contactColor);
+            if (selected != null && selected.id().equals(contact.id())) drawWhiteSelectionBars(g, px, py, icon, contactColor);
         }
     }
 
     private static void renderAircraftFlightInfo(GuiGraphics graphics, Minecraft minecraft, int x, int y) {
-        int color = 0xEEDDE5E8;
+        if (!ClientVisualConfig.showAircraftHud()) return;
+        int color = ClientVisualConfig.hudTextColor(0xEEDDE5E8);
         Vec3 velocity = ClientRadarState.getOwnVelocity();
         double metresPerSecond = velocity.length() * 20.0;
-        graphics.drawString(minecraft.font, String.format(Locale.ROOT, "速度      %.0f km/h", metresPerSecond * 3.6), x, y, color, false);
-        graphics.drawString(minecraft.font, String.format(Locale.ROOT, "马赫数    %.2f", metresPerSecond / 340.3), x, y + 11, color, false);
-        graphics.drawString(minecraft.font, String.format(Locale.ROOT, "高度      %.0f m", ClientRadarState.getOrigin().y), x, y + 22, color, false);
-        String[] names = {"远距离空空弹", "中距离空空弹", "近距离空空弹",
-                "普通空地弹", "攻顶空地弹", "激光制导弹"};
-        int[] ammo = {ClientRadarState.getFarAmmo(), ClientRadarState.getMediumAmmo(),
+        graphics.drawString(minecraft.font, Component.translatable("hud.create_fire_control.aircraft.speed",
+                String.format(Locale.ROOT, "%.0f", metresPerSecond * 3.6)), x, y, color, false);
+        graphics.drawString(minecraft.font, Component.translatable("hud.create_fire_control.aircraft.mach",
+                String.format(Locale.ROOT, "%.2f", metresPerSecond / 340.3)), x, y + 11, color, false);
+        graphics.drawString(minecraft.font, Component.translatable("hud.create_fire_control.aircraft.altitude",
+                String.format(Locale.ROOT, "%.0f", ClientRadarState.getOrigin().y)), x, y + 22, color, false);
+        int[] legacyAmmo = {ClientRadarState.getFarAmmo(), ClientRadarState.getMediumAmmo(),
                 ClientRadarState.getCloseAmmo(), ClientRadarState.getAirToGroundDirectAmmo(),
-                ClientRadarState.getAirToGroundTopAttackAmmo(), ClientRadarState.getLaserGuidedAmmo()};
-        for (int i = 0; i < names.length; i++) {
-            graphics.drawString(minecraft.font,
-                    (i == ClientRadarState.getSelectedAircraftWeapon() ? "> " : "  ") + names[i] + "  " + ammo[i],
+                ClientRadarState.getAirToGroundTopAttackAmmo(), ClientRadarState.getLaserGuidedAmmo(),
+                ClientRadarState.getRocketAmmo(), ClientRadarState.getOpticalGuidedAmmo(),
+                ClientRadarState.getMicaEmAmmo(), ClientRadarState.getAim120dAmmo()};
+        int[] ammo = java.util.Arrays.copyOf(legacyAmmo, MianbaoAircraftCompat.WeaponType.values().length);
+        ammo[MianbaoAircraftCompat.WeaponType.ANTI_RADIATION.ordinal()] = AntiRadiationHudRenderer.ammo();
+        String[] weaponLines = aircraftWeaponHudLines(
+                ClientRadarState.getSelectedAircraftWeapon(), ammo);
+        for (int i = 0; i < weaponLines.length; i++) {
+            graphics.drawString(minecraft.font, weaponLines[i],
                     x, y + 42 + i * 11, color, false);
         }
+        graphics.drawString(minecraft.font, ClientBombSight.weaponLine(),
+                x, y + 42 + weaponLines.length * 11, color, false);
+    }
+
+    static String[] aircraftWeaponHudLines(int selectedWeapon, int[] ammo) {
+        String[] categories = {
+                Component.translatable("hud.create_fire_control.aircraft.air_to_air").getString(),
+                Component.translatable("hud.create_fire_control.aircraft.air_to_ground").getString(),
+                Component.translatable("hud.create_fire_control.aircraft.rockets").getString()
+        };
+        String[] lines = {"  " + categories[0], "  " + categories[1], "  " + categories[2]};
+        if (ammo == null || ammo.length < 10 || selectedWeapon < 0 || selectedWeapon >= ammo.length
+                || selectedWeapon >= MianbaoAircraftCompat.WeaponType.values().length
+                || com.hooya.stabilizedturret.content.controller.MianbaoBombCompat
+                .isBomb(MianbaoAircraftCompat.WeaponType.values()[selectedWeapon])) {
+            return lines;
+        }
+
+        int category;
+        int categoryTotal;
+        if (selectedWeapon <= 2 || selectedWeapon == 8 || selectedWeapon == 9) {
+            category = 0;
+            categoryTotal = ammo[0] + ammo[1] + ammo[2] + ammo[8] + ammo[9];
+        } else if (selectedWeapon == 6) {
+            category = 2;
+            categoryTotal = ammo[6];
+        } else {
+            category = 1;
+            categoryTotal = ammo[3] + ammo[4] + ammo[5] + ammo[7];
+            int anti = MianbaoAircraftCompat.WeaponType.ANTI_RADIATION.ordinal();
+            if (ammo.length > anti) categoryTotal += ammo[anti];
+        }
+
+        Component model = MianbaoAircraftCompat.WeaponType.values()[selectedWeapon].displayName();
+        if (category == 2) {
+            lines[category] = Component.translatable("hud.create_fire_control.aircraft.rockets_selected",
+                    categories[category], categoryTotal).getString();
+        } else {
+            lines[category] = Component.translatable("hud.create_fire_control.aircraft.weapon_selected",
+                    categories[category], model, ammo[selectedWeapon], categoryTotal).getString();
+        }
+        return lines;
     }
 
     private static void drawWhiteAircraftSymbol(GuiGraphics g,int x,int y,int size){
         int c=0xFFF2F5F6;g.fill(x,y-size,x+1,y+size+1,c);g.fill(x-size,y-1,x+size+1,y+1,c);
         g.fill(x-size/2,y+2,x+size/2+1,y+3,c);
     }
+    private static void drawWhiteContactCircle(GuiGraphics g,int centerX,int centerY,int radius){
+        drawWhiteContactCircle(g, centerX, centerY, radius, 0xFFF2F5F6);
+    }
+    private static void drawWhiteContactCircle(GuiGraphics g,int centerX,int centerY,int radius,int c){
+        int x=Math.max(2,radius),y=0,error=1-x;
+        while(y<=x){
+            drawCircleOctants(g,centerX,centerY,x,y,c);
+            y++;
+            if(error<=0) error+=2*y+1;
+            else { x--; error+=2*(y-x)+1; }
+        }
+    }
+    private static void drawCircleOctants(GuiGraphics g,int centerX,int centerY,int x,int y,int color){
+        g.fill(centerX+x,centerY+y,centerX+x+1,centerY+y+1,color);
+        g.fill(centerX+y,centerY+x,centerX+y+1,centerY+x+1,color);
+        g.fill(centerX-y,centerY+x,centerX-y+1,centerY+x+1,color);
+        g.fill(centerX-x,centerY+y,centerX-x+1,centerY+y+1,color);
+        g.fill(centerX-x,centerY-y,centerX-x+1,centerY-y+1,color);
+        g.fill(centerX-y,centerY-x,centerX-y+1,centerY-x+1,color);
+        g.fill(centerX+y,centerY-x,centerX+y+1,centerY-x+1,color);
+        g.fill(centerX+x,centerY-y,centerX+x+1,centerY-y+1,color);
+    }
     private static void drawWhiteSelectionBars(GuiGraphics g,int x,int y,int size){
-        int c=0xFFF2F5F6,gap=size+3;g.fill(x-gap,y-size,x-gap+2,y+size+1,c);g.fill(x+gap-1,y-size,x+gap+1,y+size+1,c);
+        drawWhiteSelectionBars(g, x, y, size, 0xFFF2F5F6);
+    }
+    private static void drawWhiteSelectionBars(GuiGraphics g,int x,int y,int size,int c){
+        int gap=size+3;g.fill(x-gap,y-size,x-gap+2,y+size+1,c);g.fill(x+gap-1,y-size,x+gap+1,y+size+1,c);
     }
 
     private static ClientRadarState.Contact selectedAircraftContact(Minecraft minecraft,float partialTick){
@@ -212,17 +451,19 @@ public final class RadarHudRenderer {
         int radius = Math.max(1, (int) Math.round(diameter * 0.459));
 
         float sweep = ClientRadarState.getSweepDegrees();
+        int radarRgb = GREEN & 0x00FFFFFF;
         for (int trail = 3; trail >= 0; trail--) {
             int alpha = trail == 0 ? 0xE8 : 0x22 + (3 - trail) * 0x24;
             drawRadialLine(graphics, cx, cy, radius, sweep - trail * 2.2F,
-                    (alpha << 24) | 0x00FF22, trail == 0 ? 2 : 1);
+                    (alpha << 24) | radarRgb, trail == 0 ? 2 : 1);
         }
 
         Vector3f look = minecraft.gameRenderer.getMainCamera().getLookVector();
         float viewDegrees = (float) Math.toDegrees(Math.atan2(look.x, -look.z));
-        drawRadialLine(graphics, cx, cy, (int) Math.round(radius * 0.88),
-                viewDegrees, VIEW_GREEN, 2);
-        drawDirectionTip(graphics, cx, cy, radius, viewDegrees);
+        // Player heading is deliberately a single, flat line. It reaches the
+        // circular grid edge directly; there is no arrow head or protrusion.
+        drawRadialLine(graphics, cx, cy, radius,
+                viewDegrees, VIEW_GREEN, 1);
 
         Vec3 origin = ClientRadarState.getOrigin();
         double range = Math.max(1.0, ClientRadarState.getRange());
@@ -233,16 +474,62 @@ public final class RadarHudRenderer {
             int x = cx + (int) Math.round(delta.x / range * radius);
             int y = cy + (int) Math.round(delta.z / range * radius);
             if ((x - cx) * (long) (x - cx) + (y - cy) * (long) (y - cy) > radius * (long) radius) continue;
-            drawAircraft(graphics, x, y, iconSize, contact.velocity());
-            if (contact.id().equals(locked)) drawRadarLockBars(graphics, x, y, iconSize);
+            drawSmoothContactCircle(graphics, x, y, Math.max(2.5F, iconSize * 0.56F),
+                    ClientRadarMemory.controllerColor(contact.id(), contact.missile() ? RADAR_CONTACT_AMBER : RADAR_CONTACT_CYAN));
+            if (contact.id().equals(locked)) drawRadarLockBars(graphics, x, y, iconSize,
+                    ClientRadarMemory.controllerColor(contact.id(), RADAR_LOCK_AMBER));
         }
 
         drawCompassLabels(graphics, minecraft, left, top, diameter, cx, cy, radius);
     }
 
     private static void drawRadarTexture(GuiGraphics graphics, int x, int y, int size) {
+        // The transparent grid texture's outer green ring is inset from its
+        // square bounds. Match the glass disc to that ring instead of filling
+        // the whole texture; otherwise a dark stepped halo appears outside
+        // the radar, especially against bright terrain or sky.
+        int radius = Math.max(1, (int) Math.round(size * 0.459));
+        fillCircularBackground(graphics, x + size / 2, y + size / 2, radius, RADAR_DISC);
+
+        // The source grid is deliberately kept as a transparent circular
+        // texture so existing resource-pack overrides still work. Tinting it
+        // at draw time gives the circular scope the aircraft-style cyan glass
+        // treatment without changing the texture contract.
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShaderColor(0.56F, 0.90F, 0.78F, 0.74F);
         graphics.blit(RADAR_GRID, x, y, size, size, 0.0F, 0.0F,
                 1024, 1024, 1024, 1024);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    }
+
+    private static void fillCircularBackground(
+            GuiGraphics graphics, int cx, int cy, int radius, int color
+    ) {
+        long radiusSquared = radius * (long) radius;
+        int baseAlpha = color >>> 24;
+        for (int y = -radius; y <= radius; y++) {
+            double halfWidthExact = Math.sqrt(Math.max(
+                    0.0, radiusSquared - y * (long) y));
+            int halfWidth = (int) Math.floor(halfWidthExact);
+            graphics.fill(cx - halfWidth, cy + y,
+                    cx + halfWidth + 1, cy + y + 1, color);
+            // Add fractional edge coverage so the dark glass disc does not
+            // produce the stepped grey halo visible around the old HUD.
+            float edgeCoverage = (float) (halfWidthExact - halfWidth);
+            if (edgeCoverage > 0.01F) {
+                int edgeColor = withAlpha(color,
+                        Math.round(baseAlpha * edgeCoverage));
+                graphics.fill(cx - halfWidth - 1, cy + y,
+                        cx - halfWidth, cy + y + 1, edgeColor);
+                graphics.fill(cx + halfWidth + 1, cy + y,
+                        cx + halfWidth + 2, cy + y + 1, edgeColor);
+            }
+        }
+    }
+
+    private static int withAlpha(int color, int alpha) {
+        return (Mth.clamp(alpha, 0, 255) << 24) | (color & 0x00FFFFFF);
     }
 
     private static void drawCompassLabels(
@@ -258,15 +545,13 @@ public final class RadarHudRenderer {
                 cy - 4, GREEN, false);
 
         int textY = top + diameter + 10;
-        graphics.drawString(minecraft.font, "SRC", left, textY, GREEN, false);
+        graphics.drawString(minecraft.font, Component.translatable("hud.create_fire_control.radar.search"), left, textY, GREEN, false);
         graphics.drawString(minecraft.font,
                 "360°  ↑" + Math.round(ClientRadarState.getElevation())
                         + "°  ↓" + Math.round(ClientRadarState.getDepression()) + "°",
                 left, textY + 10, GREEN, false);
         double displayRange = ClientRadarState.getRange();
-        String distance = displayRange >= 1000.0
-                ? String.format(Locale.ROOT, "%.1f km*", displayRange / 1000.0)
-                : String.format(Locale.ROOT, "%.0f m*", displayRange);
+        Component distance = radarRangeText(displayRange, false).copy().append("*");
         graphics.drawString(minecraft.font, distance, left, textY + 20, GREEN, false);
     }
 
@@ -281,26 +566,41 @@ public final class RadarHudRenderer {
         graphics.pose().popPose();
     }
 
-    private static void drawDirectionTip(GuiGraphics graphics, int cx, int cy, int radius, float degrees) {
-        graphics.pose().pushPose();
-        graphics.pose().translate(cx, cy, 0.0F);
-        graphics.pose().mulPose(Axis.ZP.rotationDegrees(degrees));
-        int y = -(int) Math.round(radius * 0.88);
-        graphics.fill(-3, y, 4, y + 1, VIEW_GREEN);
-        graphics.fill(-2, y - 1, 3, y, VIEW_GREEN);
-        graphics.pose().popPose();
+    private static void drawAircraft(GuiGraphics graphics, int x, int y, int size, Vec3 velocity) {
+        drawSmoothContactCircle(graphics, x, y,
+                Math.max(2.5F, size * 0.56F), RADAR_CONTACT_CYAN);
     }
 
-    private static void drawAircraft(GuiGraphics graphics, int x, int y, int size, Vec3 velocity) {
-        float heading = velocity.horizontalDistanceSqr() > 1.0e-6
-                ? (float) Math.toDegrees(Math.atan2(velocity.x, -velocity.z)) : 0.0F;
-        graphics.pose().pushPose();
-        graphics.pose().translate(x, y, 0.0F);
-        graphics.pose().mulPose(Axis.ZP.rotationDegrees(heading));
-        int half = size / 2;
-        graphics.blit(RADAR_CONTACT, -half, -half, size, size, 0.0F, 0.0F,
-                256, 256, 256, 256);
-        graphics.pose().popPose();
+    /**
+     * Draws a small anti-aliased ring using pixel coverage rather than a
+     * blocky octant approximation. This keeps contacts circular at the small
+     * sizes used by the radar scope.
+     */
+    private static void drawSmoothContactCircle(
+            GuiGraphics graphics, int centerX, int centerY,
+            float radius, int color
+    ) {
+        float halfThickness = Math.max(0.75F, radius * 0.20F);
+        float ringRadius = Math.max(0.75F, radius - halfThickness);
+        int extent = (int) Math.ceil(radius + 1.0F);
+        for (int y = -extent; y <= extent; y++) {
+            for (int x = -extent; x <= extent; x++) {
+                float distance = (float) Math.hypot(x + 0.5F, y + 0.5F);
+                float coverage = 1.0F - Math.abs(distance - ringRadius)
+                        / (halfThickness + 0.75F);
+                if (coverage <= 0.01F) continue;
+                coverage = Mth.clamp(coverage, 0.0F, 1.0F);
+                graphics.fill(centerX + x, centerY + y,
+                        centerX + x + 1, centerY + y + 1,
+                        withAlpha(color, Math.round((color >>> 24) * coverage)));
+            }
+        }
+    }
+
+    /** A narrow arrow-and-fins glyph, deliberately distinct from the aircraft silhouette. */
+    private static void drawMissile(GuiGraphics graphics, int x, int y, int size, Vec3 velocity) {
+        drawSmoothContactCircle(graphics, x, y,
+                Math.max(2.5F, size * 0.56F), RADAR_CONTACT_AMBER);
     }
 
     public static void renderPreview(GuiGraphics graphics, int x, int y, int size) {
@@ -312,7 +612,7 @@ public final class RadarHudRenderer {
         drawRadialLine(graphics, cx, cy, (int) Math.round(radius * 0.88), -18.0F, VIEW_GREEN, 1);
         int icon = Mth.clamp(size / 22, 3, 6);
         drawAircraft(graphics, cx + radius / 3, cy - radius / 4, icon, new Vec3(0.4, 0.0, -0.8));
-        drawAircraft(graphics, cx - radius / 2, cy + radius / 3, icon, new Vec3(-0.4, 0.0, 0.6));
+        drawMissile(graphics, cx - radius / 2, cy + radius / 3, icon, new Vec3(-0.4, 0.0, 0.6));
     }
 
     public static void renderAircraftPreview(GuiGraphics graphics, int x, int y, int width, int height,
@@ -324,40 +624,47 @@ public final class RadarHudRenderer {
     }
 
     private static void drawRadarLockBars(GuiGraphics graphics, int x, int y, int iconSize) {
+        drawRadarLockBars(graphics, x, y, iconSize, RADAR_LOCK_AMBER);
+    }
+    private static void drawRadarLockBars(GuiGraphics graphics, int x, int y, int iconSize, int color) {
         int half = Math.max(2, iconSize / 2);
         int gap = half + 2;
-        graphics.fill(x - gap - 1, y - half, x - gap, y + half + 1, GREEN);
-        graphics.fill(x + gap, y - half, x + gap + 1, y + half + 1, GREEN);
+        graphics.fill(x - gap - 1, y - half, x - gap, y + half + 1, color);
+        graphics.fill(x + gap, y - half, x + gap + 1, y + half + 1, color);
     }
 
     private static void renderWorldFrames(GuiGraphics graphics, Minecraft minecraft, float partialTick) {
         int width = graphics.guiWidth();
+        int height = graphics.guiHeight();
         if (ClientRadarState.isAircraftMode()) {
             ClientRadarState.Contact contact = selectedAircraftContact(minecraft, partialTick);
             if (contact == null) return;
-            ScreenPoint center = project(minecraft, contact.center(), width, graphics.guiHeight(), partialTick);
-            ScreenSize size = projectBounds(minecraft, contact.bounds(), graphics.guiHeight(), partialTick);
-            if (center == null || size == null) return;
-            int half = Mth.clamp((Math.max(size.width,size.height)+1)/2+2,7,220);
-            drawCornerSquare(graphics,center.x,center.y,half);
-            double distance=contact.center().distanceTo(ClientRadarState.getOrigin());
-            Vec3 los=contact.center().subtract(ClientRadarState.getOrigin()).normalize();
-            double closing=-contact.velocity().subtract(ClientRadarState.getOwnVelocity()).dot(los)*20.0;
-            String text=String.format(Locale.ROOT,"%.1f km   %.0f m/s",distance/1000.0,closing);
-            graphics.drawCenteredString(minecraft.font,text,center.x,center.y-half-12,GREEN);
+            ScreenPoint center = project(minecraft, contact.center(), width, height, partialTick);
+            if (center == null) return;
+            TargetLockFrame.render(graphics, minecraft, center.x, center.y, height,
+                    TargetLockFrame.Style.AIRCRAFT_RADAR, ClientRadarMemory.controllerColor(contact.id(), LOCK_FRAME_GREEN),
+                    contact.center(), contact.telemetry());
             return;
         }
-        int height = graphics.guiHeight();
         UUID locked = ClientRadarState.getLockedTarget();
         for (ClientRadarState.Contact contact : ClientRadarState.getContacts()) {
-            ScreenPoint center = project(minecraft, contact.center(), width, height, partialTick);
-            ScreenSize size = projectBounds(minecraft, contact.bounds(), height, partialTick);
-            if (center == null || size == null) continue;
-            int half = Mth.clamp((Math.max(size.width, size.height) + 1) / 2 + 2, 7, 220);
+            Vec3 target = contact.center();
+            boolean remembered = ClientRadarMemory.remembered(contact.id());
+            if (contact.id().equals(locked) && !remembered) {
+                Vec3 smooth = ClientCannonLockLead.radarTarget();
+                if (smooth != null) target = smooth;
+            }
+            ScreenPoint center = project(minecraft, target, width, height, partialTick);
+            if (center == null) continue;
             if (contact.id().equals(locked)) {
-                drawConnectedSquare(graphics, center.x, center.y, half);
+                if (!remembered) CannonLeadHud.render(graphics, minecraft, center.x, center.y,
+                        ClientCannonLockLead.radarAimPoint(target, partialTick),
+                        ClientCannonLockLead.radarStatus(), partialTick, LOCK_FRAME_GREEN);
+                TargetLockFrame.render(graphics, minecraft, center.x, center.y, height,
+                        TargetLockFrame.Style.GROUND_RADAR, ClientRadarMemory.controllerColor(contact.id(), LOCK_FRAME_GREEN),
+                        target, contact.telemetry());
             } else {
-                drawCornerSquare(graphics, center.x, center.y, half);
+                TargetLockFrame.renderRadarContact(graphics, center.x, center.y, height, ClientRadarMemory.controllerColor(contact.id(), GREEN));
             }
         }
     }
@@ -405,53 +712,15 @@ public final class RadarHudRenderer {
         return new ScreenPoint(x, y);
     }
 
-    private static ScreenSize projectBounds(Minecraft minecraft, AABB bounds, int height, float partialTick) {
-        Camera camera = minecraft.gameRenderer.getMainCamera();
-        Vector3f forwardVector = camera.getLookVector();
-        Vector3f leftVector = camera.getLeftVector();
-        Vector3f upVector = camera.getUpVector();
-        Vec3 forward = new Vec3(forwardVector.x, forwardVector.y, forwardVector.z);
-        Vec3 left = new Vec3(leftVector.x, leftVector.y, leftVector.z);
-        Vec3 up = new Vec3(upVector.x, upVector.y, upVector.z);
-        double fov = ((GameRendererAccessor) (Object) minecraft.gameRenderer)
-                .stabilizedTurret$getFov(camera, partialTick, true);
-        double focal = height * 0.5 / Math.tan(Mth.DEG_TO_RAD * fov * 0.5);
-        double minX = Double.POSITIVE_INFINITY, minY = Double.POSITIVE_INFINITY;
-        double maxX = Double.NEGATIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
-        int visible = 0;
-        for (int ix = 0; ix < 2; ix++) for (int iy = 0; iy < 2; iy++) for (int iz = 0; iz < 2; iz++) {
-            Vec3 corner = new Vec3(ix == 0 ? bounds.minX : bounds.maxX,
-                    iy == 0 ? bounds.minY : bounds.maxY,
-                    iz == 0 ? bounds.minZ : bounds.maxZ);
-            Vec3 relative = corner.subtract(camera.getPosition());
-            double depth = relative.dot(forward);
-            if (depth <= 0.05) continue;
-            double x = -relative.dot(left) * focal / depth;
-            double y = -relative.dot(up) * focal / depth;
-            minX = Math.min(minX, x); maxX = Math.max(maxX, x);
-            minY = Math.min(minY, y); maxY = Math.max(maxY, y);
-            visible++;
-        }
-        return visible == 0 ? null : new ScreenSize(
-                (int) Math.ceil(maxX - minX), (int) Math.ceil(maxY - minY));
-    }
-
-    private static void drawCornerSquare(GuiGraphics graphics, int x, int y, int half) {
-        int arm = Math.max(4, half / 3);
-        int l = x - half, r = x + half, t = y - half, b = y + half;
-        graphics.fill(l, t, l + arm, t + 1, GREEN); graphics.fill(l, t, l + 1, t + arm, GREEN);
-        graphics.fill(r - arm, t, r, t + 1, GREEN); graphics.fill(r - 1, t, r, t + arm, GREEN);
-        graphics.fill(l, b - 1, l + arm, b, GREEN); graphics.fill(l, b - arm, l + 1, b, GREEN);
-        graphics.fill(r - arm, b - 1, r, b, GREEN); graphics.fill(r - 1, b - arm, r, b, GREEN);
-    }
-
-    private static void drawConnectedSquare(GuiGraphics graphics, int x, int y, int half) {
-        int l=x-half, r=x+half, t=y-half, b=y+half;
-        graphics.fill(l,t,r,t+1,GREEN); graphics.fill(l,b-1,r,b,GREEN);
-        graphics.fill(l,t+1,l+1,b-1,GREEN); graphics.fill(r-1,t+1,r,b-1,GREEN);
+    private static Component radarRangeText(double metres, boolean wholeKilometres) {
+        return metres >= 1000.0
+                ? Component.translatable("screen.create_fire_control.connected_display.range.kilometers",
+                        String.format(Locale.ROOT, wholeKilometres ? "%.0f" : "%.1f", metres / 1000.0))
+                : Component.translatable("screen.create_fire_control.connected_display.range.meters",
+                        String.format(Locale.ROOT, "%.0f", metres));
     }
 
     private record ScreenPoint(int x, int y) {}
-    private record ScreenSize(int width, int height) {}
+    private record ThreatPoint(int x, int y) {}
     private RadarHudRenderer() {}
 }

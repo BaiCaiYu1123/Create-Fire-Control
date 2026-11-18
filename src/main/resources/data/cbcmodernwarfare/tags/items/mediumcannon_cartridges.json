@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "stabilized_turret:apfsds_medium_cannon_cartridge"
+    "create_fire_control:apfsds_medium_cannon_cartridge",
+    "create_fire_control:annihilation_medium_cannon_cartridge"
   ]
 }

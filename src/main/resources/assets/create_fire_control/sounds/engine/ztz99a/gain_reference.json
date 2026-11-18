@@ -1,0 +1,44 @@
+{
+  "source": "https://github.com/GaijinEntertainment/fmod_studio_warthunder_for_modders/blob/master/Metadata/Event/%7B63385eb2-f16b-4574-9740-3f308964a659%7D.xml",
+  "sha256": "8baa18e127905d8821a7d7ad1f8755164be1a9ea0c0129d27f55b61a95fb2912",
+  "parameterId": "{5ef70fb5-a09f-4cf2-bf00-99ac247b0865}",
+  "interpolation": "Default shapes: 1001 native FMOD response points normalized to these endpoints, interpolated in dB. Custom shapes smoothly blend/warp these tables (approximate). See native_load_response.json for provenance.",
+  "curves": {
+    "layer00": {
+      "groupId": "{a9b40670-dabb-42fe-b10c-4c87dc3f34c4}",
+      "curveId": "{892a599c-8523-44d7-b8ec-132013fbe939}",
+      "points": [
+        {
+          "id": "{5dfa8850-7bcb-4090-9d21-19b86cc273b3}",
+          "load": 0.0,
+          "db": 2.0,
+          "curveShape": 0.822146177
+        },
+        {
+          "id": "{7c64168d-592a-4c2e-bbc3-18b086b3a903}",
+          "load": 1.0,
+          "db": -80.0,
+          "curveShape": 0.0
+        }
+      ]
+    },
+    "layer06": {
+      "groupId": "{87a22eed-e63c-49f7-b656-49cf9bb89189}",
+      "curveId": "{da743148-90b1-48e5-a1ef-83e0cc1d7899}",
+      "points": [
+        {
+          "id": "{204bc422-b63d-452c-8d9d-ba540c7b917f}",
+          "load": 0.0,
+          "db": 0.0,
+          "curveShape": -0.450167418
+        },
+        {
+          "id": "{754ffe22-f39e-407e-998d-86d9df489740}",
+          "load": 0.9971751412429378,
+          "db": 6.0,
+          "curveShape": 0.0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": true,
+  "textures": {
+    "layer0": "create_fire_control:block/gas_turbine",
+    "particle": "create_fire_control:block/gas_turbine_particle"
+  },
+  "loader": "neoforge:obj",
+  "flip_v": true,
+  "automatic_culling": false,
+  "shade_quads": true,
+  "model": "create_fire_control:models/block/gas_turbine/positive.obj"
+}

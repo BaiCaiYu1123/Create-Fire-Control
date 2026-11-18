@@ -1,0 +1,5 @@
+{
+  "type":"minecraft:crafting_shaped","category":"redstone","pattern":[" P ","BLB"," R "],
+  "key":{"P":{"item":"create:precision_mechanism"},"B":{"item":"create:brass_sheet"},"L":{"item":"create:brass_casing"},"R":{"item":"create:redstone_link"}},
+  "result":{"id":"create_fire_control:wireless_signal_processor","count":1}
+}

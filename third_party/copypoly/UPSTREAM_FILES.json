@@ -1,0 +1,462 @@
+[
+  {
+    "path": ".gitignore",
+    "upstreamSha256": "63c992a373143a8758afd6857e63536c8d3d6ac46796833b52f5949429c43b5a",
+    "vendoredSha256": "63c992a373143a8758afd6857e63536c8d3d6ac46796833b52f5949429c43b5a"
+  },
+  {
+    "path": "build.gradle",
+    "upstreamSha256": "0a39b0f571b0ffccc3ce3562322094b1447dba406c1a986e24b36263e9b6fcbc",
+    "vendoredSha256": "0a39b0f571b0ffccc3ce3562322094b1447dba406c1a986e24b36263e9b6fcbc"
+  },
+  {
+    "path": "gradle.properties",
+    "upstreamSha256": "ac79eb012d46ccd144b7345833ae39dbac0ff0b12cb9b1c56e37e876bbec72bf",
+    "vendoredSha256": "ac79eb012d46ccd144b7345833ae39dbac0ff0b12cb9b1c56e37e876bbec72bf"
+  },
+  {
+    "path": "gradlew",
+    "upstreamSha256": "d8231d345ab33433ab7b2c0720d5beb416c8d5c6789dbc01ad122b63bc2cae0d",
+    "vendoredSha256": "d8231d345ab33433ab7b2c0720d5beb416c8d5c6789dbc01ad122b63bc2cae0d"
+  },
+  {
+    "path": "gradlew.bat",
+    "upstreamSha256": "95e8ae8e8a256a2f066cdd745d56f7a3fc87aa058a2e4beb483300db7171bd1f",
+    "vendoredSha256": "95e8ae8e8a256a2f066cdd745d56f7a3fc87aa058a2e4beb483300db7171bd1f"
+  },
+  {
+    "path": "LICENSE",
+    "upstreamSha256": "6ba81b7f5161ad7ea05f7125be43328a8837f63308065661600e4c0b0dbe996a",
+    "vendoredSha256": "6ba81b7f5161ad7ea05f7125be43328a8837f63308065661600e4c0b0dbe996a"
+  },
+  {
+    "path": "README.md",
+    "upstreamSha256": "93f3d915be1a3e85ddaac3129ec1f14be5ae4fd27500c8280e707a06cc56c9f9",
+    "vendoredSha256": "93f3d915be1a3e85ddaac3129ec1f14be5ae4fd27500c8280e707a06cc56c9f9"
+  },
+  {
+    "path": "settings.gradle",
+    "upstreamSha256": "8f433c10d6b6f56e4b17251aecff0d40e23f20520d85f625b6764805a750de03",
+    "vendoredSha256": "8f433c10d6b6f56e4b17251aecff0d40e23f20520d85f625b6764805a750de03"
+  },
+  {
+    "path": "docs/API.md",
+    "upstreamSha256": "b0bd1cccfaf3bf567d75add3fe6efe6ba90c08af142f38d2b75971e7ebb38577",
+    "vendoredSha256": "b0bd1cccfaf3bf567d75add3fe6efe6ba90c08af142f38d2b75971e7ebb38577"
+  },
+  {
+    "path": "docs/freeform-mesh.md",
+    "upstreamSha256": "ff324c5f0c474d233c792605aa4ef51401db1480fd99d98de2472e75cf9a9b70",
+    "vendoredSha256": "ff324c5f0c474d233c792605aa4ef51401db1480fd99d98de2472e75cf9a9b70"
+  },
+  {
+    "path": "docs/reference-collision.md",
+    "upstreamSha256": "4954ec81c84a311e32cfd50e757bc5170ac4ef29524dc0e5c13dca619682542b",
+    "vendoredSha256": "4954ec81c84a311e32cfd50e757bc5170ac4ef29524dc0e5c13dca619682542b"
+  },
+  {
+    "path": "docs/reference-interaction.md",
+    "upstreamSha256": "2df4ba4459f838843174f92046644c8c4c7852907316d099573fdaad7b2bda97",
+    "vendoredSha256": "2df4ba4459f838843174f92046644c8c4c7852907316d099573fdaad7b2bda97"
+  },
+  {
+    "path": "gradle/wrapper/gradle-wrapper.jar",
+    "upstreamSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8",
+    "vendoredSha256": "cb0da6751c2b753a16ac168bb354870ebb1e162e9083f116729cec9c781156b8"
+  },
+  {
+    "path": "gradle/wrapper/gradle-wrapper.properties",
+    "upstreamSha256": "05e7bec397ce5a52628d31dcc4c8b636cbdc55e28f8cef19d097c71b5c5fbb42",
+    "vendoredSha256": "05e7bec397ce5a52628d31dcc4c8b636cbdc55e28f8cef19d097c71b5c5fbb42"
+  },
+  {
+    "path": "src/gametest/java/com/caca/copypoly/ClientCompatibilityProbe.java",
+    "upstreamSha256": "a2a84982b4925f8f3f9859b6b7df7889ae743d312f5240bb0324dc7194d0fc88",
+    "vendoredSha256": "c4032145c11cbe6b173734af387db96d3ec6f40fe8b120d3ec45d649f8502d1b"
+  },
+  {
+    "path": "src/gametest/java/com/caca/copypoly/CollisionOutlineProbe.java",
+    "upstreamSha256": "689970bf2125d8ec403008411303c6dd71112cbdda37488c63a5c552c5412945",
+    "vendoredSha256": "e436d818d9a89086c47a939840eb154fefb860ba4634df84294f28992e09ff3d"
+  },
+  {
+    "path": "src/gametest/java/com/caca/copypoly/CustomVertexInteractionProbe.java",
+    "upstreamSha256": "7ddfb135f05f9a9e6fbbfa96580c2a6d100108725d9bfb3ced4a8f9ebd93abfc",
+    "vendoredSha256": "ed27ec0550366538831b3820115ff23bfba3665352b7508779308e88de77be0f"
+  },
+  {
+    "path": "src/gametest/java/com/caca/copypoly/EditorInteractionProbe.java",
+    "upstreamSha256": "dcb4b5ce08a0755bfe2c7957fe183654faefe312eb34a49735d1253819ef5133",
+    "vendoredSha256": "4abfbdcafb0a90542a4e87600b9cf4c722fb8c851cca973e8e1b26a66007559a"
+  },
+  {
+    "path": "src/gametest/java/com/caca/copypoly/LineInteractionProbe.java",
+    "upstreamSha256": "5e1a7d22ea1842d90e3b873e9678d0466c5f464666292c6995c00ba0fb77e0ad",
+    "vendoredSha256": "f38de72c2fc9610ad4460183b5157042a5a16187277f699de115c03b260977ef"
+  },
+  {
+    "path": "src/gametest/java/com/caca/copypoly/MaterialPersistenceProbe.java",
+    "upstreamSha256": "4822e15d8e5ca0142731e25e921665be067778ab92058b026ff934409d4172a1",
+    "vendoredSha256": "dcde26b347b644ead7a3565b2a742eb5d0f9098e64faef460f01062f4b927788"
+  },
+  {
+    "path": "src/gametest/java/com/caca/copypoly/PolyGameTests.java",
+    "upstreamSha256": "0796970183d2677ebfbc992a2920cf90157b202e4616869caa1bf28c86e4fa13",
+    "vendoredSha256": "7400407e61d97ab0190e6c9f890a4fbfd802f69ed19df4c7f150341cb88cb07e"
+  },
+  {
+    "path": "src/gametest/java/com/caca/copypoly/SableEditorInteractionProbe.java",
+    "upstreamSha256": "eddb41352d66c5df87b961daecf64096ae6f55908360319b638b2b569a118d7a",
+    "vendoredSha256": "e068ce8fcfa5686caeede0b0515074011c8591034f510bb5a0fa0d678453c3c4"
+  },
+  {
+    "path": "src/gametest/java/com/caca/copypoly/SablePhysicsGameTests.java",
+    "upstreamSha256": "f328f94d10862ab0f59fceab162dfef09c4af9f87ab6e259108e0903e866af99",
+    "vendoredSha256": "99303d6e003d97cc67e01232ff63feaefe94c87b3dd5d50e3464b881135bebfd"
+  },
+  {
+    "path": "src/gametest/java/com/caca/copypoly/TopologyFixtures.java",
+    "upstreamSha256": "e37d881e80a3bd7817fe350115492f7ca7d347b05670058cc181c2f6e16f53f5",
+    "vendoredSha256": "b9aec2f7b1aa2b0e5e92a42528921ae62f0ef23b146f47af43badf1901d32783"
+  },
+  {
+    "path": "src/gametest/java/com/caca/copypoly/TopologyInteractionProbe.java",
+    "upstreamSha256": "7caf3dfea0954f74d9dc08dc8bd6a42ce0cc31fdeba3715a2797bf352c7c2c3e",
+    "vendoredSha256": "90081b200d7edf894e10cabadb92be80c90a2d1235571988e48f21b50e2ae0c0"
+  },
+  {
+    "path": "src/gametest/resources/data/copypoly/structure/empty.nbt",
+    "upstreamSha256": "bc4f2ef59b92d8861201a59a5ce4a02bab8c378317465db8a5e7865e3d9e151b",
+    "vendoredSha256": "bc4f2ef59b92d8861201a59a5ce4a02bab8c378317465db8a5e7865e3d9e151b"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/Copypoly.java",
+    "upstreamSha256": "e8542807d9c13a2041ee426fb04825df75de25c3e831fb01b5fb7f6affd27c8b",
+    "vendoredSha256": "d7e53cad103bd80481f3c57e9dafd6b65f8de62a0a9eee48e43f1500c80ba8a9"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/PolyBlock.java",
+    "upstreamSha256": "dddbc9e1dcaf107c8929a2f757254af5a9dcbfc7bd614d11e1015ca7e8dd106c",
+    "vendoredSha256": "f0d988e31ad897f1168828e61dce728338b163d56db05f6843058b4df9485742"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/PolyBlockEntity.java",
+    "upstreamSha256": "0b120c9c4b171d7107635734f6e572f3cc7a797e9afc0557767e87747b3c8d60",
+    "vendoredSha256": "9a07720389716bc1bda28f62f42d15c0762e8c323de46ee746cf9a83d2d53c95"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/PolyItem.java",
+    "upstreamSha256": "bfca175036848533ace5c777949aa909275f1e8987bb697acc28c55b7aaf8fcd",
+    "vendoredSha256": "018b6d6b5affd3d8a7170132248138092c151d7a6f048228b22c0e7d29daef52"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/PolyMenu.java",
+    "upstreamSha256": "68092dd7db8fd621f1c69bdebb7f1fb94c6e77561d81732cabb244a1422c14ac",
+    "vendoredSha256": "f251742f42ac37e2b2edf855787bb08da54100d6944dd76e3da23ebef9a3a9df"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/PolyPackets.java",
+    "upstreamSha256": "dd041a43efe7f142cb0f0e290baf54adcb27ce3e49203bee832343fc02c4068d",
+    "vendoredSha256": "e533ac08fb2adf4992fa136d0d4ddb37e0e4fb883c2815b25920680e62d277cf"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/api/CopypolyApi.java",
+    "upstreamSha256": "cdaf4a88ada90d93a20c7b7ed0c91e029dc22d7cda85300388fc9774fadea370",
+    "vendoredSha256": "80fbf96f29a0e99ec7cda0bfc131c0f88063865254be4246e1cad5e8545c772d"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/api/PolyShape.java",
+    "upstreamSha256": "192f23dd189e7baa8f03e6d9266b91dabca6e86b5462867cfb8d1ccd733647cc",
+    "vendoredSha256": "cacbe2860208a21aa51d39f712884fedaaa06c66796099b172ac44e20cf8f3b7"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/api/PolyShapeCodec.java",
+    "upstreamSha256": "8a13ceba66aa1617284a93be18370838880d16a1fe97bc4f9fd7fea03240e024",
+    "vendoredSha256": "687cc8a50268c6ebf755df5ce0df6eeaaaaedb7e62b5d7f080cdd57612c71fad"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/api/SurfaceNetwork.java",
+    "upstreamSha256": "b613b7a683c0249d7e32c2684a40ba40fe8ef54073f514440f9f083d0f4f024b",
+    "vendoredSha256": "ec73221ea6ff46c94326d36dc25bf190ff530f61eabc1c1ff6f0b473eac29eee"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/api/VertexType.java",
+    "upstreamSha256": "70ffd202b002d634d1cc57db9810bd61d99ddd2fe5abcf283bf68351c92fa0f4",
+    "vendoredSha256": "f432b9e7171960ca264a8cd5df0a8e27f46689ac132dd13cd100c553dcd09bf4"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/CameraMouseInput.java",
+    "upstreamSha256": "498498121c2847a75070f810921c8aca3ae66113f4c7ab6c93d440e4a3e57558",
+    "vendoredSha256": "b61a0d6192a58d98386e7fd5a52f62d233b2d03f47b6d49d7ed946e8f075cfe7"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/EditorBlockTransform.java",
+    "upstreamSha256": "323ebfc2627496fc5e7b5467563c4efddcca1bd67bbdc0c7c984a70da6938879",
+    "vendoredSha256": "ba2b8eba60914368f39b19bc335bf69ac87c82febad87ce5b8c8ea02bc776fc9"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/EditorLinePicking.java",
+    "upstreamSha256": "c109355c9a6e52af7cb259ca9e6592ace55347dc9ac7ef04a5925a7d5fbf2670",
+    "vendoredSha256": "20b8225e2c8371f221dee7f97b7a770440322293c27ff12391401bfe4d61ace8"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/EditorSurfacePicking.java",
+    "upstreamSha256": "a7a9d2c83ae802a07b686c82e377eb45ce7961143b0301a797fd88937ba09ece",
+    "vendoredSha256": "8964b7487c3e6993e036f7bd4789ba15c380b323e1c27f5bedd090f81db5ff03"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/EditorWorldProjection.java",
+    "upstreamSha256": "aa47f01224ef5fd0adb0aaa244efa4401f82ac23164f12e7a4b1f8ee2a6b42f7",
+    "vendoredSha256": "841760c36f24a69ea5201c4a0b0aa4197781cc1f540ad56a49b38422e3e1c49b"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/PolyClient.java",
+    "upstreamSha256": "bafa8c539cdb8e503d57f85de2b6efba3786a62855f2c763bcd77cb1b60815a4",
+    "vendoredSha256": "65af7b7b478199710d67ed040150907517bc58849070a55ee4f913cb972784f4"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/PolyGizmo.java",
+    "upstreamSha256": "c43b2cc0e8c3fde0a8818d91a8c35c136a6dbfe2d1e1636f77cba73c766f91aa",
+    "vendoredSha256": "507c4d473e25195ae5867bb816e5f43eb7a8c1e32799280fa79ff87a7f8aa996"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/PolyModel.java",
+    "upstreamSha256": "e5c462131edf328780449a99694531f2565c858710b2b004970e59722a994af1",
+    "vendoredSha256": "9b5454b4940d90ab0faff4eebfd280bffec2b040ac19a0177a42b805c1e136ee"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/PolyScreen.java",
+    "upstreamSha256": "fb8cbda79f90944a2db2a8a4bbefc404f637f46a026bfa1586a5ea041958e60c",
+    "vendoredSha256": "b84daccdf1cc2e92fe91ee07084984f51bf8bf41484c61150644bc311781b815"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/PolyWorldEditor.java",
+    "upstreamSha256": "5456dc3bd1c6ac0be1729561a3ff84e669f2efefae71f26de565ecd47a1a4f4e",
+    "vendoredSha256": "1cfb5921246b1ea557ecaa6aba3f9490fec119ce03a2f0f6760248a3a98ff428"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/SableEditorBlockTransform.java",
+    "upstreamSha256": "1fa0e6e50b0d09da249f7b75d8281eedc6ce0dea2f47b8a9c8d15e3f00a9d8d2",
+    "vendoredSha256": "eec10945d3eaf2176c94d39d66c9674284eb26dec2ffe468ea208aa765d92189"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/ShapeHistory.java",
+    "upstreamSha256": "df59acd16673ac3dfebd70103a23271dd9bec99025475a18583c694ea0fe6bb6",
+    "vendoredSha256": "72462880e8ba8f2bcecb54d912dbc1fcc28e731be1a25cf4445ea43545c96046"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/SmoothOverlay.java",
+    "upstreamSha256": "935ff1345734a5b5f82ec2ff38f467a64f96d22ee3712c0ad67d6ef7043759a2",
+    "vendoredSha256": "709f831b02e5fe0592fbd48ce57841b48c0886eacc546461232d381782467d37"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/VertexMarquee.java",
+    "upstreamSha256": "f100ca806d71c1ad84ac8786e9f9af0e5e8d0893abb05a3661fc80729ccffa48",
+    "vendoredSha256": "aba38d68b7fc401cc4bab3966da67ec96538013b9afbcf405ac0729b5c1f4f71"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/client/WorldEditorCamera.java",
+    "upstreamSha256": "c2cec5c83a33c473b79a2fb715f238ee4e590f0194789d22e1be6f230f86ccc0",
+    "vendoredSha256": "8c7dfaf1ad73dfbf187d617c5cd3594574106058b30cc1cbf029e398d054fac6"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/compat/OptionalPhysicsMixinPlugin.java",
+    "upstreamSha256": "4926fd543e685dd2a6aae03a0ddd529227874dd94b90d39f044df6b1a221798b",
+    "vendoredSha256": "b19633e7c4dc9ff5257883a8a79ab858bb16aba5c0e0f75692ff5f85941e8676"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/compat/PhysicsCompat.java",
+    "upstreamSha256": "ee9d07ca1942e1f5e4716cf754caa1028ff1bd22305b2c9e615b43b276636371",
+    "vendoredSha256": "b87b085aea9ead5538fe583c1f8734deb78d343ba9154fe397a40b91d3516c78"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/compat/PolyRapierColliders.java",
+    "upstreamSha256": "1aae69e10e61f3e610f9a18634ec1bac86ab0afc5fb36e78352c88b7a64e1123",
+    "vendoredSha256": "7b908ce9abf4b83da9bfb823224ee9f22ded7506181fb210f37d4dcb02ce114e"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/compat/SablePhysicsCompat.java",
+    "upstreamSha256": "7cc2da01a204ab683188e65779e45ac3caf56e444c3f56797cbcd49d9e4cd0da",
+    "vendoredSha256": "7fb51f6f46932c6f09db143b7df32992da053ea9347bf25425e8fcecd1fd216c"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/geometry/MeshGeometry.java",
+    "upstreamSha256": "bef3356b249db3020d2668f44a9a913b237e0e645cf89f4f2af32dc0fa595228",
+    "vendoredSha256": "0b69a0e4a3ec5ff99f61494d1e4f7b13e5223994a36ce69cd7d57bb8279e4538"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/geometry/MeshOpenings.java",
+    "upstreamSha256": "d170f72d2fced4633f03802130d2d70bbe36474fd0c9820aa5c0f32e02b67507",
+    "vendoredSha256": "78af5c6723c29d0c3dfd9e1f4a97178d24358251f09f4a55b1226ca32fd57789"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/geometry/Polyhedron.java",
+    "upstreamSha256": "ecf0cb7057ca909adf63a2f916c3e01dfd4f25071893d659f7f260a689e869b3",
+    "vendoredSha256": "4f6363e36f3a538b54a3a9c07a5ba86e889e4e1e6d3566f24601de8a141a865f"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/geometry/PolyOutlineShape.java",
+    "upstreamSha256": "f3a620849cbc96153bfd3783c9f265afc10a48a7bb1017bd568e66fe1de588e6",
+    "vendoredSha256": "1df3fceaa61546f04400142a7be6f34fd15a74996af5261c2d982c3365d791c5"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/geometry/PolyShapeText.java",
+    "upstreamSha256": "6000eaecb013ae8ab094a3bf7818f3334c724349a0502e53e030a0128a264469",
+    "vendoredSha256": "a2fb0598343055c864da5b17f440ff1a1afd175444c5d6334008b9561116afee"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/geometry/VertexEditing.java",
+    "upstreamSha256": "dde357b65c9b79c21406733639814775d1e043d5086077f565ffbf5f2e969028",
+    "vendoredSha256": "0578c232fe9b12022cfcb53db72e1f754bc6b4f9992ea6f313a5cb3cdb0b5d12"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/mixin/VoxelShapeAccessor.java",
+    "upstreamSha256": "73efa4ee41038022755493cf6c18beb2d4322247c6a500fe9fb41db15fd48753",
+    "vendoredSha256": "7752b6d807937ff8b0028ce6fd58594a965efd41b1075d903a560c92a79dfd97"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/mixin/sable/PolyRapierPipelineMixin.java",
+    "upstreamSha256": "7138158d41f02448da4089b25149a10d4901ebd72c62f9a89a935eb960511f69",
+    "vendoredSha256": "2af2875fe4abd6d44e459bedbbd64c34f41c7bb76af8bfe06e78a35a5b05a923"
+  },
+  {
+    "path": "src/main/java/com/caca/copypoly/mixin/sable/PolySingleBlockRenderMixin.java",
+    "upstreamSha256": "76a1ee3f684f55055c26bf9ba602ac03029c86dc48109416bb80fa5186df8e81",
+    "vendoredSha256": "a11254f070ebda16f931a9374dc8a1e51f36638574945c60545689493a552f75"
+  },
+  {
+    "path": "src/main/resources/copypoly.mixins.json",
+    "upstreamSha256": "03c5fc01f17a59dfcc6539007b95fa2cb354dba3e4b4f1826f4824b1872dc9bb",
+    "vendoredSha256": "03c5fc01f17a59dfcc6539007b95fa2cb354dba3e4b4f1826f4824b1872dc9bb"
+  },
+  {
+    "path": "src/main/resources/assets/copypoly/blockstates/copycat_polyhedron.json",
+    "upstreamSha256": "0ab6e00da446fd8c08e1babf9afe8d9d459a7395c929ca6bb3acfa6e9fd3e9c3",
+    "vendoredSha256": "0ab6e00da446fd8c08e1babf9afe8d9d459a7395c929ca6bb3acfa6e9fd3e9c3"
+  },
+  {
+    "path": "src/main/resources/assets/copypoly/lang/en_us.json",
+    "upstreamSha256": "c041132328a5deba2510cb8e19de1d7f263c0143ac3025f74f6d7102ad690615",
+    "vendoredSha256": "ebd92f98a599b28a8b2137fdc71bc4981d5edea39f6e9a400adf3f5b9a47fb95"
+  },
+  {
+    "path": "src/main/resources/assets/copypoly/lang/zh_cn.json",
+    "upstreamSha256": "5033945d5e54f8e0b533b4da390cb9ab696e3bc5f77332e8aec9ce035a8ebecf",
+    "vendoredSha256": "5a4670bb989ec6e816b9b41035200f000ce7d2378b6acee8aadd541a01d60282"
+  },
+  {
+    "path": "src/main/resources/assets/copypoly/models/block/copycat_polyhedron.json",
+    "upstreamSha256": "95344f56e1d0945ac958fe2a53f383a24b4c5af7ee190316c7171d1de996c36f",
+    "vendoredSha256": "95344f56e1d0945ac958fe2a53f383a24b4c5af7ee190316c7171d1de996c36f"
+  },
+  {
+    "path": "src/main/resources/assets/copypoly/models/item/copycat_polyhedron.json",
+    "upstreamSha256": "c92141c4b731ef6dc7f335cc7a31ea775cac5e43609e7c3d1abd35a0e432737c",
+    "vendoredSha256": "c92141c4b731ef6dc7f335cc7a31ea775cac5e43609e7c3d1abd35a0e432737c"
+  },
+  {
+    "path": "src/main/resources/data/copypoly/advancement/recipes/decorations/copycat_polyhedron.json",
+    "upstreamSha256": "6e78137121a4910177925045403f4ba893efffaf56e940be8f3c574199e49e0e",
+    "vendoredSha256": "6e78137121a4910177925045403f4ba893efffaf56e940be8f3c574199e49e0e"
+  },
+  {
+    "path": "src/main/resources/data/copypoly/loot_table/blocks/copycat_polyhedron.json",
+    "upstreamSha256": "e899cbbd3ee40c8689d5d9e713ee40c13abc7be7e2598f6a404001abcae8733a",
+    "vendoredSha256": "a297d88ff78188f4dd57c3547ee3366eb31a91eb6f6f6b869043b764f24855b7"
+  },
+  {
+    "path": "src/main/resources/data/copypoly/recipe/copycat_polyhedron.json",
+    "upstreamSha256": "f54dfc0c3ac83038d8dbd2b79724d09e1a32829de6a76422ce337afedbf509d1",
+    "vendoredSha256": "0e88c8a4e4309bfbfc582958e02c8c21944bc88716e9e2ada8a4284237cb6ba7"
+  },
+  {
+    "path": "src/main/resources/data/create/tags/block/copycat_deny.json",
+    "upstreamSha256": "537d6aae03cc5fb3fbde1bf49e157aa24b2d8c09ad2c7183825e1ffbab1966dc",
+    "vendoredSha256": "3a4de4714a69769dafb3e4a1788355fb0670ceb901faa947f00a2c20c12b064a"
+  },
+  {
+    "path": "src/main/resources/data/minecraft/tags/block/mineable/pickaxe.json",
+    "upstreamSha256": "537d6aae03cc5fb3fbde1bf49e157aa24b2d8c09ad2c7183825e1ffbab1966dc",
+    "vendoredSha256": "3a4de4714a69769dafb3e4a1788355fb0670ceb901faa947f00a2c20c12b064a"
+  },
+  {
+    "path": "src/main/templates/META-INF/neoforge.mods.toml",
+    "upstreamSha256": "dda56d719234f92dac123104a777a83bb531271d637428f5c7d3ef348da4cba2",
+    "vendoredSha256": "dda56d719234f92dac123104a777a83bb531271d637428f5c7d3ef348da4cba2"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/api/ArbitraryMeshTest.java",
+    "upstreamSha256": "222069bf2f9ef9fd52d16a58cbe0e3f9ca4b0b81ec369f000846ae576506aa65",
+    "vendoredSha256": "a87e41c7b775c3c2aa6dbb9653fdad1f18d0d58fded60c0de21084879479f23a"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/api/PolyShapeTest.java",
+    "upstreamSha256": "290228688e0f88e6bf8105fded636f50cdd3cb1594c67185f084e0429f996543",
+    "vendoredSha256": "338368a1fa628eaac89dcee71b470afe203aac9d7ff6eb020bbac14b2c2df31f"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/api/SurfaceNetworkTest.java",
+    "upstreamSha256": "5849da4c6c1bf266bd5114ce2edf7720828dcb79f617989d0caeea9c126ff7b9",
+    "vendoredSha256": "51a217c05bb398f30f05e076906ec61d7fb5cb0d181104c3e6fb352d9cffc48e"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/client/CameraMouseInputTest.java",
+    "upstreamSha256": "f2cca739b585e275f6291fa91d4dd9e059f39ff60d97a1be6f72f05cc042760b",
+    "vendoredSha256": "c7e6ea6824f3219021a071e6441db08e6858978c2777ef0a765efbac7117ec7e"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/client/EditorLinePickingTest.java",
+    "upstreamSha256": "712d7d5c0d08e6a84899b9c2bf2cde8dddbef4c722827830df6ae7620dfd38db",
+    "vendoredSha256": "b3948feda0eb698290f8e3ea7a28a1ac77257f63d4aa4bfaaae6e911e23c437d"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/client/EditorSurfacePickingTest.java",
+    "upstreamSha256": "c450862d7babc1ee5fbf02dfe14157353baca4e2bbffef7cfad5355c97168d61",
+    "vendoredSha256": "ae1336470b0a10ccd40dcfa59892b5efa5284afa7fdb2c0334a696aeb3984283"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/client/EditorWorldProjectionTest.java",
+    "upstreamSha256": "acc342ea9358c4d02b1668d7e9b09cc4b0eb8bd3bbec382d51125aee8d3ef52c",
+    "vendoredSha256": "29e01793ef49d5b154f1531cb85abcf1c587350c73cbef5ade8332af6e96d405"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/client/PolyGizmoTest.java",
+    "upstreamSha256": "849e956be9c2567e0714c190ef32901881fa7c23cfd970602eb7b5f458d90a83",
+    "vendoredSha256": "d2249b717e417c03f2c987af9339a841c46e97a7180103f7a80790ff55403f79"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/client/ShapeHistoryTest.java",
+    "upstreamSha256": "d18b0dccb02b313a02b933644cd5bf9921e7833309ea6fb5d35807a83fe9dcf1",
+    "vendoredSha256": "d4a7870cc0a91935d5eb3d323a9ffc87edc8e433e20f0029d824aef8cf20a51f"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/client/VertexMarqueeTest.java",
+    "upstreamSha256": "f6aec64e92bfd50739b0a219cb5a82bcd40f62687e5caad6e23fd48e84544774",
+    "vendoredSha256": "479fbcda9f3878f9a23112d2eb24b3a8baab156c0ffbb721ee8069c705a37db1"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/client/WorldEditorCameraTest.java",
+    "upstreamSha256": "3d8a1452bcb7a6ce452b33e068a79d713288f371a8e9fc2e14705ad3ac5aee09",
+    "vendoredSha256": "245321351d790f7b67f746bb89460a270d45b70bae16a694c40853e9995f4fd7"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/geometry/FreeformMeshTest.java",
+    "upstreamSha256": "910445651217df2941c674d7395537247ca3f3ac0574d2e9f80fadb74e44b905",
+    "vendoredSha256": "43127d08fac3be1b8b50207d26f1e955a98fbc330f6f0229ab111be670ec71f2"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/geometry/MeshOpeningsTest.java",
+    "upstreamSha256": "b7a5f7833201b9e0095d1eafe234189e70336308ad17f9a2738954f52255b26b",
+    "vendoredSha256": "0c26aeaaacfe33904a354a466ea5e165acd7d08d3bb4b3e8f2f5cf274eaf0cdc"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/geometry/PolyhedronTest.java",
+    "upstreamSha256": "4f17bde135b92625c50dd029a2e245535b644547c687ac707d9d6421d4f0e4b6",
+    "vendoredSha256": "abbfc6612793593b6c9b5d06882780180d319c6c79a2e750a4e81895c5efbeea"
+  },
+  {
+    "path": "src/test/java/com/caca/copypoly/geometry/VertexEditingTest.java",
+    "upstreamSha256": "e12ae51a1279558a01239331af3a151ceb7c27d6fadc92bcc048fed3a44b9883",
+    "vendoredSha256": "de6d7d82b6964febc9821d8d366549730505a5177e433ef9921f2948fddafd5a"
+  }
+]

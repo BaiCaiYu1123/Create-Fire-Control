@@ -1,0 +1,17 @@
+{
+  "targets": [
+    "thermal_shader_pack_swap"
+  ],
+  "passes": [
+    {
+      "name": "create_fire_control:thermal_shader_pack",
+      "intarget": "minecraft:main",
+      "outtarget": "thermal_shader_pack_swap"
+    },
+    {
+      "name": "blit",
+      "intarget": "thermal_shader_pack_swap",
+      "outtarget": "minecraft:main"
+    }
+  ]
+}

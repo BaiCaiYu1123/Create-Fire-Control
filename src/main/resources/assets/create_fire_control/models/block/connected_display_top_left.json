@@ -1,0 +1,21 @@
+{
+  "parent": "minecraft:block/cube",
+  "elements": [
+    { "from": [0,0,0], "to": [16,16,16],
+      "faces": {
+        "up": {"texture": "#up", "cullface": "up", "rotation": 90},
+        "north": {"texture": "#north", "cullface": "north"},
+        "south": {"texture": "#south", "cullface": "south"},
+        "west": {"texture": "#west", "cullface": "west"}
+      }
+    }
+  ],
+  "textures": {
+    "particle": "create_fire_control:block/connected_display_front_single",
+    "north": "create_fire_control:block/connected_display_front_top_right",
+    "south": "create_fire_control:block/connected_display_casing_corner_tl",
+    "west": "create_fire_control:block/connected_display_casing_side_top",
+    "up": "create_fire_control:block/connected_display_casing_side_bottom"
+  }
+}
+

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "create_fire_control:block/stabilizer_controller" },
+    "facing=east":  { "model": "create_fire_control:block/stabilizer_controller", "y": 90 },
+    "facing=south": { "model": "create_fire_control:block/stabilizer_controller", "y": 180 },
+    "facing=west":  { "model": "create_fire_control:block/stabilizer_controller", "y": 270 }
+  }
+}

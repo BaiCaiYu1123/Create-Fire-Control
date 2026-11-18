@@ -1,0 +1,33 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": false,
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "create:brass_casing"
+    },
+    "K": {
+      "item": "minecraft:black_concrete"
+    },
+    "L": {
+      "item": "create:rose_quartz_lamp"
+    },
+    "N": {
+      "item": "minecraft:nether_star"
+    },
+    "P": {
+      "item": "create:precision_mechanism"
+    }
+  },
+  "pattern": [
+    "BBBBB",
+    "BKKLB",
+    "BPNLB",
+    "BPPPB",
+    "BBBBB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_fire_control:stabilizer_controller"
+  }
+}

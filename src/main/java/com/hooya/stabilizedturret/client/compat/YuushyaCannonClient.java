@@ -2,6 +2,7 @@ package com.hooya.stabilizedturret.client.compat;
 
 import com.hooya.stabilizedturret.registry.ModCbcContent;
 import com.yuushya.modelling.client.NeoItemBlockModel;
+import com.yuushya.modelling.client.NeoShowBlockModel;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -18,12 +19,26 @@ public final class YuushyaCannonClient {
     }
 
     private static void wrapBarrelModels(ModelEvent.ModifyBakingResult event) {
-        Block barrel = ModCbcContent.YUUSHYA_MEDIUM_CANNON_BARREL.get();
+        YuushyaCannonComponentRenderer.clearCache();
+        wrapItemBarrel(event, ModCbcContent.YUUSHYA_MEDIUM_CANNON_BARREL.get());
+        wrapShowBarrel(event, ModCbcContent.YUUSHYA_SHOW_MEDIUM_CANNON_BARREL.get());
+    }
+
+    private static void wrapItemBarrel(ModelEvent.ModifyBakingResult event, Block barrel) {
         for (BlockState state : barrel.getStateDefinition().getPossibleStates()) {
             ModelResourceLocation location = BlockModelShaper.stateToModelLocation(state);
             BakedModel original = event.getModels().get(location);
             Direction facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
             event.getModels().put(location, new NeoItemBlockModel(facing, original));
+        }
+    }
+
+    private static void wrapShowBarrel(ModelEvent.ModifyBakingResult event, Block barrel) {
+        for (BlockState state : barrel.getStateDefinition().getPossibleStates()) {
+            ModelResourceLocation location = BlockModelShaper.stateToModelLocation(state);
+            BakedModel original = event.getModels().get(location);
+            Direction facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            event.getModels().put(location, new NeoShowBlockModel(facing, original));
         }
     }
 

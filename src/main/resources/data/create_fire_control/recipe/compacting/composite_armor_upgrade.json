@@ -1,0 +1,13 @@
+{
+  "type": "create_fire_control:composite_armor_compacting",
+  "ingredients": [
+    {"item": "create_fire_control:camouflaged_polyhedral_armor"},
+    {"item": "create_fire_control:composite_armor_plate"}
+  ],
+  "results": [
+    {
+      "id": "create_fire_control:camouflaged_polyhedral_armor",
+      "components": {"create_fire_control:armor_level": 2}
+    }
+  ]
+}

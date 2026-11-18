@@ -1,0 +1,10 @@
+allprojects {
+    afterEvaluate {
+        tasks.register('testTigerIResources', JavaExec) {
+            dependsOn tasks.named('testClasses')
+            classpath = sourceSets.test.runtimeClasspath
+            mainClass = 'com.hooya.stabilizedturret.client.TigerIResourceChecks'
+            workingDir = projectDir
+        }
+    }
+}

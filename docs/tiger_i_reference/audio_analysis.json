@@ -1,0 +1,933 @@
+{
+  "blips-001": {
+    "seconds": 1.2,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 27067,
+    "sha256": "7d8d864e0293f048048621a7710890b2e1dfafb3c08c359602b449c1ad26cdbc",
+    "rms": 0.13272357805352575,
+    "peak": 1.0474631786346436,
+    "seam_delta": 0.0012604852599906735,
+    "tonalCueHz": [
+      59.25,
+      127.25,
+      51.0,
+      44.0,
+      63.0
+    ],
+    "confidence": [
+      0.6346736229052811,
+      0.2286427521635274,
+      0.7884173962625173,
+      0.5637560825079019,
+      0.6856995534496373
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.1290019196501541,
+    "spatialPeak": 1.0050621032714844,
+    "spatialSeamDelta": 0.00043541765262489207,
+    "ordinaryDeltaP999": 0.13576120273769496,
+    "seamRepair": null
+  },
+  "blips-002": {
+    "seconds": 1.2,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 27006,
+    "sha256": "51f14b7f0c94f4e72be5682ea5f99b9bcb1f5aca0635a750b404876b565e1604",
+    "rms": 0.16298351770079791,
+    "peak": 0.9768266081809998,
+    "seam_delta": 0.0003348182945046574,
+    "tonalCueHz": [
+      53.25,
+      111.75,
+      50.5,
+      49.5,
+      114.25
+    ],
+    "confidence": [
+      0.4452602774294941,
+      0.7367008671375032,
+      0.7327435348864805,
+      1.0,
+      0.33013537536185783
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.1612928708479658,
+    "spatialPeak": 0.9637187719345093,
+    "spatialSeamDelta": 0.00011253822322032647,
+    "ordinaryDeltaP999": 0.07870771094411652,
+    "seamRepair": null
+  },
+  "blips-003": {
+    "seconds": 1.2,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 27311,
+    "sha256": "9a0056d7e919ce065502fa4634d5d9ee5f2d92a2a5a50f56a08700298920a214",
+    "rms": 0.17165250941189714,
+    "peak": 0.9921668171882629,
+    "seam_delta": 0.0006791300547774881,
+    "tonalCueHz": [
+      123.25,
+      121.75,
+      116.25,
+      33.75,
+      30.25
+    ],
+    "confidence": [
+      0.8897302115713573,
+      1.0,
+      0.9987335919482279,
+      0.4257761881645896,
+      0.5735464194418082
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.17131436924502477,
+    "spatialPeak": 0.9655725359916687,
+    "spatialSeamDelta": 6.861743167974055e-05,
+    "ordinaryDeltaP999": 0.071869300723077,
+    "seamRepair": null
+  },
+  "blips-004": {
+    "seconds": 1.2056235827664399,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 28376,
+    "sha256": "ffa4238a2d7f7c7cac0d2873ef7cc0350aa9d8c731936941f9e6b567042330db",
+    "rms": 0.14203147859106355,
+    "peak": 1.0205259323120117,
+    "seam_delta": 0.000667800650717254,
+    "tonalCueHz": [
+      40.75,
+      122.5,
+      67.25,
+      47.5,
+      92.0
+    ],
+    "confidence": [
+      0.36035392997243765,
+      0.4396626950540801,
+      0.3775292340375094,
+      0.9807648300571854,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.13901229595655198,
+    "spatialPeak": 0.9913024306297302,
+    "spatialSeamDelta": 0.0006024303129379405,
+    "ordinaryDeltaP999": 0.18176543660461938,
+    "seamRepair": null
+  },
+  "blips-005": {
+    "seconds": 1.19437641723356,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 26771,
+    "sha256": "2042bd7d20a02fee89363dbba8a449f8efdae810afecdb2a29492565601d0e79",
+    "rms": 0.09832148097370456,
+    "peak": 0.717687726020813,
+    "seam_delta": 0.0001297493590755039,
+    "tonalCueHz": [
+      78.75,
+      76.75,
+      41.75,
+      86.25,
+      79.25
+    ],
+    "confidence": [
+      1.0,
+      0.19281716172519134,
+      0.8375971084629388,
+      0.6361599879147265,
+      0.9148947438290952
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.09783564595486044,
+    "spatialPeak": 0.6138792037963867,
+    "spatialSeamDelta": 9.58070668275468e-05,
+    "ordinaryDeltaP999": 0.05307336717844028,
+    "seamRepair": null
+  },
+  "blips-006": {
+    "seconds": 1.2,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 26997,
+    "sha256": "6262e2c1b529554625abc2a7bcd0db5cd721a26635bdbac9bc8d9c9634024c1e",
+    "rms": 0.09871859130244538,
+    "peak": 0.9669133424758911,
+    "seam_delta": 2.4445419512630906e-05,
+    "tonalCueHz": [
+      62.5,
+      91.5,
+      86.25,
+      34.0,
+      34.0
+    ],
+    "confidence": [
+      0.6800044249440655,
+      0.9937093985639619,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.09500577061330442,
+    "spatialPeak": 0.8727890253067017,
+    "spatialSeamDelta": 3.83182626251255e-06,
+    "ordinaryDeltaP999": 0.08804822347313196,
+    "seamRepair": null
+  },
+  "blips-007": {
+    "seconds": 1.2,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 26903,
+    "sha256": "b7a7e9896be080d0c3abd34db14ba45eeb255704b5d8d5aa48727b0519d01f24",
+    "rms": 0.1288383789855915,
+    "peak": 0.9380389451980591,
+    "seam_delta": 7.140610614442267e-05,
+    "tonalCueHz": [
+      58.5,
+      108.5,
+      94.25,
+      84.75,
+      39.75
+    ],
+    "confidence": [
+      0.7419882611430975,
+      0.6986352918229759,
+      1.0,
+      1.0,
+      0.9903276719425889
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.12439153707341588,
+    "spatialPeak": 0.8536381721496582,
+    "spatialSeamDelta": 8.024164708331227e-05,
+    "ordinaryDeltaP999": 0.07315125000476866,
+    "seamRepair": null
+  },
+  "blips-008": {
+    "seconds": 1.2,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 28005,
+    "sha256": "d34742e135cb2387019074c06a3ca0cb348077e8d6d9bf36981fe127e22b831c",
+    "rms": 0.08297837474458233,
+    "peak": 0.9393320083618164,
+    "seam_delta": 0.00015547764360235306,
+    "tonalCueHz": [
+      78.0,
+      58.0,
+      39.25,
+      31.5,
+      45.25
+    ],
+    "confidence": [
+      0.9709194254662049,
+      0.6767639083498903,
+      0.46350120298537795,
+      0.7007510407277303,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.08181505404385389,
+    "spatialPeak": 0.9138319492340088,
+    "spatialSeamDelta": 9.697088080429239e-05,
+    "ordinaryDeltaP999": 0.07132964321970955,
+    "seamRepair": null
+  },
+  "blips-009": {
+    "seconds": 1.2,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 28728,
+    "sha256": "2119843f0747f510f8fd7b20d0feb6878eb0830b85a6720c1b87bfac6722890b",
+    "rms": 0.06284729890161345,
+    "peak": 0.8578566908836365,
+    "seam_delta": 0.00010832467251020717,
+    "tonalCueHz": [
+      40.0,
+      33.5,
+      82.75,
+      42.25,
+      81.25
+    ],
+    "confidence": [
+      1.0,
+      1.0,
+      0.5884832325516739,
+      1.0,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.06202146788898188,
+    "spatialPeak": 0.7230494022369385,
+    "spatialSeamDelta": 6.57915956026045e-06,
+    "ordinaryDeltaP999": 0.06671445649303506,
+    "seamRepair": null
+  },
+  "fast_load": {
+    "seconds": 9.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 153910,
+    "sha256": "dfa69f5a2c65f2f229526a15359949d4a18ae4a4df115d342db78e6acbd72c17",
+    "rms": 0.38242306988230634,
+    "peak": 1.0296950340270996,
+    "seam_delta": 0.14051532745361328,
+    "tonalCueHz": [
+      97.75,
+      97.5,
+      98.25,
+      99.5,
+      99.0
+    ],
+    "confidence": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.3752481422507726,
+    "spatialPeak": 1.0068416595458984,
+    "spatialSeamDelta": 0.1056058406829834,
+    "ordinaryDeltaP999": 0.161844124421477,
+    "seamRepair": null
+  },
+  "fast_not_load": {
+    "seconds": 9.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 157989,
+    "sha256": "83cdc604ed1071994f3bd13c497204b21e254d771d455cf003da016f2c0fc3c3",
+    "rms": 0.16915224453736324,
+    "peak": 0.8241060376167297,
+    "seam_delta": 0.07113660126924515,
+    "tonalCueHz": [
+      33.25,
+      33.25,
+      33.25,
+      33.25,
+      33.75
+    ],
+    "confidence": [
+      0.9790471053770916,
+      1.0,
+      1.0,
+      0.990418790417609,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.16385034200365683,
+    "spatialPeak": 0.6692883372306824,
+    "spatialSeamDelta": 0.05875048786401749,
+    "ordinaryDeltaP999": 0.06429981264844532,
+    "seamRepair": null
+  },
+  "idle_load": {
+    "seconds": 9.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 189828,
+    "sha256": "9f18a0ad103eaeaa0ad267e27bf9799cdf9c6286dd10d7c7aa1788cae6ecdb0c",
+    "rms": 0.09287580322149254,
+    "peak": 0.44285285472869873,
+    "seam_delta": 0.008895359933376312,
+    "tonalCueHz": [
+      38.5,
+      36.25,
+      28.75,
+      37.75,
+      86.75
+    ],
+    "confidence": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.0922058112612485,
+    "spatialPeak": 0.4184689223766327,
+    "spatialSeamDelta": 0.002671118825674057,
+    "ordinaryDeltaP999": 0.02811739861592634,
+    "seamRepair": null
+  },
+  "idle_not_load": {
+    "seconds": 9.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 5252,
+    "sha256": "30b70fb64801af391e9efcdd8089812bf8d1b0654879220374ebac4fcacc96c5",
+    "rms": 0.0,
+    "peak": 0.0,
+    "seam_delta": 0.0,
+    "tonalCueHz": [
+      25.0,
+      25.0,
+      25.0,
+      25.0,
+      25.0
+    ],
+    "confidence": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0"
+  },
+  "med_load": {
+    "seconds": 7.8,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 125165,
+    "sha256": "200565b60a2c24e1b944bf9772498952919c5ece30180ba6c33454650ba21d2d",
+    "rms": 0.3205397329581816,
+    "peak": 1.0174624919891357,
+    "seam_delta": 0.26095645129680634,
+    "tonalCueHz": [
+      89.0,
+      90.25,
+      86.75,
+      86.5,
+      87.25
+    ],
+    "confidence": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.29842220708869616,
+    "spatialPeak": 0.9666741490364075,
+    "spatialSeamDelta": 0.0007085353136062622,
+    "ordinaryDeltaP999": 0.13144896878302093,
+    "seamRepair": {
+      "millisecondsPerEnd": 8,
+      "before": 0.24968013167381287,
+      "ordinaryP999": 0.13139194548130034,
+      "method": "smoothstep endpoint-to-common-midpoint repair in the mono derivative; no extra runtime voice",
+      "after": 0.0007085353136062622
+    }
+  },
+  "med_not_load": {
+    "seconds": 7.8,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 129565,
+    "sha256": "1c001b58cb8a1f5287627509f1606e9f2d590c6fffbda0d3c60aeab6c26dfc3f",
+    "rms": 0.15930127082677634,
+    "peak": 0.7500611543655396,
+    "seam_delta": 0.04118150472640991,
+    "tonalCueHz": [
+      86.0,
+      87.75,
+      88.25,
+      86.75,
+      86.25
+    ],
+    "confidence": [
+      0.813231375007471,
+      0.5439003921911789,
+      1.0,
+      1.0,
+      0.8208776968055225
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.15519513049614297,
+    "spatialPeak": 0.7105317115783691,
+    "spatialSeamDelta": 0.035790082067251205,
+    "ordinaryDeltaP999": 0.05794017601013178,
+    "seamRepair": null
+  },
+  "release-001": {
+    "seconds": 3.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 61138,
+    "sha256": "8112372ef9063089ed7f93f0d17683852b5a8995be3c1e5a0f0d7043663e2da3",
+    "rms": 0.15992612237741602,
+    "peak": 0.9507368803024292,
+    "seam_delta": 9.245068486052332e-05,
+    "tonalCueHz": [
+      37.25,
+      41.0,
+      90.5,
+      92.25,
+      39.0
+    ],
+    "confidence": [
+      1.0,
+      0.6540318223511953,
+      0.6782634038051606,
+      0.49563059415762156,
+      0.735999517041276
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.15643925932543742,
+    "spatialPeak": 0.946271538734436,
+    "spatialSeamDelta": 1.8814500435837545e-05,
+    "ordinaryDeltaP999": 0.08025963725894676,
+    "seamRepair": null
+  },
+  "release-002": {
+    "seconds": 3.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 57927,
+    "sha256": "a8a850c67a0f416e1d23583e10a98f69a95ecb137cc0b2bfc14d1c236c55abc8",
+    "rms": 0.14163050086875173,
+    "peak": 0.913849949836731,
+    "seam_delta": 0.013196292566135526,
+    "tonalCueHz": [
+      83.0,
+      91.75,
+      94.25,
+      95.75,
+      92.75
+    ],
+    "confidence": [
+      0.7652071288994757,
+      0.5890296809335666,
+      0.615761519272705,
+      0.307319935758304,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.1392648498368861,
+    "spatialPeak": 0.8658648729324341,
+    "spatialSeamDelta": 0.010638086358085275,
+    "ordinaryDeltaP999": 0.08339789053797649,
+    "seamRepair": null
+  },
+  "release-003": {
+    "seconds": 3.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 61026,
+    "sha256": "51c0fae71e7f5fdfa89432d8b6a71f5192d30fafcb8d173d913c7beb31d9ffcf",
+    "rms": 0.17498278327884664,
+    "peak": 0.9923079609870911,
+    "seam_delta": 0.0020428226853255183,
+    "tonalCueHz": [
+      38.25,
+      88.5,
+      76.75,
+      40.25,
+      43.0
+    ],
+    "confidence": [
+      1.0,
+      0.6520980551866734,
+      0.409332236970031,
+      1.0,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.16983552451432934,
+    "spatialPeak": 0.9076128005981445,
+    "spatialSeamDelta": 0.0015427189064212143,
+    "ordinaryDeltaP999": 0.08974425331503151,
+    "seamRepair": null
+  },
+  "release-004": {
+    "seconds": 3.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 60895,
+    "sha256": "1616fb790829aff79c8f6e5e632a0c2a15e27a8ae19e3085f6e11b1f5c202bf9",
+    "rms": 0.15772025817675467,
+    "peak": 0.9643853306770325,
+    "seam_delta": 0.018884627272200305,
+    "tonalCueHz": [
+      101.75,
+      88.25,
+      76.75,
+      40.25,
+      38.75
+    ],
+    "confidence": [
+      0.3531640826347246,
+      0.6888940993828411,
+      0.8946211108855487,
+      1.0,
+      0.9497113584294726
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.15341532163087832,
+    "spatialPeak": 0.9524513483047485,
+    "spatialSeamDelta": 0.017701275635772618,
+    "ordinaryDeltaP999": 0.09587132860720157,
+    "seamRepair": null
+  },
+  "release-005": {
+    "seconds": 3.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 63448,
+    "sha256": "ad03e235a00f9ce7723f2b3f4db5111032930d1e8a006c9c7b61817e2ff4f605",
+    "rms": 0.1721223412777912,
+    "peak": 0.9992831349372864,
+    "seam_delta": 0.019719438976608217,
+    "tonalCueHz": [
+      116.5,
+      98.25,
+      74.75,
+      110.5,
+      40.5
+    ],
+    "confidence": [
+      0.3160037401138957,
+      0.716089966273232,
+      0.8526013189664504,
+      0.44379592440251203,
+      0.5735008149453392
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.16845657849506412,
+    "spatialPeak": 0.9662266969680786,
+    "spatialSeamDelta": 0.017660344135947526,
+    "ordinaryDeltaP999": 0.09861413308978077,
+    "seamRepair": null
+  },
+  "release-006": {
+    "seconds": 3.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 61400,
+    "sha256": "4affe862143a58fb7fed4883ae1faf4d066d438ce8d18ef5265885eff39cf52c",
+    "rms": 0.18699437279578288,
+    "peak": 1.024151086807251,
+    "seam_delta": 0.011306400585453957,
+    "tonalCueHz": [
+      88.75,
+      105.5,
+      94.25,
+      89.5,
+      79.25
+    ],
+    "confidence": [
+      1.0,
+      0.5382228211289363,
+      0.5693492902058663,
+      1.0,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.1828066154976435,
+    "spatialPeak": 0.9709484577178955,
+    "spatialSeamDelta": 0.010892154241446406,
+    "ordinaryDeltaP999": 0.09224620354175556,
+    "seamRepair": null
+  },
+  "release-007": {
+    "seconds": 3.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 61628,
+    "sha256": "2fca168cc49358e013c765408507a12c24b02ff1770b01acaaa1df72a323f879",
+    "rms": 0.1765472230582415,
+    "peak": 1.0605409145355225,
+    "seam_delta": 0.019372051174286753,
+    "tonalCueHz": [
+      36.25,
+      96.25,
+      89.5,
+      81.25,
+      45.25
+    ],
+    "confidence": [
+      1.0,
+      1.0,
+      0.7165634997611164,
+      1.0,
+      0.7753272524077538
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.17093529720044764,
+    "spatialPeak": 0.9693373441696167,
+    "spatialSeamDelta": 0.016676472150720656,
+    "ordinaryDeltaP999": 0.12153799366950936,
+    "seamRepair": null
+  },
+  "revv-001": {
+    "seconds": 3.0,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 54034,
+    "sha256": "b927576330be33351a76084a89e4f4fb1854d01bd438e04531df8cac7ac293c9",
+    "rms": 0.2670373850883521,
+    "peak": 1.0894408226013184,
+    "seam_delta": 0.013630740315420553,
+    "tonalCueHz": [
+      37.75,
+      78.0,
+      45.25,
+      92.5,
+      95.25
+    ],
+    "confidence": [
+      0.7098219914311987,
+      0.4811871476420526,
+      0.7993911382115235,
+      1.0,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.25765935794025946,
+    "spatialPeak": 0.9868749380111694,
+    "spatialSeamDelta": 0.013610554538900033,
+    "ordinaryDeltaP999": 0.19474035188555605,
+    "seamRepair": null
+  },
+  "revv-002": {
+    "seconds": 3.0,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 54088,
+    "sha256": "7971b43b03be2debd36f8837aac359e1af6daef199ad769c67c852ca4f36e205",
+    "rms": 0.26357106661832586,
+    "peak": 1.043237328529358,
+    "seam_delta": 0.002437667495541973,
+    "tonalCueHz": [
+      38.25,
+      85.5,
+      82.0,
+      42.5,
+      41.0
+    ],
+    "confidence": [
+      0.8150828206984558,
+      0.7129159182585679,
+      0.970605818744915,
+      1.0,
+      0.552572144918214
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.2577481950218925,
+    "spatialPeak": 0.9871494174003601,
+    "spatialSeamDelta": 0.0014031652754091795,
+    "ordinaryDeltaP999": 0.19226548701524535,
+    "seamRepair": null
+  },
+  "revv-003": {
+    "seconds": 3.0,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 54182,
+    "sha256": "bf6a438cc890f56066d0bf4c607d0be02fccafe1e7e03f0f3fb51882a2f54442",
+    "rms": 0.2781298782569936,
+    "peak": 1.0958815813064575,
+    "seam_delta": 0.0001745066015246266,
+    "tonalCueHz": [
+      38.25,
+      39.0,
+      78.75,
+      38.5,
+      44.0
+    ],
+    "confidence": [
+      0.8832428072458723,
+      0.9256907238966153,
+      0.8597449013498432,
+      1.0,
+      0.5325603339060653
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.26776423813944045,
+    "spatialPeak": 0.9760785698890686,
+    "spatialSeamDelta": 0.00010895206833083648,
+    "ordinaryDeltaP999": 0.17308958601951593,
+    "seamRepair": null
+  },
+  "revv-004": {
+    "seconds": 2.99,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 56083,
+    "sha256": "6c9efa81b2454784b7a7e61b3952c47b82972ee7357cce5ee26fa75e85e6c563",
+    "rms": 0.28155428896597834,
+    "peak": 1.0712846517562866,
+    "seam_delta": 4.019727748527657e-05,
+    "tonalCueHz": [
+      37.0,
+      42.25,
+      37.0,
+      103.25,
+      77.25
+    ],
+    "confidence": [
+      0.8674459095054995,
+      1.0,
+      1.0,
+      0.5931937178819973,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.27460527179460525,
+    "spatialPeak": 0.993071436882019,
+    "spatialSeamDelta": 0.00013192558466812443,
+    "ordinaryDeltaP999": 0.16639330285787626,
+    "seamRepair": null
+  },
+  "revv-005": {
+    "seconds": 3.0,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 54900,
+    "sha256": "3d0c912c2e50954e48581fd4d1e28e824496d3abcfad86c771e349a321a7fb38",
+    "rms": 0.30170551591207007,
+    "peak": 1.0673458576202393,
+    "seam_delta": 0.004765225341543555,
+    "tonalCueHz": [
+      88.75,
+      43.0,
+      79.0,
+      91.0,
+      108.75
+    ],
+    "confidence": [
+      0.47649747889460653,
+      1.0,
+      0.5357498681989568,
+      0.7832130254115718,
+      0.3181331242180169
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.2906630969108262,
+    "spatialPeak": 0.9863730669021606,
+    "spatialSeamDelta": 0.0038928379653953016,
+    "ordinaryDeltaP999": 0.2033595611155008,
+    "seamRepair": null
+  },
+  "slow_load": {
+    "seconds": 9.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 150202,
+    "sha256": "66b3a5214895e114fd005167a18a68f76c586f36eedb9f270aa112a016bd8adb",
+    "rms": 0.21261720971030146,
+    "peak": 0.8728110790252686,
+    "seam_delta": 0.038698598742485046,
+    "tonalCueHz": [
+      104.25,
+      88.25,
+      90.75,
+      37.75,
+      42.0
+    ],
+    "confidence": [
+      1.0,
+      0.500250635796334,
+      0.6690188031923814,
+      0.5894399793576953,
+      0.5272795818070805
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.1796458763526917,
+    "spatialPeak": 0.838408350944519,
+    "spatialSeamDelta": 0.018360760062932968,
+    "ordinaryDeltaP999": 0.06274503803253173,
+    "seamRepair": null
+  },
+  "slow_not_load": {
+    "seconds": 9.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 167622,
+    "sha256": "0e219a19a810518f44ddf1bbca59f27cf7116080f4905c9f9ea49e866ff8551e",
+    "rms": 0.09551083226906223,
+    "peak": 0.47260841727256775,
+    "seam_delta": 0.06027650833129883,
+    "tonalCueHz": [
+      31.5,
+      32.0,
+      31.75,
+      31.75,
+      31.5
+    ],
+    "confidence": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.09107289045610398,
+    "spatialPeak": 0.39955437183380127,
+    "spatialSeamDelta": 0.054610803723335266,
+    "ordinaryDeltaP999": 0.07395406524091959,
+    "seamRepair": null
+  },
+  "start": {
+    "seconds": 7.2,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 135421,
+    "sha256": "51bb1fb1f28491b3a26f61f863e3ceca973822b013960770e43285acbc3b1c5f",
+    "rms": 0.18776176863801788,
+    "peak": 1.0740923881530762,
+    "seam_delta": 0.0005131342841195874,
+    "tonalCueHz": [
+      29.0,
+      51.0,
+      40.5,
+      32.0,
+      37.5
+    ],
+    "confidence": [
+      1.0,
+      0.5351035262586633,
+      0.6643469368621485,
+      0.8693478627436232,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.18181319583213024,
+    "spatialPeak": 0.9325929284095764,
+    "spatialSeamDelta": 0.0003759824330700212,
+    "ordinaryDeltaP999": 0.17145086032152568,
+    "seamRepair": null
+  },
+  "stop": {
+    "seconds": 9.6,
+    "rate": 44100,
+    "channels": 2,
+    "bytes": 166998,
+    "sha256": "c3134cb525aafb076ce0731ebea551f69f4ce8502f1bc8d2544cffbe2901854d",
+    "rms": 0.07476948102244495,
+    "peak": 0.7461736798286438,
+    "seam_delta": 0.0007656089292140678,
+    "tonalCueHz": [
+      29.0,
+      32.25,
+      27.5,
+      31.0,
+      35.0
+    ],
+    "confidence": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "cueMethod": "four-harmonic comb 25-151 Hz; matching cue, not verified engine F0",
+    "spatialRms": 0.07327369989499748,
+    "spatialPeak": 0.6319779753684998,
+    "spatialSeamDelta": 0.0007551645721832756,
+    "ordinaryDeltaP999": 0.02262875770032386,
+    "seamRepair": null
+  }
+}

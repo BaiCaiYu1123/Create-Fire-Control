@@ -1,0 +1,6 @@
+gradle.projectsEvaluated {
+    rootProject.runs.server {
+        systemProperty 'create_fire_control.radarMemoryChecks', rootProject.providers.gradleProperty('radarMemoryChecks').getOrElse('false')
+        systemProperty 'create_fire_control.radarMemoryMotionChecks', rootProject.providers.gradleProperty('radarMemoryMotionChecks').getOrElse('false')
+    }
+}

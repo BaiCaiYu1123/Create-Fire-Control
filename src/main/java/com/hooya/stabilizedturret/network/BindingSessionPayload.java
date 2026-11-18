@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public record BindingSessionPayload(boolean active, List<Candidate> candidates)
+public record BindingSessionPayload(boolean active, boolean append, List<Candidate> candidates)
         implements CustomPacketPayload {
     public static final Type<BindingSessionPayload> TYPE = new Type<>(
             ResourceLocation.fromNamespaceAndPath(StabilizedTurret.MOD_ID, "binding_session")
@@ -24,7 +24,9 @@ public record BindingSessionPayload(boolean active, List<Candidate> candidates)
             StreamCodec.of(
                     (buffer, payload) -> {
                         buffer.writeBoolean(payload.active);
-                        int size = Math.min(1024, payload.candidates.size());
+                        buffer.writeBoolean(payload.append);
+                        int size = payload.candidates.size();
+                        if(size>1024)throw new IllegalArgumentException("Binding page too large");
                         buffer.writeVarInt(size);
                         for (int index = 0; index < size; index++) {
                             Candidate candidate = payload.candidates.get(index);
@@ -38,7 +40,9 @@ public record BindingSessionPayload(boolean active, List<Candidate> candidates)
                     },
                     buffer -> {
                         boolean active = buffer.readBoolean();
-                        int size = Math.min(1024, Math.max(0, buffer.readVarInt()));
+                        boolean append=buffer.readBoolean();
+                        int size=buffer.readVarInt();
+                        if(size<0||size>1024)throw new IllegalArgumentException("Invalid binding page size");
                         List<Candidate> candidates = new ArrayList<>(size);
                         for (int index = 0; index < size; index++) {
                             BlockPos pos = buffer.readBlockPos();
@@ -46,9 +50,23 @@ public record BindingSessionPayload(boolean active, List<Candidate> candidates)
                             boolean bound = buffer.readBoolean();
                             candidates.add(new Candidate(pos, subLevelId, bound));
                         }
-                        return new BindingSessionPayload(active, List.copyOf(candidates));
+                        return new BindingSessionPayload(active, append, List.copyOf(candidates));
                     }
             );
+
+    public BindingSessionPayload(boolean active,List<Candidate> candidates){this(active,false,List.copyOf(candidates));}
+    public BindingSessionPayload { candidates=List.copyOf(candidates); }
+    public static void send(net.minecraft.server.level.ServerPlayer player,BindingSessionPayload payload) {
+        for(var page:payload.pages())net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player,page);
+    }
+    public List<BindingSessionPayload> pages() {
+        int count=candidates.size();
+        if(count==0)return List.of(this);
+        List<BindingSessionPayload> pages=new ArrayList<>();
+        for(int from=0;from<count;from+=1024)
+            pages.add(new BindingSessionPayload(active,from>0,List.copyOf(candidates.subList(from,Math.min(count,from+1024)))));
+        return List.copyOf(pages);
+    }
 
     public static BindingSessionPayload inactive() {
         return new BindingSessionPayload(false, List.of());

@@ -1,0 +1,5 @@
+{
+  "type":"minecraft:crafting_shaped","category":"equipment","pattern":[" B ","PLP"," B "],
+  "key":{"B":{"item":"create:brass_sheet"},"P":{"item":"create:precision_mechanism"},"L":{"item":"create:linked_controller"}},
+  "result":{"id":"create_fire_control:wireless_controller","count":1}
+}

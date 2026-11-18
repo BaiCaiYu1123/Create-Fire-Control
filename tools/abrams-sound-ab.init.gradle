@@ -1,0 +1,16 @@
+allprojects {
+    afterEvaluate {
+        runs.named('client').configure {
+            if (providers.gradleProperty('abramsMix').isPresent()) {
+                systemProperty 'create_fire_control.abrams.mix', providers.gradleProperty('abramsMix').get()
+            }
+            systemProperty 'create_fire_control.debug_engine_sound', providers.gradleProperty('abramsSoundDebug').getOrElse('true')
+            if (providers.gradleProperty('abramsDebugLoad').isPresent()) {
+                systemProperty 'create_fire_control.abrams.debug_load', providers.gradleProperty('abramsDebugLoad').get()
+            }
+            if (providers.gradleProperty('abramsDebugRpm').isPresent()) {
+                systemProperty 'create_fire_control.abrams.debug_rpm', providers.gradleProperty('abramsDebugRpm').get()
+            }
+        }
+    }
+}

@@ -1,0 +1,51 @@
+// Compile only the display fix against the installed release. This also keeps
+// unrelated work in the shared checkout out of the repaired game JAR.
+gradle.projectsEvaluated {
+    def project = rootProject
+    def release = project.files(project.providers.gradleProperty('xaeroDisplayRelease').get())
+    def classes = project.layout.projectDirectory.dir('analysis/xaero-display-fix-20261113/classes')
+    def compile = project.tasks.register('compileXaeroDisplayChecks', JavaCompile) {
+        source = project.files(
+                'src/main/java/com/hooya/stabilizedturret/client/ConnectedDisplayRenderer.java',
+                'src/main/java/com/hooya/stabilizedturret/client/XaeroDisplayMapCompat.java',
+                'src/test/java/com/hooya/stabilizedturret/client/XaeroDisplayCacheChecks.java',
+                'src/test/java/com/hooya/stabilizedturret/client/ConnectedDisplayDepthGlChecks.java')
+        classpath = release + project.configurations.testCompileClasspath
+        destinationDirectory = classes
+        options.encoding = 'UTF-8'
+    }
+    project.tasks.register('checkXaeroDisplay', JavaExec) {
+        dependsOn compile
+        classpath = project.files(classes) + release + project.configurations.testRuntimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.client.ConnectedDisplayDepthGlChecks'
+        def runDir = project.layout.projectDirectory.dir('analysis/xaero-display-fix-20261113/test-run').asFile
+        doFirst { runDir.mkdirs() }
+        workingDir runDir
+    }
+    project.tasks.register('checkXaeroDisplayCache', JavaExec) {
+        dependsOn compile
+        classpath = project.files(classes) + release + project.configurations.testRuntimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.client.XaeroDisplayCacheChecks'
+        systemProperty 'xaeroCacheRoot', project.providers.gradleProperty('xaeroCacheRoot').getOrElse('')
+        def runDir = project.layout.projectDirectory.dir('analysis/xaero-display-fix-20261113/test-run').asFile
+        doFirst { runDir.mkdirs() }
+        workingDir runDir
+    }
+    def packagedTests = project.layout.projectDirectory.dir('analysis/xaero-display-fix-20261113/packaged-tests')
+    def compilePackaged = project.tasks.register('compilePackagedXaeroDisplayChecks', JavaCompile) {
+        source = project.files(
+                'src/test/java/com/hooya/stabilizedturret/client/ConnectedDisplayDepthGlChecks.java',
+                'src/test/java/com/hooya/stabilizedturret/client/XaeroDisplayCacheChecks.java')
+        classpath = release + project.configurations.testCompileClasspath
+        destinationDirectory = packagedTests
+        options.encoding = 'UTF-8'
+    }
+    project.tasks.register('checkPackagedXaeroDisplay', JavaExec) {
+        dependsOn compilePackaged
+        classpath = project.files(packagedTests) + release + project.configurations.testRuntimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.client.ConnectedDisplayDepthGlChecks'
+        def runDir = project.layout.projectDirectory.dir('analysis/xaero-display-fix-20261113/test-run').asFile
+        doFirst { runDir.mkdirs() }
+        workingDir runDir
+    }
+}

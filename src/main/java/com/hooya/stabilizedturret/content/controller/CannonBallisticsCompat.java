@@ -2,6 +2,7 @@ package com.hooya.stabilizedturret.content.controller;
 
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import dev.ryanhcode.sable.Sable;
+import dev.ryanhcode.sable.mixinterface.clip_overwrite.ClipContextExtension;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -11,6 +12,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
@@ -25,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -40,6 +46,14 @@ public final class CannonBallisticsCompat {
             "rbasamoyai.createbigcannons.munitions.big_cannon.propellant.IntegratedPropellantProjectile";
     private static final String AUTOCANNON_AMMO =
             "rbasamoyai.createbigcannons.munitions.autocannon.AutocannonAmmoItem";
+    private static final String AUTOCANNON_AMMO_CONTAINER =
+            "rbasamoyai.createbigcannons.munitions.autocannon.ammo_container.AutocannonAmmoContainerItem";
+    private static final String HEAVY_AMMO_CONTAINER =
+            "com.dsvv.cbcat.cannon.heavy_autocannon.munitions.box.HeavyAutocannonAmmoContainerItem";
+    private static final String MILITARY_PROJECTILE_BLOCK =
+            "com.cainiao1053.cbcmoreshells.munitions.dual_cannon.DualCannonProjectileBlock";
+    private static final String MILITARY_MUNITION_REGISTRY =
+            "com.cainiao1053.cbcmoreshells.munitions.dual_cannon.shaolib.CBCMSDualCannonMunitionRegistry";
     private static final String HEAVY_AUTOCANNON_AMMO =
             "com.dsvv.cbcat.cannon.heavy_autocannon.munitions.HeavyAutocannonAmmoItem";
     private static final String HEAVY_AUTOCANNON_PROJECTILE_ITEM =
@@ -77,7 +91,7 @@ public final class CannonBallisticsCompat {
         Map<?, ?> blocks = geometry.blocks;
         Vec3 forward = geometry.forward;
         CannonFamily family = geometry.family;
-        boolean itemCannon = family != CannonFamily.BIG_CANNON;
+        boolean itemCannon = family != CannonFamily.BIG_CANNON && family != CannonFamily.MILITARY_CANNON;
         List<BlockPos> line = geometry.line;
         String cannonType = geometry.cannonType;
         Vec3 muzzle = geometry.muzzle;
@@ -88,7 +102,9 @@ public final class CannonBallisticsCompat {
                 (Map<BlockPos, Object>) readField(contraption, "presentBlockEntities");
         if (presentBlockEntities == null) presentBlockEntities = Map.of();
 
-        ShotProfile profile = itemCannon
+        ShotProfile profile = family == CannonFamily.MILITARY_CANNON
+                ? analyzeMilitaryCannon(level, geometry, presentBlockEntities)
+                : itemCannon
                 ? analyzeItemCannon(level, cannon, contraption, start, line,
                         presentBlockEntities, muzzle, forward, carrierVelocity, cannonType, family)
                 : analyzeBigCannon(level, cannon, contraption, orientation, line,
@@ -96,7 +112,7 @@ public final class CannonBallisticsCompat {
         if (profile == null && cached != null && tick - cached.tick <= 5) {
             ShotProfile previous = cached.profile;
             profile = new ShotProfile(
-                    muzzle, forward, carrierVelocity,
+                    muzzle, forward, profileCarrierVelocity(previous, geometry),
                     previous.muzzleSpeed, previous.gravity, previous.drag,
                     previous.quadraticDrag, previous.projectile, previous.cannonType,
                     line.size(), previous.propellantCount, previous.maxFlightTicks,
@@ -132,16 +148,33 @@ public final class CannonBallisticsCompat {
         Object material = readField(geometry.contraption, "cannonMaterial");
         Object properties =
                 material == null ? null : invokeNoArg(material, "properties");
-        Number baseSpeed =
-                properties == null ? null : invokeNumber(properties, "baseSpeed");
+        Number baseSpeed = itemCannonBallisticNumber(
+                geometry.contraption,
+                properties,
+                "stabilizedTurret$getBallisticBaseSpeed",
+                "baseSpeed"
+        );
         if (baseSpeed == null || !(baseSpeed.doubleValue() > 1.0e-5)) {
             return null;
         }
-        Number speedPerBarrel = invokeNumber(
-                properties, "speedIncreasePerBarrel");
-        Number maxIncreases = invokeNumber(
-                properties, "maxSpeedIncreases");
-        Number lifetime = invokeNumber(properties, "projectileLifetime");
+        Number speedPerBarrel = itemCannonBallisticNumber(
+                geometry.contraption,
+                properties,
+                "stabilizedTurret$getBallisticSpeedIncreasePerBarrel",
+                "speedIncreasePerBarrel"
+        );
+        Number maxIncreases = itemCannonBallisticNumber(
+                geometry.contraption,
+                properties,
+                "stabilizedTurret$getBallisticMaxSpeedIncreases",
+                "maxSpeedIncreases"
+        );
+        Number lifetime = itemCannonBallisticNumber(
+                geometry.contraption,
+                properties,
+                "stabilizedTurret$getBallisticProjectileLifetime",
+                "projectileLifetime"
+        );
         int barrelCount = Math.max(0, geometry.line.size() - 1);
         int effectiveBarrels = maxIncreases == null
                 ? barrelCount
@@ -177,7 +210,7 @@ public final class CannonBallisticsCompat {
                         : Math.max(1, lifetime.intValue()),
                 1.0,
                 2.0,
-                materialRecoil(properties)
+                itemCannonRecoil(geometry.contraption, properties)
         );
     }
 
@@ -247,6 +280,37 @@ public final class CannonBallisticsCompat {
         Vec3 analytical = analyticalLaunchDirection(profile, target);
         if (analytical == null) return null;
         return refineLaunchDirection(profile, target, analytical);
+    }
+
+    /**
+     * Solves the first reachable intercept of a linearly moving world-space
+     * target.  Solving time and position together is important for fast
+     * incoming missiles: estimating time from range / muzzle speed alone can
+     * advance the target past the muzzle and make the gun reverse direction.
+     */
+    public static @Nullable MovingTargetSolution solveMovingTarget(
+            ShotProfile profile,
+            Vec3 target,
+            Vec3 targetVelocity
+    ) {
+        if (profile == null || target == null || targetVelocity == null
+                || !isFinite(target) || !isFinite(targetVelocity)
+                || !(profile.muzzleSpeed > 1.0e-5)) return null;
+        MovingTargetIntercept.Solution analytical = MovingTargetIntercept.solve(
+                profile.muzzle,
+                profile.carrierVelocity,
+                profile.muzzleSpeed,
+                profile.gravity,
+                profile.drag,
+                profile.quadraticDrag,
+                Math.min(profile.maxFlightTicks, MAX_FLIGHT_TICKS),
+                target,
+                targetVelocity);
+        if (analytical == null) return null;
+        Vec3 direction = solveLaunchDirection(profile, analytical.target());
+        if (direction == null || direction.lengthSqr() < 1.0e-10) return null;
+        return new MovingTargetSolution(
+                analytical.target(), direction.normalize(), analytical.flightTicks());
     }
 
     /**
@@ -350,6 +414,9 @@ public final class CannonBallisticsCompat {
         }
         TrajectorySample finalSample = simulateTrajectory(
                 profile, target, direction, flightTicks);
+        // A nearest trajectory is not a firing solution for an unreachable target.
+        double tolerance = Math.max(0.15, Math.min(1.0, distance * 0.001));
+        if (Math.min(finalSample.errorSqr, best.errorSqr) > tolerance * tolerance) return null;
         return finalSample.errorSqr < best.errorSqr ? direction : bestDirection;
     }
 
@@ -368,17 +435,11 @@ public final class CannonBallisticsCompat {
         double drag = Math.max(0.0, profile.drag);
 
         for (int tick = 1; tick <= maxTicks; tick++) {
-            double speed = velocity.length();
-            double dragForce = drag * speed;
-            if (profile.quadraticDrag) dragForce *= speed;
-            dragForce = Math.min(dragForce, speed);
-            Vec3 acceleration = speed > 1.0e-10
-                    ? velocity.normalize().scale(-dragForce)
-                    : Vec3.ZERO;
-            acceleration = acceleration.add(0.0, profile.gravity, 0.0);
             Vec3 previousPosition = position;
-            position = position.add(velocity).add(acceleration.scale(0.5));
-            velocity = velocity.add(acceleration);
+            CannonProjectileFlight.Step step = CannonProjectileFlight.step(position, velocity,
+                    profile.gravity, drag, profile.quadraticDrag);
+            position = step.position();
+            velocity = step.velocity();
             // CBC collision detection sweeps the projectile through the
             // complete movement segment for this tick. Sampling only the
             // integer-tick endpoint quantizes a 9-block/tick autocannon path
@@ -480,6 +541,94 @@ public final class CannonBallisticsCompat {
         return geometry == null ? null : geometry.muzzle;
     }
 
+    public static @Nullable Vec3 getCurrentMuzzlePosition(Level level, BindingRef ref) {
+        CannonGeometry geometry = inspectGeometry(level, ref, 1.0F);
+        return geometry == null ? null : geometry.muzzle;
+    }
+
+    /** Compact diagnostics for a loaded gun whose optional ammunition API could not be resolved. */
+    public static String describeLoadedCannon(Level level, BindingRef ref) {
+        CannonGeometry geometry = inspectGeometry(level, ref);
+        if (geometry == null) return "unavailable-geometry";
+        List<String> loaded = new ArrayList<>();
+        Object rawPresent = readField(geometry.contraption, "presentBlockEntities");
+        if (rawPresent instanceof Map<?, ?> present) {
+            for (BlockPos position : geometry.line) {
+                Object be = present.get(position);
+                Object raw = invokeNoArg(invokeNoArg(be, "cannonBehavior"), "block");
+                if (raw instanceof StructureBlockInfo info && !info.state().isAir())
+                    loaded.add(BuiltInRegistries.BLOCK.getKey(info.state().getBlock()).toString());
+                if (loaded.size() >= 8) break;
+            }
+            ItemStack item = findCannonAmmunition(geometry.contraption, present.get(geometry.start), ammunitionTypes(geometry.family));
+            if (!item.isEmpty()) loaded.add(BuiltInRegistries.ITEM.getKey(item.getItem()).toString());
+        }
+        return geometry.cannonType + "|family=" + geometry.family.id + "|loaded=" + loaded;
+    }
+
+    public static @Nullable ShotProfile withCurrentFrame(ShotProfile profile, Level level, BindingRef ref) {
+        if (profile == null) return null;
+        CannonGeometry geometry = inspectGeometry(level, ref, 1.0F);
+        if (geometry == null) return null;
+        return new ShotProfile(geometry.muzzle, geometry.forward,
+                profileCarrierVelocity(profile, geometry),
+                profile.muzzleSpeed, profile.gravity, profile.drag, profile.quadraticDrag,
+                profile.projectile, profile.cannonType, profile.barrelLength, profile.propellantCount,
+                profile.maxFlightTicks, profile.propellantCharge, profile.projectileMass, profile.recoil);
+    }
+
+    public static ShotProfile withLaunchDirection(ShotProfile profile, Vec3 direction) {
+        return new ShotProfile(profile.muzzle, direction.normalize(), profile.carrierVelocity,
+                profile.muzzleSpeed, profile.gravity, profile.drag, profile.quadraticDrag,
+                profile.projectile, profile.cannonType, profile.barrelLength, profile.propellantCount,
+                profile.maxFlightTicks, profile.propellantCharge, profile.projectileMass, profile.recoil);
+    }
+
+    public static ShotProfile withCarrierVelocity(ShotProfile profile, Vec3 velocity) {
+        return new ShotProfile(profile.muzzle, profile.currentForward, velocity,
+                profile.muzzleSpeed, profile.gravity, profile.drag, profile.quadraticDrag,
+                profile.projectile, profile.cannonType, profile.barrelLength, profile.propellantCount,
+                profile.maxFlightTicks, profile.propellantCharge, profile.projectileMass, profile.recoil);
+    }
+
+    /** Uses one physical point/velocity snapshot while retaining the ammunition's parameters. */
+    public static ShotProfile withFrame(ShotProfile profile, Vec3 muzzle, Vec3 forward, Vec3 velocity) {
+        return new ShotProfile(muzzle, forward, velocity,
+                profile.muzzleSpeed, profile.gravity, profile.drag, profile.quadraticDrag,
+                profile.projectile, profile.cannonType, profile.barrelLength, profile.propellantCount,
+                profile.maxFlightTicks, profile.propellantCharge, profile.projectileMass, profile.recoil);
+    }
+
+    public static @Nullable Vec3 predictImpact(ServerLevel root, ShotProfile profile, Set<UUID> ignored) {
+        if (profile == null || !(profile.muzzleSpeed > 0)) return null;
+        return CannonProjectileFlight.trace(profile.muzzle,
+                profile.currentForward.scale(profile.muzzleSpeed).add(profile.carrierVelocity),
+                profile.gravity, profile.drag, profile.quadraticDrag, profile.maxFlightTicks,
+                root.getMinBuildHeight() - 64.0, (from, to) -> {
+                    Vec3 closest = null;
+                    if (loadedSegment(root, from, to)) {
+                        ClipContext context = new ClipContext(from, to, ClipContext.Block.COLLIDER,
+                                ClipContext.Fluid.NONE, CollisionContext.empty());
+                        // Query structures separately: Sable's clip overwrite returns plot-space hits.
+                        ((ClipContextExtension) context).sable$setSubLevelIgnoring(subLevel -> true);
+                        var hit = root.clip(context);
+                        if (hit.getType() != HitResult.Type.MISS) closest = hit.getLocation();
+                    }
+                    var structure = SableMissileFuze.firstBlockContact(root, from, to, ignored);
+                    if (structure != null && (closest == null || structure.position().distanceToSqr(from)
+                            < closest.distanceToSqr(from))) closest = structure.position();
+                    return closest;
+                });
+    }
+
+    private static boolean loadedSegment(ServerLevel level, Vec3 from, Vec3 to) {
+        int samples = Math.max(1, (int) Math.ceil(Math.max(Math.abs(to.x - from.x), Math.abs(to.z - from.z)) / 16));
+        for (int i = 0; i <= samples; i++) {
+            if (!level.hasChunkAt(BlockPos.containing(from.lerp(to, (double) i / samples)))) return false;
+        }
+        return true;
+    }
+
     /**
      * Returns the authoritative world-space barrel axis produced by CBC's
      * current contraption transform, without consulting ammunition caches.
@@ -506,6 +655,92 @@ public final class CannonBallisticsCompat {
     public static Vec3 getInheritedVelocity(Level level, BindingRef ref) {
         ShotProfile profile = analyze(level, ref);
         return profile == null ? Vec3.ZERO : profile.carrierVelocity;
+    }
+
+    /** Military Supplement 2.x uses entities; 3.x uses data-driven Shaolib projectiles. */
+    private static @Nullable ShotProfile analyzeMilitaryCannon(Level level, CannonGeometry geometry,
+            Map<BlockPos, Object> present) {
+        Class<?> projectileBlockType = optionalClass(MILITARY_PROJECTILE_BLOCK);
+        if (projectileBlockType == null) return null;
+        List<StructureBlockInfo> roundBlocks = new ArrayList<>();
+        Block projectileBlock = null;
+        for (BlockPos position : geometry.line) {
+            Object be = present.get(position);
+            Object raw = invokeNoArg(invokeNoArg(be, "cannonBehavior"), "block");
+            if (!(raw instanceof StructureBlockInfo info) || info.state().isAir()) continue;
+            Block block = info.state().getBlock();
+            if (!projectileBlockType.isInstance(block)) continue;
+            // Two different rounds may occupy the two barrels. The primary
+            // cue follows the first complete round, matching fireShot's order.
+            if (projectileBlock != null && Boolean.TRUE.equals(invokeCompatible(
+                    projectileBlock, "isComplete", List.copyOf(roundBlocks), geometry.orientation))) break;
+            projectileBlock = block;
+            roundBlocks.add(info);
+        }
+        if (projectileBlock == null || !Boolean.TRUE.equals(invokeCompatible(
+                projectileBlock, "isComplete", List.copyOf(roundBlocks), geometry.orientation))) return null;
+        Object material = readField(geometry.contraption, "cannonMaterial");
+        Object materialProperties = invokeNoArg(material, "properties");
+        if (materialProperties == null) return null;
+        int addedLife = numberOr(invokeNumber(materialProperties, "addedLifetime"), 0).intValue();
+        float commandLife = numberOr(readNumberField(geometry.contraption, "commandLifetimeModifier"), 1).floatValue();
+        float equipmentLife = numberOr(readNumberField(geometry.contraption, "equipmentLifetimeModifier"), 1).floatValue();
+        Class<?> registry = optionalClass(MILITARY_MUNITION_REGISTRY);
+        double speed, gravity, drag, mass, recoil, charge;
+        boolean quadratic;
+        int lifetime;
+        String source;
+        if (registry != null) {
+            // Use the same live property resolver as spawnRound, including
+            // datapack reloads. Legacy JSON/entity defaults differ in 3.x.
+            Object entry = invokeStaticCompatible(registry, "of", projectileBlock);
+            Object properties = invokeStaticCompatible(registry, "properties", entry);
+            Object launch = invokeNoArg(properties, "dualCannon");
+            Object physics = invokeNoArg(properties, "ballistics");
+            Number initial = invokeNumber(launch, "initialVelocity");
+            Number gravityValue = invokeNumber(physics, "gravity");
+            Number dragValue = invokeNumber(physics, "drag");
+            Number baseLife = invokeNumber(launch, "baseLifetime");
+            if (initial == null || gravityValue == null || dragValue == null || baseLife == null) return null;
+            Number resolvedLife = invokeNumber(invokeNoArg(entry, "launchProfile"), "resolveLifetimeTicks",
+                    baseLife.intValue(), addedLife, commandLife, equipmentLife);
+            if (resolvedLife == null) return null;
+            speed = initial.doubleValue();
+            gravity = gravityValue.doubleValue();
+            drag = dragValue.doubleValue();
+            quadratic = Boolean.TRUE.equals(invokeNoArg(physics, "quadraticDrag"));
+            mass = numberOr(invokeNumber(physics, "durabilityMass"), 0).doubleValue();
+            recoil = numberOr(invokeNumber(launch, "baseRecoil"), 0).doubleValue();
+            charge = numberOr(invokeNumber(launch, "minimumChargePower"), 0).doubleValue();
+            lifetime = resolvedLife.intValue();
+            source = "shaolib";
+        } else {
+            Object projectile = invokeCompatible(projectileBlock, "getProjectile", level, List.copyOf(roundBlocks));
+            String id = BuiltInRegistries.BLOCK.getKey(projectileBlock).toString();
+            ProjectilePhysics physics = projectilePhysics(projectile, id);
+            Number initial = invokeNumber(projectile, "getInitVel");
+            Number baseLife = invokeNumber(projectile, "getLifetime");
+            if (physics == null || initial == null || baseLife == null) return null;
+            speed = initial.doubleValue();
+            gravity = physics.gravity;
+            drag = physics.drag;
+            quadratic = physics.quadraticDrag;
+            mass = physics.mass;
+            recoil = numberOr(invokeNumber(projectile, "addedRecoil"), 0).doubleValue();
+            charge = numberOr(invokeNumber(projectile, "minimumChargePower"), 0).doubleValue();
+            lifetime = Math.max(1, (int) ((baseLife.intValue() + addedLife) * (double) commandLife * equipmentLife));
+            source = "legacy";
+        }
+        if (!Double.isFinite(speed) || speed <= 1e-5 || !Double.isFinite(gravity)
+                || !Double.isFinite(drag) || drag < 0 || lifetime < 1) return null;
+        return new ShotProfile(geometry.muzzle, geometry.forward, Vec3.ZERO, speed, gravity, drag, quadratic,
+                BuiltInRegistries.BLOCK.getKey(projectileBlock).toString(),
+                geometry.cannonType + "|family=military_cannon|physics=" + source,
+                geometry.line.size(), 1, lifetime, charge, mass, recoil);
+    }
+
+    private static Number numberOr(@Nullable Number value, Number fallback) {
+        return value == null ? fallback : value;
     }
 
     private static @Nullable ShotProfile analyzeBigCannon(
@@ -599,11 +834,30 @@ public final class CannonBallisticsCompat {
 
         Object material = readField(contraption, "cannonMaterial");
         Object properties = material == null ? null : invokeNoArg(material, "properties");
-        Number baseSpeed = properties == null ? null : invokeNumber(properties, "baseSpeed");
-        Number speedPerBarrel = properties == null ? null
-                : invokeNumber(properties, "speedIncreasePerBarrel");
-        Number maxIncreases = properties == null ? null : invokeNumber(properties, "maxSpeedIncreases");
-        Number lifetime = properties == null ? null : invokeNumber(properties, "projectileLifetime");
+        Number baseSpeed = itemCannonBallisticNumber(
+                contraption,
+                properties,
+                "stabilizedTurret$getBallisticBaseSpeed",
+                "baseSpeed"
+        );
+        Number speedPerBarrel = itemCannonBallisticNumber(
+                contraption,
+                properties,
+                "stabilizedTurret$getBallisticSpeedIncreasePerBarrel",
+                "speedIncreasePerBarrel"
+        );
+        Number maxIncreases = itemCannonBallisticNumber(
+                contraption,
+                properties,
+                "stabilizedTurret$getBallisticMaxSpeedIncreases",
+                "maxSpeedIncreases"
+        );
+        Number lifetime = itemCannonBallisticNumber(
+                contraption,
+                properties,
+                "stabilizedTurret$getBallisticProjectileLifetime",
+                "projectileLifetime"
+        );
         if (baseSpeed == null) return null;
         int barrelCount = Math.max(0, line.size() - 1);
         int effectiveBarrels = maxIncreases == null
@@ -621,6 +875,16 @@ public final class CannonBallisticsCompat {
         if (velocityMultiplier != null && velocityMultiplier.doubleValue() > 0.0) {
             speed *= velocityMultiplier.doubleValue();
             referenceSpeed *= velocityMultiplier.doubleValue();
+        }
+        // Autogun Revolution boosts the entire launch velocity on the first
+        // tick, after the gun has added inherited motion. Reading only the
+        // ordinary material speed loses that boost and gives excessive lead.
+        boolean boosted = projectile != null && projectile.getClass().getName().startsWith("com.cbcaddon.")
+                && Boolean.TRUE.equals(readField(projectile, "highVelocity"));
+        if (boosted) {
+            speed *= 2;
+            referenceSpeed *= 2;
+            carrierVelocity = carrierVelocity.scale(2);
         }
         if (family == CannonFamily.ROCKET_POD
                 || family == CannonFamily.MEDIUM_ROCKET_POD) {
@@ -643,11 +907,12 @@ public final class CannonBallisticsCompat {
             referenceSpeed *= 1.5;
         }
         if (!(speed > 1.0e-5)) return null;
-        double referenceRecoil = materialRecoil(properties);
+        double referenceRecoil = itemCannonRecoil(contraption, properties);
         String describedType = cannonType
                 + "|family=" + family.id
                 + "|fixed_speed=" + referenceSpeed
                 + "|fixed_recoil=" + referenceRecoil
+                + (boosted ? "|doubles_inherited_velocity" : "")
                 + "|strong=" + strongRound;
         return new ShotProfile(
                 muzzle, forward, carrierVelocity, speed,
@@ -773,6 +1038,12 @@ public final class CannonBallisticsCompat {
     private static ItemStack findCannonAmmunition(
             Object contraption, @Nullable Object breech, Class<?>[] ammunitionTypes
     ) {
+        Object bridged = invokeNoArg(
+                contraption, "stabilizedTurret$getBallisticAmmunition");
+        if (bridged instanceof ItemStack stack
+                && isAmmunition(stack, ammunitionTypes)) {
+            return stack;
+        }
         Object queue = breech == null ? null : invokeNoArg(breech, "getInputBuffer");
         if (queue instanceof ItemStack stack && isAmmunition(stack, ammunitionTypes)) {
             return stack;
@@ -782,6 +1053,20 @@ public final class CannonBallisticsCompat {
                 if (value instanceof ItemStack stack && isAmmunition(stack, ammunitionTypes)) {
                     return stack;
                 }
+            }
+        }
+        // CBC AT's quick-firing heavy breech exposes no input queue/getter.
+        // Inspect its current cartridge without calling the consuming extractor.
+        Object cartridge = breech == null ? null : readField(breech, "cartridge");
+        if (cartridge instanceof ItemStack stack && isAmmunition(stack, ammunitionTypes)) return stack;
+        // CBC fires directly from the fitted magazine when its input queue is empty.
+        // Ask CBC to select the next round on a copy: this also respects creative
+        // magazines, tracer-only magazines and their alternating round order.
+        Object magazine = breech == null ? null : invokeNoArg(breech, "getMagazine");
+        if (magazine instanceof ItemStack stack && !stack.isEmpty()) {
+            for (String container : new String[]{AUTOCANNON_AMMO_CONTAINER, HEAVY_AMMO_CONTAINER}) {
+                Object next = invokeStaticCompatible(optionalClass(container), "pollItemFromContainer", stack.copy());
+                if (next instanceof ItemStack round && isAmmunition(round, ammunitionTypes)) return round;
             }
         }
         Object storage = invokeNoArg(contraption, "getItemStorage");
@@ -838,6 +1123,7 @@ public final class CannonBallisticsCompat {
 
     private static CannonFamily cannonFamily(String className) {
         String value = className == null ? "" : className.toLowerCase(java.util.Locale.ROOT);
+        if (value.contains("mounteddualcannoncontraption")) return CannonFamily.MILITARY_CANNON;
         if (value.contains("mountedheavyautocannoncontraption")) {
             return CannonFamily.HEAVY_AUTOCANNON;
         }
@@ -862,6 +1148,16 @@ public final class CannonBallisticsCompat {
         return CannonFamily.BIG_CANNON;
     }
 
+    private static CannonFamily cannonFamily(Class<?> type) {
+        // Third-party cannon variants can subclass an existing item-fed gun.
+        // Their own simple name need not contain MountedAutocannonContraption.
+        for (Class<?> current = type; current != null; current = current.getSuperclass()) {
+            CannonFamily family = cannonFamily(current.getName());
+            if (family != CannonFamily.BIG_CANNON) return family;
+        }
+        return CannonFamily.BIG_CANNON;
+    }
+
     private static String describeCannon(
             Object contraption,
             Map<?, ?> blocks,
@@ -870,6 +1166,10 @@ public final class CannonBallisticsCompat {
         String materialName = "";
         Object material = readField(contraption, "cannonMaterial");
         Object rawMaterialName = material == null ? null : invokeNoArg(material, "name");
+        if (rawMaterialName == null) {
+            rawMaterialName = invokeNoArg(
+                    contraption, "stabilizedTurret$getBallisticMaterialName");
+        }
         if (rawMaterialName != null) materialName = rawMaterialName.toString();
 
         String representativeBlock = "";
@@ -896,6 +1196,27 @@ public final class CannonBallisticsCompat {
         return value == null ? 0.0 : Math.max(0.0, value.doubleValue());
     }
 
+    private static @Nullable Number itemCannonBallisticNumber(
+            Object contraption,
+            @Nullable Object properties,
+            String bridgeMethod,
+            String propertyMethod
+    ) {
+        Number bridged = invokeNumber(contraption, bridgeMethod);
+        return bridged != null ? bridged : invokeNumber(properties, propertyMethod);
+    }
+
+    private static double itemCannonRecoil(
+            Object contraption,
+            @Nullable Object properties
+    ) {
+        Number bridged = invokeNumber(
+                contraption, "stabilizedTurret$getBallisticBaseRecoil");
+        return bridged == null
+                ? materialRecoil(properties)
+                : Math.max(0.0, bridged.doubleValue());
+    }
+
     private static List<BlockPos> collectCannonLine(
             Map<?, ?> blocks, BlockPos start, Direction direction
     ) {
@@ -914,12 +1235,13 @@ public final class CannonBallisticsCompat {
             BlockPos start,
             Direction orientation,
             List<BlockPos> line,
-            Vec3 forward
+            Vec3 forward,
+            float partialTick
     ) {
         BlockPos firstAir = line.isEmpty()
                 ? start.relative(orientation)
                 : line.get(line.size() - 1).relative(orientation);
-        Vec3 beyondMuzzle = worldPoint(cannon, Vec3.atCenterOf(firstAir.relative(orientation)));
+        Vec3 beyondMuzzle = worldPoint(cannon, Vec3.atCenterOf(firstAir.relative(orientation)), partialTick);
         return beyondMuzzle == null ? null : beyondMuzzle.subtract(forward.scale(2.0));
     }
 
@@ -928,12 +1250,13 @@ public final class CannonBallisticsCompat {
             BlockPos start,
             Direction orientation,
             List<BlockPos> line,
-            Vec3 forward
+            Vec3 forward,
+            float partialTick
     ) {
         BlockPos firstAir = line.isEmpty()
                 ? start.relative(orientation)
                 : line.get(line.size() - 1).relative(orientation);
-        Vec3 beyondMuzzle = worldPoint(cannon, Vec3.atCenterOf(firstAir.relative(orientation)));
+        Vec3 beyondMuzzle = worldPoint(cannon, Vec3.atCenterOf(firstAir.relative(orientation)), partialTick);
         return beyondMuzzle == null ? null : beyondMuzzle.subtract(forward.scale(1.5));
     }
 
@@ -982,6 +1305,10 @@ public final class CannonBallisticsCompat {
     private static @Nullable CannonGeometry inspectGeometry(
             Level level, BindingRef ref
     ) {
+        return inspectGeometry(level, ref, 0.0F);
+    }
+
+    private static @Nullable CannonGeometry inspectGeometry(Level level, BindingRef ref, float partialTick) {
         BlockEntity mount = ref.resolve(level);
         if (mount == null) return null;
         Object mounted = invokeNoArg(mount, "getContraption");
@@ -998,14 +1325,16 @@ public final class CannonBallisticsCompat {
         Object rawBlocks = invokeNoArg(contraption, "getBlocks");
         if (orientation == null || start == null
                 || !(rawBlocks instanceof Map<?, ?> blocks)) return null;
-        Vec3 forward = worldForward(cannon, orientation);
+        Vec3 forward = worldForward(cannon, orientation, partialTick);
         if (forward == null) return null;
-        CannonFamily family = cannonFamily(contraption.getClass().getName());
+        CannonFamily family = cannonFamily(contraption.getClass());
         List<BlockPos> line = collectCannonLine(blocks, start, orientation);
         String cannonType = describeCannon(contraption, blocks, line);
-        Vec3 muzzle = family == CannonFamily.BIG_CANNON
-                ? bigCannonMuzzle(cannon, start, orientation, line, forward)
-                : autocannonMuzzle(cannon, start, orientation, line, forward);
+        Vec3 muzzle = family == CannonFamily.MILITARY_CANNON
+                ? militaryCannonMuzzle(cannon, contraption, start, orientation, line, partialTick)
+                : family == CannonFamily.BIG_CANNON
+                ? bigCannonMuzzle(cannon, start, orientation, line, forward, partialTick)
+                : autocannonMuzzle(cannon, start, orientation, line, forward, partialTick);
         if (muzzle == null || !isFinite(muzzle)) return null;
         return new CannonGeometry(
                 cannon, contraption, orientation, start, blocks, forward,
@@ -1013,26 +1342,48 @@ public final class CannonBallisticsCompat {
         );
     }
 
+    private static Vec3 profileCarrierVelocity(ShotProfile profile, CannonGeometry geometry) {
+        // Military Supplement supplies world velocity directly and does not add
+        // carrier motion in either its legacy entity or Shaolib spawn path.
+        if (geometry.family == CannonFamily.MILITARY_CANNON) return Vec3.ZERO;
+        Vec3 velocity = sampleMuzzleVelocity(geometry.cannon, geometry.muzzle);
+        return profile.cannonType.contains("|doubles_inherited_velocity") ? velocity.scale(2) : velocity;
+    }
+
+    private static @Nullable Vec3 militaryCannonMuzzle(AbstractContraptionEntity cannon, Object contraption,
+            BlockPos start, Direction orientation, List<BlockPos> line, float partialTick) {
+        BlockPos firstAir = line.isEmpty() ? start.relative(orientation)
+                : line.getLast().relative(orientation);
+        Vec3 ahead = cannon.toGlobalVector(Vec3.atCenterOf(firstAir.relative(orientation)), partialTick);
+        Vec3 axis = ahead.subtract(cannon.toGlobalVector(Vec3.atCenterOf(BlockPos.ZERO), partialTick)).normalize();
+        Object material = readField(contraption, "cannonMaterial");
+        Object properties = invokeNoArg(material, "properties");
+        Number gap = invokeNumber(properties, "barrelGap");
+        Number inverter = readNumberField(contraption, "barrelInverter");
+        double offset = gap == null ? 0 : gap.doubleValue() * .5 * (inverter == null ? 1 : inverter.intValue());
+        Vec3 point = ahead.subtract(axis.scale(2)).add(axis.yRot((float) (Math.PI / 2)).scale(offset));
+        return Sable.HELPER.projectOutOfSubLevel(cannon.level(), point);
+    }
+
     private static Vec3 sampleMuzzleVelocity(AbstractContraptionEntity cannon, Vec3 muzzle) {
-        SubLevel containing = Sable.HELPER.getContaining(cannon);
+        return sampleBodyVelocity(cannon.level(), Sable.HELPER.getContaining(cannon), muzzle);
+    }
+
+    public static Vec3 sampleBodyVelocity(Level level, @Nullable SubLevel containing, Vec3 muzzle) {
         if (containing == null || containing.isRemoved()) return Vec3.ZERO;
         try {
-            // Measure how the *same local muzzle point* moved between Sable's
-            // previous and current carrier poses. Merely subtracting the two
-            // pose origins loses the velocity produced when an aircraft
-            // pitches, yaws or rolls. Conversely, querying the CBC cannon
-            // entity's point velocity also includes the gun mount's own
-            // traverse/elevation, which must not be treated as carrier motion.
+            // Evaluate the muzzle point on the caller's chosen rigid body.
+            // Impact prediction chooses the cannon body; head-aim feed-forward
+            // chooses the carrier outside the controlled swivel joints.
             Vector3d localMuzzle = new Vector3d(muzzle.x, muzzle.y, muzzle.z);
             containing.logicalPose().transformPositionInverse(localMuzzle);
             // Sable exposes rigid-body velocity in blocks/second and includes
             // both linear motion and omega x radius for this exact local
             // point. It is the authoritative carrier velocity on the server.
             Vector3d physicalVelocity = Sable.HELPER.getVelocity(
-                    cannon.level(), containing, localMuzzle, new Vector3d()
+                    level, containing, localMuzzle, new Vector3d()
             ).div(20.0);
-            if (physicalVelocity.isFinite()
-                    && physicalVelocity.lengthSquared() > 1.0e-10) {
+            if (physicalVelocity.isFinite()) {
                 return new Vec3(
                         physicalVelocity.x,
                         physicalVelocity.y,
@@ -1134,73 +1485,17 @@ public final class CannonBallisticsCompat {
     }
 
     private static @Nullable Object invokeCompatible(Object owner, String name, Object... arguments) {
-        if (owner == null) return null;
-        for (Class<?> current = owner.getClass(); current != null; current = current.getSuperclass()) {
-            for (Method method : current.getDeclaredMethods()) {
-                if (!method.getName().equals(name)
-                        || method.getParameterCount() != arguments.length
-                        || !accepts(method.getParameterTypes(), arguments)) continue;
-                try {
-                    method.setAccessible(true);
-                    return method.invoke(owner, arguments);
-                } catch (ReflectiveOperationException | RuntimeException | LinkageError ignored) {
-                }
-            }
-        }
-        return null;
+        return CannonReflection.invoke(owner, name, arguments);
     }
 
     private static @Nullable Object invokeStaticCompatible(
             Class<?> owner, String name, Object... arguments
     ) {
-        if (owner == null) return null;
-        for (Class<?> current = owner; current != null; current = current.getSuperclass()) {
-            for (Method method : current.getDeclaredMethods()) {
-                if (!method.getName().equals(name)
-                        || method.getParameterCount() != arguments.length
-                        || !accepts(method.getParameterTypes(), arguments)) continue;
-                try {
-                    method.setAccessible(true);
-                    return method.invoke(null, arguments);
-                } catch (ReflectiveOperationException | RuntimeException | LinkageError ignored) {
-                }
-            }
-        }
-        return null;
-    }
-
-    private static boolean accepts(Class<?>[] parameters, Object[] arguments) {
-        for (int index = 0; index < parameters.length; index++) {
-            Object argument = arguments[index];
-            if (argument == null) continue;
-            Class<?> parameter = wrap(parameters[index]);
-            if (!parameter.isInstance(argument)) return false;
-        }
-        return true;
-    }
-
-    private static Class<?> wrap(Class<?> type) {
-        if (!type.isPrimitive()) return type;
-        if (type == int.class) return Integer.class;
-        if (type == float.class) return Float.class;
-        if (type == double.class) return Double.class;
-        if (type == long.class) return Long.class;
-        if (type == boolean.class) return Boolean.class;
-        if (type == short.class) return Short.class;
-        if (type == byte.class) return Byte.class;
-        if (type == char.class) return Character.class;
-        return type;
+        return CannonReflection.invokeStatic(owner, name, arguments);
     }
 
     private static @Nullable Method findMethod(Class<?> type, String name, int argumentCount) {
-        for (Class<?> current = type; current != null; current = current.getSuperclass()) {
-            for (Method method : current.getDeclaredMethods()) {
-                if (method.getName().equals(name) && method.getParameterCount() == argumentCount) {
-                    return method;
-                }
-            }
-        }
-        return null;
+        return CannonReflection.find(type, name, argumentCount);
     }
 
     private static @Nullable Field findField(Class<?> type, String name) {
@@ -1252,6 +1547,13 @@ public final class CannonBallisticsCompat {
     ) {
     }
 
+    public record MovingTargetSolution(
+            Vec3 target,
+            Vec3 launchDirection,
+            double flightTicks
+    ) {
+    }
+
     private record ProjectilePhysics(
             double gravity,
             double drag,
@@ -1299,6 +1601,7 @@ public final class CannonBallisticsCompat {
 
     private enum CannonFamily {
         BIG_CANNON("big_cannon"),
+        MILITARY_CANNON("military_cannon"),
         AUTOCANNON("autocannon"),
         TWIN_AUTOCANNON("twin_autocannon"),
         HEAVY_AUTOCANNON("heavy_autocannon"),

@@ -29,9 +29,12 @@ import java.util.WeakHashMap;
 /** Optional CBC/CBC Neo Warfare bridge with no hard dependency. */
 @EventBusSubscriber(modid = StabilizedTurret.MOD_ID)
 public final class CannonMountCompat {
+    private static final long FIRE_REQUEST_GRACE_TICKS = 2L;
     private static final Map<BlockEntity, Boolean> VIRTUAL_FIRE_STATES =
             Collections.synchronizedMap(new WeakHashMap<>());
     private static final Map<BlockEntity, Long> ACTIVE_FIRE_REQUESTS =
+            Collections.synchronizedMap(new WeakHashMap<>());
+    private static final Map<BlockEntity, Integer> ACTIVE_FIRE_POWERS =
             Collections.synchronizedMap(new WeakHashMap<>());
 
     public static boolean isCannonMount(BlockEntity blockEntity) {
@@ -94,20 +97,51 @@ public final class CannonMountCompat {
         return cannon != null && !cannon.isRemoved();
     }
 
+    /** Exact assembled CBC entity used by mounted auxiliary weapons. */
+    public static @Nullable Entity getMountedCannonEntity(Level level, BindingRef ref) {
+        BlockEntity mount = ref == null ? null : ref.resolve(level);
+        if (mount == null) return null;
+        Entity cannon = getMountedCannon(mount);
+        return cannon == null || cannon.isRemoved() ? null : cannon;
+    }
+
+    /** CBC rotates about contraption-local block zero, never its barrel bounding-box centre. */
+    public static @Nullable VirtualScopeGeometry.Axis getMountedCannonPitchAxis(Level level, BindingRef ref) {
+        Entity entity = getMountedCannonEntity(level, ref);
+        if (!(entity instanceof com.simibubi.create.content.contraptions.AbstractContraptionEntity cannon)
+                || cannon.getContraption() == null) return null;
+        Object initial = invokeDeclaredNoArg(cannon, "getInitialOrientation");
+        if (!(initial instanceof Direction)) initial = invokeDeclaredNoArg(cannon.getContraption(), "initialOrientation");
+        if (!(initial instanceof Direction forward) || forward.getAxis().isVertical()) return null;
+        Vec3 center = Vec3.atCenterOf(net.minecraft.core.BlockPos.ZERO);
+        Vec3 lateral = Vec3.atLowerCornerOf(forward.getClockWise().getNormal());
+        Vec3 pivot = Sable.HELPER.projectOutOfSubLevel(cannon.level(), cannon.toGlobalVector(center, 1.0F));
+        Vec3 side = Sable.HELPER.projectOutOfSubLevel(cannon.level(), cannon.toGlobalVector(center.add(lateral), 1.0F));
+        return new VirtualScopeGeometry.Axis(pivot, side.subtract(pivot));
+    }
+
     /**
      * Supplies a virtual redstone signal to the CBC mount's fire input without
      * changing its assembly input.
      */
     public static boolean setAutomaticFire(Level level, BindingRef ref, boolean powered) {
+        return setAutomaticFire(level, ref, powered, powered ? 15 : 0);
+    }
+
+    /** Supplies a virtual redstone signal with a configurable firing strength. */
+    public static boolean setAutomaticFire(
+            Level level, BindingRef ref, boolean powered, int firePower) {
         BlockEntity mount = ref == null ? null : ref.resolve(level);
         if (mount == null || getMountedCannon(mount) == null) return false;
         if (powered) {
-            ACTIVE_FIRE_REQUESTS.put(
-                    mount,
-                    mount.getLevel() == null
-                            ? Long.MIN_VALUE
-                            : mount.getLevel().getGameTime()
-            );
+            Level mountLevel = mount.getLevel();
+            if (mountLevel == null || mountLevel.getServer() == null) return false;
+            // A Sable-mounted cannon can live in a sub-level whose game time
+            // pauses or lags behind another vehicle sub-level in multiplayer.
+            // Server tick count is the shared clock for every mounted cannon.
+            ACTIVE_FIRE_REQUESTS.put(mount,
+                    (long) mountLevel.getServer().getTickCount());
+            ACTIVE_FIRE_POWERS.put(mount, Math.max(1, Math.min(15, firePower)));
             return true;
         }
 
@@ -116,8 +150,10 @@ public final class CannonMountCompat {
         // bridge previously asserted the virtual fire signal.
         if (ACTIVE_FIRE_REQUESTS.remove(mount) == null
                 && !Boolean.TRUE.equals(VIRTUAL_FIRE_STATES.get(mount))) {
+            ACTIVE_FIRE_POWERS.remove(mount);
             return true;
         }
+        ACTIVE_FIRE_POWERS.remove(mount);
         return applyVirtualFireSignal(mount, false);
     }
 
@@ -128,43 +164,55 @@ public final class CannonMountCompat {
      */
     @SubscribeEvent
     public static void onServerTickPost(ServerTickEvent.Post event) {
+        long now = event.getServer().getTickCount();
         synchronized (ACTIVE_FIRE_REQUESTS) {
             var iterator = ACTIVE_FIRE_REQUESTS.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<BlockEntity, Long> entry = iterator.next();
                 BlockEntity mount = entry.getKey();
                 Level level = mount == null ? null : mount.getLevel();
-                long now = level == null ? Long.MIN_VALUE : level.getGameTime();
                 boolean live = mount != null
                         && !mount.isRemoved()
+                        && level != null
+                        && level.getServer() == event.getServer()
                         && getMountedCannon(mount) != null
-                        && entry.getValue() == now;
+                        && isFireRequestFresh(entry.getValue(), now);
                 if (!live) {
                     if (mount != null
                             && Boolean.TRUE.equals(VIRTUAL_FIRE_STATES.get(mount))) {
                         applyVirtualFireSignal(mount, false);
                     }
+                    ACTIVE_FIRE_POWERS.remove(mount);
                     iterator.remove();
                     continue;
                 }
-                if (!applyVirtualFireSignal(mount, true)) {
+                if (!applyVirtualFireSignal(mount, true,
+                        ACTIVE_FIRE_POWERS.getOrDefault(mount, 15))) {
+                    ACTIVE_FIRE_POWERS.remove(mount);
                     iterator.remove();
                 }
             }
         }
     }
 
+    static boolean isFireRequestFresh(long requestedAt, long serverTick) {
+        long age = serverTick - requestedAt;
+        return age >= 0L && age <= FIRE_REQUEST_GRACE_TICKS;
+    }
+
+    private static boolean applyVirtualFireSignal(BlockEntity mount, boolean powered) {
+        return applyVirtualFireSignal(mount, powered, powered ? 15 : 0);
+    }
+
     private static boolean applyVirtualFireSignal(
-            BlockEntity mount,
-            boolean powered
-    ) {
+            BlockEntity mount, boolean powered, int firePower) {
         Boolean stateValue = readBooleanProperty(
                 mount.getBlockState(), "fire_powered");
         Boolean virtualPrevious = VIRTUAL_FIRE_STATES.get(mount);
         boolean previous = virtualPrevious != null
                 ? virtualPrevious
                 : stateValue != null && stateValue;
-        if (applyMountedContraptionFire(mount, powered)) {
+        if (applyMountedContraptionFire(mount, powered, firePower)) {
             VIRTUAL_FIRE_STATES.put(mount, powered);
             return true;
         }
@@ -183,7 +231,7 @@ public final class CannonMountCompat {
                     true,
                     powered,
                     previous,
-                    powered ? 15 : 0
+                    powered ? firePower : 0
             );
             VIRTUAL_FIRE_STATES.put(mount, powered);
             return true;
@@ -213,9 +261,7 @@ public final class CannonMountCompat {
      * mount.
      */
     private static boolean applyMountedContraptionFire(
-            BlockEntity mount,
-            boolean powered
-    ) {
+            BlockEntity mount, boolean powered, int firePower) {
         Entity cannon = getMountedCannon(mount);
         if (cannon == null || cannon.isRemoved()
                 || !(mount.getLevel() instanceof ServerLevel serverLevel)) {
@@ -246,7 +292,7 @@ public final class CannonMountCompat {
                         serverLevel,
                         cannon,
                         powered,
-                        powered ? 15 : 0,
+                        powered ? firePower : 0,
                         mount
                 );
                 return true;
@@ -565,13 +611,14 @@ public final class CannonMountCompat {
         return null;
     }
 
-    private static void invokeDeclaredNoArg(Object owner, String name) {
+    private static @Nullable Object invokeDeclaredNoArg(Object owner, String name) {
         Method method = findDeclaredNoArgMethod(owner.getClass(), name);
-        if (method == null) return;
+        if (method == null) return null;
         try {
             method.setAccessible(true);
-            method.invoke(owner);
+            return method.invoke(owner);
         } catch (ReflectiveOperationException | RuntimeException | LinkageError ignored) {
+            return null;
         }
     }
 

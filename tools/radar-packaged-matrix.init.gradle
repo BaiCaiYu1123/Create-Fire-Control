@@ -1,0 +1,22 @@
+// Run integration fixtures against the delivered production classes, isolated from shared source builds.
+gradle.beforeProject { project ->
+    project.layout.buildDirectory.set(project.layout.projectDirectory.dir('build-radar-packaged-matrix'))
+}
+gradle.projectsEvaluated {
+    def p = rootProject
+    def artifact = p.file(p.providers.gradleProperty('radarMatrixJar').get())
+    def prepare = p.tasks.register('prepareDeliveredRadar', Sync) {
+        from(p.zipTree(artifact)) { include '**/*.class' }
+        into p.layout.buildDirectory.dir('classes/java/main')
+    }
+    def resources = p.tasks.register('prepareDeliveredRadarResources', Sync) {
+        from(p.zipTree(artifact)) { exclude '**/*.class' }
+        into p.layout.buildDirectory.dir('resources/main')
+    }
+    p.tasks.named('compileJava').configure { enabled = false; dependsOn prepare }
+    p.tasks.named('processResources').configure { enabled = false; dependsOn resources }
+    p.tasks.named('classes').configure { dependsOn prepare, resources }
+    p.runs.server {
+        systemProperty 'create_fire_control.missileParityOnly', p.providers.gradleProperty('missileParityOnly').getOrElse('false')
+    }
+}

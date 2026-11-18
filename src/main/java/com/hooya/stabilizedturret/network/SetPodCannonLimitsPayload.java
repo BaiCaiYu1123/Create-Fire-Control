@@ -2,14 +2,12 @@ package com.hooya.stabilizedturret.network;
 
 import com.hooya.stabilizedturret.StabilizedTurret;
 import com.hooya.stabilizedturret.content.controller.StabilizerControllerBlockEntity;
-import dev.ryanhcode.sable.Sable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record SetPodCannonLimitsPayload(
@@ -37,9 +35,7 @@ public record SetPodCannonLimitsPayload(
             if (!(context.player() instanceof ServerPlayer player)
                     || !Double.isFinite(payload.depression)
                     || !Double.isFinite(payload.elevation)
-                    || Sable.HELPER.distanceSquaredWithSubLevels(
-                    player.level(), player.position(),
-                    Vec3.atCenterOf(payload.controllerPos)) > 64.0) {
+                    || !C2SWriteAuthorization.canEditNearby(player, payload.controllerPos)) {
                 return;
             }
             if (player.level().getBlockEntity(payload.controllerPos)

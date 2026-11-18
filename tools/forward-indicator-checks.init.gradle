@@ -1,0 +1,25 @@
+// Actual installed Flight Control block, candidate packets and wrench interactions.
+gradle.projectsEvaluated {
+    def p = rootProject
+    def fixture = p.sourceSets.create('forwardIndicatorIntegration') {
+        java.srcDirs = ['src/forwardIndicatorIntegration/java']
+        compileClasspath += p.sourceSets.main.output + p.sourceSets.main.compileClasspath
+        runtimeClasspath += p.sourceSets.main.output + p.sourceSets.main.runtimeClasspath
+    }
+    p.dependencies.add('localRuntime', p.files(
+            'libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+            'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar'))
+    p.runs.server { modSource fixture }
+    def runDir = p.file(p.providers.gradleProperty('runRoot').get() + '/server')
+    p.tasks.named('runServer').configure {
+        doFirst {
+            runDir.mkdirs()
+            new File(runDir, 'forward-indicator-result.txt').text = 'RUNNING'
+        }
+        doLast {
+            def result = new File(runDir, 'forward-indicator-result.txt')
+            if (!result.isFile() || !result.text.startsWith('PASS:'))
+                throw new GradleException('Forward indicator integration failed: ' + (result.isFile() ? result.text : 'missing result'))
+        }
+    }
+}

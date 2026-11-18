@@ -3,7 +3,6 @@ package com.hooya.stabilizedturret.network;
 import com.hooya.stabilizedturret.StabilizedTurret;
 import com.hooya.stabilizedturret.content.controller.BindingSlot;
 import com.hooya.stabilizedturret.content.controller.StabilizerControllerBlockEntity;
-import dev.ryanhcode.sable.Sable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -11,7 +10,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
@@ -51,8 +49,7 @@ public record UnbindDevicePayload(
             if (!(context.player() instanceof ServerPlayer player)) {
                 return;
             }
-            if (Sable.HELPER.distanceSquaredWithSubLevels(
-                    player.level(), player.position(), Vec3.atCenterOf(payload.controllerPos)) > 64.0) {
+            if (!C2SWriteAuthorization.canEditNearby(player, payload.controllerPos)) {
                 return;
             }
             BindingSlot slot;
@@ -71,8 +68,10 @@ public record UnbindDevicePayload(
             }
             boolean removed = controller.unbindDevice(slot, payload.index, payload.targetPos);
             player.displayClientMessage(Component.translatable(removed
-                    ? "message.stabilized_turret.device_unbound"
-                    : "message.stabilized_turret.device_unbind_failed"), true);
+                    ? "message.create_fire_control.device_unbound"
+                    : "message.create_fire_control.device_unbind_failed"), true);
+            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player,
+                    new FireControlInputsStatePayload(payload.controllerPos, controller.inputUiState(), true));
         });
     }
 

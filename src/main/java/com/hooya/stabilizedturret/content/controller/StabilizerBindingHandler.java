@@ -8,6 +8,8 @@ import dev.simulated_team.simulated.content.blocks.swivel_bearing.link_block.Swi
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.link_block.SwivelBearingPlateBlockEntity;
 import com.hooya.stabilizedturret.client.ClientBindingState;
 import com.hooya.stabilizedturret.network.BindingSessionPayload;
+import com.hooya.stabilizedturret.content.loader.MzLoaderAutomation;
+import com.hooya.stabilizedturret.content.loader.CannonAutoLoader;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.contraptions.actors.seat.SeatBlock;
 import net.minecraft.core.BlockPos;
@@ -39,22 +41,35 @@ import java.util.UUID;
  */
 @EventBusSubscriber(modid = StabilizedTurret.MOD_ID)
 public final class StabilizerBindingHandler {
-    private static final Map<UUID, BindingRef> PENDING = new HashMap<>();
+    private static final long BINDING_TIMEOUT_TICKS = 20L * 60L * 10L;
+    private static final Map<UUID, PendingBinding> PENDING = new HashMap<>();
+    private static final ThreadLocal<Vec3> BINDING_OBSERVER=new ThreadLocal<>();
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)
                 || !PENDING.containsKey(player.getUUID())) return;
-        if (!AllItems.WRENCH.isIn(player.getMainHandItem())
+        PendingBinding pending = PENDING.get(player.getUUID());
+        if (pending == null) return;
+        if (pending.expiresAt() < player.level().getGameTime()
+                || !pending.source().isInDimension(player.level())
+                || !AllItems.WRENCH.isIn(player.getMainHandItem())
                 && !AllItems.WRENCH.isIn(player.getOffhandItem())) {
             cancelBinding(player, false);
+            return;
+        }
+        if(player.tickCount%40==0) {
+            Object source=pending.source().resolve(player.level());
+            if(source instanceof StabilizerControllerBlockEntity || source instanceof CannonAutoLoader)
+                sendCandidates(player,bindingPayloadFor(player,source));
+            else cancelBinding(player,false);
         }
     }
 
     @SubscribeEvent
     public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            PENDING.remove(player.getUUID());
+            PendingBinding pending=PENDING.remove(player.getUUID());if(pending!=null)pending.lease().close();
         }
     }
 
@@ -62,6 +77,8 @@ public final class StabilizerBindingHandler {
     public static void onBlockBroken(BlockEvent.BreakEvent event) {
         if (event.getLevel() instanceof Level level && !level.isClientSide) {
             ControllerTracker.invalidateBindingsAt(level, event.getPos());
+            com.hooya.stabilizedturret.content.display.ConnectedDisplayBlockEntity
+                    .invalidateBindingsAt(level, event.getPos());
         }
     }
 
@@ -86,6 +103,7 @@ public final class StabilizerBindingHandler {
             // the normal block-placement sound). Only empty-hand and wrench
             // interactions require bearing protection.
             if (wrench && (level.getBlockEntity(clickedPos) instanceof StabilizerControllerBlockEntity
+                    || level.getBlockEntity(clickedPos) instanceof CannonAutoLoader
                     || ClientBindingState.isActive())) {
                 consume(event);
                 return;
@@ -117,23 +135,49 @@ public final class StabilizerBindingHandler {
             return;
         }
 
-        BindingRef pending = PENDING.get(player.getUUID());
+        PendingBinding pending = PENDING.get(player.getUUID());
 
         if (wrench && level.getBlockEntity(clickedPos) instanceof StabilizerControllerBlockEntity controller) {
+            AutoDefenseDisplayBindingHandler.cancel(player);
             BindingRef controllerRef = BindingRef.capture(level, clickedPos);
-            if (pending != null && pending.equals(controllerRef)) {
+            if (pending != null && pending.kind() == BindingKind.FIRE_CONTROL
+                    && pending.source().equals(controllerRef)) {
                 cancelBinding(player, false);
                 player.displayClientMessage(
-                        Component.translatable("message.stabilized_turret.binding.cancelled"),
+                        Component.translatable("message.create_fire_control.binding.cancelled"),
                         true
                 );
             } else {
-                PENDING.put(player.getUUID(), controllerRef);
-                PacketDistributor.sendToPlayer(player, bindingPayload(controller));
+                if(pending!=null)pending.lease().close();
+                PENDING.put(player.getUUID(), new PendingBinding(
+                        BindingKind.FIRE_CONTROL, controllerRef,
+                        level.getGameTime() + BINDING_TIMEOUT_TICKS,new BindingSourceLease(player.serverLevel(),controllerRef)));
+                sendCandidates(player,bindingPayloadFor(player,controller));
                 player.displayClientMessage(
-                        Component.translatable("message.stabilized_turret.binding.select_module"),
+                        Component.translatable("message.create_fire_control.binding.select_module"),
                         true
                 );
+            }
+            consume(event);
+            return;
+        }
+
+        if (wrench && level.getBlockEntity(clickedPos) instanceof CannonAutoLoader loader) {
+            AutoDefenseDisplayBindingHandler.cancel(player);
+            BindingRef loaderRef = BindingRef.capture(level, clickedPos);
+            if (pending != null && pending.kind() == BindingKind.CANNON_LOADER
+                    && pending.source().equals(loaderRef)) {
+                cancelBinding(player, false);
+                player.displayClientMessage(
+                        Component.translatable("message.create_fire_control.binding.cancelled"), true);
+            } else {
+                if(pending!=null)pending.lease().close();
+                PENDING.put(player.getUUID(), new PendingBinding(
+                        BindingKind.CANNON_LOADER, loaderRef,
+                        level.getGameTime() + BINDING_TIMEOUT_TICKS,new BindingSourceLease(player.serverLevel(),loaderRef)));
+                sendCandidates(player,bindingPayloadFor(player,loader));
+                player.displayClientMessage(Component.translatable(
+                        "message.create_fire_control.loader_binding.select_mount"), true);
             }
             consume(event);
             return;
@@ -142,10 +186,36 @@ public final class StabilizerBindingHandler {
         if (wrench && pending != null) {
             // A binding click must never fall through to Create/Aeronautics.
             consume(event);
-            if (!(pending.resolve(level) instanceof StabilizerControllerBlockEntity controller)) {
+            if (pending.expiresAt() < level.getGameTime()) {
+                cancelBinding(player, false);
+                player.displayClientMessage(Component.translatable(
+                        "message.create_fire_control.binding.cancelled"), true);
+                return;
+            }
+            if (pending.kind() == BindingKind.CANNON_LOADER) {
+                if (!(pending.source().resolve(level) instanceof CannonAutoLoader loader)) {
+                    cancelBinding(player, false);
+                    player.displayClientMessage(Component.translatable(
+                            "message.create_fire_control.binding.cancelled"), true);
+                    return;
+                }
+                if (!MzLoaderAutomation.isSupportedMount(level, clickedPos)) {
+                    sendCandidates(player,bindingPayloadFor(player,loader));
+                    player.displayClientMessage(Component.translatable(
+                            "message.create_fire_control.loader_binding.invalid_mount"), true);
+                    return;
+                }
+                loader.bindCannonMount(BindingRef.capture(level, clickedPos));
+                PENDING.put(player.getUUID(),new PendingBinding(pending.kind(),pending.source(),level.getGameTime()+BINDING_TIMEOUT_TICKS,pending.lease()));
+                sendCandidates(player,bindingPayloadFor(player,loader));
+                player.displayClientMessage(Component.translatable(
+                        "message.create_fire_control.loader_binding.success"), true);
+                return;
+            }
+            if (!(pending.source().resolve(level) instanceof StabilizerControllerBlockEntity controller)) {
                 cancelBinding(player, false);
                 player.displayClientMessage(
-                        Component.translatable("message.stabilized_turret.binding.cancelled"),
+                        Component.translatable("message.create_fire_control.binding.cancelled"),
                         true
                 );
                 return;
@@ -153,9 +223,9 @@ public final class StabilizerBindingHandler {
 
             BindingSlot detected = detectBindingSlot(level, clickedPos);
             if (detected == null) {
-                PacketDistributor.sendToPlayer(player, bindingPayload(controller));
+                sendCandidates(player,bindingPayloadFor(player,controller));
                 player.displayClientMessage(
-                        Component.translatable("message.stabilized_turret.binding.invalid_auto"),
+                        Component.translatable("message.create_fire_control.binding.invalid_auto"),
                         true
                 );
                 return;
@@ -166,13 +236,17 @@ public final class StabilizerBindingHandler {
                     && level.getBlockState(clickedPos).getBlock() instanceof SwivelBearingBlock bearingBlock) {
                 BindingSlot defaultRole = bearingBlock.getRotationAxis(level.getBlockState(clickedPos))
                         == net.minecraft.core.Direction.Axis.Y ? BindingSlot.YAW : BindingSlot.PITCH;
-                detected = controller.getBinding(defaultRole) == null
-                        ? defaultRole : BindingSlot.BEARING;
+                // Every newly bound swivel bearing is assigned from its
+                // physical rotation axis.  The controller keeps both roles
+                // as lists, while the device page still permits moving an
+                // individual bearing to the other role manually.
+                detected = defaultRole;
             }
             controller.bind(detected, target);
-            PacketDistributor.sendToPlayer(player, bindingPayload(controller));
+            sendCandidates(player,bindingPayloadFor(player,controller));
+            PENDING.put(player.getUUID(),new PendingBinding(pending.kind(),pending.source(),level.getGameTime()+BINDING_TIMEOUT_TICKS,pending.lease()));
             player.displayClientMessage(
-                    Component.translatable("message.stabilized_turret.binding.success", detected.displayName()),
+                    Component.translatable("message.create_fire_control.binding.success", detected.displayName()),
                     true
             );
             return;
@@ -199,12 +273,12 @@ public final class StabilizerBindingHandler {
             if (wrench && player.isShiftKeyDown()) {
                 bearing.disassemble();
                 player.displayClientMessage(
-                        Component.translatable("message.stabilized_turret.bearing.disassembled"),
+                        Component.translatable("message.create_fire_control.bearing.disassembled"),
                         true
                 );
             } else {
                 player.displayClientMessage(
-                        Component.translatable("message.stabilized_turret.bearing.disassemble_requires_wrench"),
+                        Component.translatable("message.create_fire_control.bearing.disassemble_requires_wrench"),
                         true
                 );
             }
@@ -247,20 +321,41 @@ public final class StabilizerBindingHandler {
         if (id != null) {
             String namespace = id.getNamespace();
             String path = id.getPath();
-            if (("createbigcannons".equals(namespace) && path.contains("mount"))
-                    || ("cbcmodernwarfare".equals(namespace) && path.contains("mount"))) {
+            if ("create_flight_control".equals(namespace)
+                    && "forward_indicator".equals(path)) {
+                return BindingSlot.FORWARD_INDICATOR;
+            }
+            if ("createbigcannons".equals(namespace) && path.contains("mount")) {
                 return BindingSlot.CANNON_MOUNT;
             }
         }
 
+        if (MianbaoBallisticMissileCompat.isBindingTarget(state)) {
+            return BindingSlot.BALLISTIC_MISSILE_LAUNCHER;
+        }
         if (MianbaoMissileCompat.isLauncher(state)) return BindingSlot.MISSILE_LAUNCHER;
-        if (MianbaoMissileCompat.isDesignator(state)) return BindingSlot.LASER_DESIGNATOR;
         if (blockEntity instanceof com.simibubi.create.content.contraptions.bearing.MechanicalBearingBlockEntity) {
             return BindingSlot.RADAR_BEARING;
         }
         if (MianbaoAirDefenseCompat.isLauncher(state)) return BindingSlot.AA_MISSILE_LAUNCHER;
         if (MianbaoAircraftCompat.isRack(state)) return BindingSlot.AIRCRAFT_MISSILE_RACK;
+        if (MianbaoRocketPodCompat.isPod(state)) return BindingSlot.AIRCRAFT_ROCKET_POD;
+        if (MianbaoCannonTurretPodCompat.isCannonTurret(level, pos)) {
+            return BindingSlot.CANNON_TURRET_POD;
+        }
+        if (MianbaoCountermeasureCompat.isLauncher(state)) {
+            return BindingSlot.COUNTERMEASURE_LAUNCHER;
+        }
+        if (MianbaoRemoteWeaponStationCompat.isStation(level, pos)) {
+            return BindingSlot.REMOTE_WEAPON_STATION;
+        }
         if (MianbaoAircraftCompat.isRadar(state)) return BindingSlot.AIRCRAFT_RADAR;
+        if (blockEntity instanceof com.hooya.stabilizedturret.content.iff.IffTransponderBlockEntity) {
+            return BindingSlot.IFF_TRANSPONDER;
+        }
+        if (RemoteControllerCompat.isTerminal(level, pos, RemoteControllerCompat.Type.WIRELESS)) {
+            return BindingSlot.WIRELESS_CONTROLLER_HUB;
+        }
         if (RemoteControllerCompat.isTerminal(level, pos, RemoteControllerCompat.Type.NORMAL)) {
             return BindingSlot.REMOTE_CONTROLLER_HUB;
         }
@@ -274,133 +369,72 @@ public final class StabilizerBindingHandler {
     ) {
         return new BindingSessionPayload(true, findBindingCandidates(controller));
     }
+    private static BindingSessionPayload bindingPayloadFor(ServerPlayer player,Object source) {
+        BINDING_OBSERVER.set(Sable.HELPER.projectOutOfSubLevel(player.level(),player.position()));
+        try {return source instanceof StabilizerControllerBlockEntity controller?bindingPayload(controller):bindingPayload((CannonAutoLoader)source);}
+        finally {BINDING_OBSERVER.remove();}
+    }
+    private static void sendCandidates(ServerPlayer player,BindingSessionPayload payload){BindingSessionPayload.send(player,payload);}
+    @SubscribeEvent public static void stop(net.neoforged.neoforge.event.server.ServerStoppingEvent event) {
+        PENDING.values().forEach(pending->pending.lease().close());PENDING.clear();
+    }
+
+    private static BindingSessionPayload bindingPayload(CannonAutoLoader loader) {
+        return new BindingSessionPayload(true, findBindingCandidates(loader));
+    }
 
     private static java.util.List<BindingSessionPayload.Candidate> findBindingCandidates(
             StabilizerControllerBlockEntity controller
     ) {
         Level level = controller.getLevel();
         if (level == null) return java.util.List.of();
-
-        java.util.LinkedHashSet<BindingSessionPayload.Candidate> candidates =
-                new java.util.LinkedHashSet<>();
         java.util.Set<BoundTarget> boundTargets = new java.util.HashSet<>();
         for (StabilizerControllerBlockEntity.BoundDevice device : controller.getBoundDevices()) {
             BindingRef ref = device.ref();
             boundTargets.add(new BoundTarget(ref.pos(), ref.subLevelId()));
         }
-        Vec3 controllerWorld = Sable.HELPER.projectOutOfSubLevel(
-                level, Vec3.atCenterOf(controller.getBlockPos())
-        );
-
-        BlockPos center = BlockPos.containing(controllerWorld);
-        scanBox(level, center.offset(-24, -24, -24), center.offset(24, 24, 24),
-                controllerWorld, null, boundTargets, candidates, 180000);
-
-        dev.ryanhcode.sable.api.sublevel.SubLevelContainer container =
-                dev.ryanhcode.sable.api.sublevel.SubLevelContainer.getContainer(level);
-        if (container != null) {
-            for (dev.ryanhcode.sable.sublevel.SubLevel subLevel : container.getAllSubLevels()) {
-                if (subLevel == null || subLevel.isRemoved() || candidates.size() >= 1024) continue;
-                dev.ryanhcode.sable.companion.math.BoundingBox3dc worldBounds =
-                        subLevel.boundingBox();
-                double closestX = Math.max(worldBounds.minX(),
-                        Math.min(worldBounds.maxX(), controllerWorld.x));
-                double closestY = Math.max(worldBounds.minY(),
-                        Math.min(worldBounds.maxY(), controllerWorld.y));
-                double closestZ = Math.max(worldBounds.minZ(),
-                        Math.min(worldBounds.maxZ(), controllerWorld.z));
-                if (controllerWorld.distanceToSqr(closestX, closestY, closestZ) > 96.0 * 96.0) {
-                    continue;
-                }
-
-                org.joml.Vector3d localMin = new org.joml.Vector3d(
-                        Double.POSITIVE_INFINITY,
-                        Double.POSITIVE_INFINITY,
-                        Double.POSITIVE_INFINITY
-                );
-                org.joml.Vector3d localMax = new org.joml.Vector3d(
-                        Double.NEGATIVE_INFINITY,
-                        Double.NEGATIVE_INFINITY,
-                        Double.NEGATIVE_INFINITY
-                );
-                for (int corner = 0; corner < 8; corner++) {
-                    org.joml.Vector3d point = new org.joml.Vector3d(
-                            (corner & 1) == 0 ? worldBounds.minX() : worldBounds.maxX(),
-                            (corner & 2) == 0 ? worldBounds.minY() : worldBounds.maxY(),
-                            (corner & 4) == 0 ? worldBounds.minZ() : worldBounds.maxZ()
-                    );
-                    subLevel.logicalPose().transformPositionInverse(point);
-                    localMin.min(point);
-                    localMax.max(point);
-                }
-                BlockPos min = BlockPos.containing(
-                        Math.floor(localMin.x) - 1.0,
-                        Math.floor(localMin.y) - 1.0,
-                        Math.floor(localMin.z) - 1.0
-                );
-                BlockPos max = BlockPos.containing(
-                        Math.ceil(localMax.x) + 1.0,
-                        Math.ceil(localMax.y) + 1.0,
-                        Math.ceil(localMax.z) + 1.0
-                );
-                scanBox(subLevel.getLevel(), min, max, controllerWorld,
-                        subLevel.getUniqueId(), boundTargets, candidates, 300000);
-            }
-        }
-        return java.util.List.copyOf(candidates);
+        return findBindingCandidates(level, controller.getBlockPos(), boundTargets, false);
     }
 
-    private static void scanBox(
-            Level level,
-            BlockPos min,
-            BlockPos max,
-            Vec3 controllerWorld,
-            UUID subLevelId,
-            java.util.Set<BoundTarget> boundTargets,
-            java.util.Set<BindingSessionPayload.Candidate> candidates,
-            int maximumChecks
+    private static java.util.List<BindingSessionPayload.Candidate> findBindingCandidates(
+            CannonAutoLoader loader
     ) {
-        long sizeX = (long) max.getX() - min.getX() + 1L;
-        long sizeY = (long) max.getY() - min.getY() + 1L;
-        long sizeZ = (long) max.getZ() - min.getZ() + 1L;
-        if (sizeX <= 0L || sizeY <= 0L || sizeZ <= 0L
-                || sizeX * sizeY * sizeZ > maximumChecks) {
-            return;
+        Level level = loader.getLevel();
+        if (level == null) return java.util.List.of();
+        java.util.Set<BoundTarget> boundTargets = new java.util.HashSet<>();
+        BindingRef binding = loader.getCannonMountBinding();
+        if (binding != null) {
+            boundTargets.add(new BoundTarget(binding.pos(), binding.subLevelId()));
         }
-        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
-        for (int y = min.getY(); y <= max.getY() && candidates.size() < 1024; y++) {
-            for (int z = min.getZ(); z <= max.getZ() && candidates.size() < 1024; z++) {
-                for (int x = min.getX(); x <= max.getX() && candidates.size() < 1024; x++) {
-                    cursor.set(x, y, z);
-                    if (level.getBlockState(cursor).isAir()
-                            || detectBindingSlot(level, cursor) == null) {
-                        continue;
-                    }
-                    Vec3 world = Sable.HELPER.projectOutOfSubLevel(
-                            level, Vec3.atCenterOf(cursor)
-                    );
-                    if (world.distanceToSqr(controllerWorld) <= 96.0 * 96.0) {
-                        candidates.add(new BindingSessionPayload.Candidate(
-                                cursor.immutable(),
-                                subLevelId,
-                                boundTargets.contains(new BoundTarget(cursor.immutable(), subLevelId))
-                        ));
-                    }
-                }
-            }
-        }
+        return findBindingCandidates(level, loader.getBlockPos(), boundTargets, true);
+    }
+
+    private static java.util.List<BindingSessionPayload.Candidate> findBindingCandidates(
+            Level level, BlockPos sourcePos, java.util.Set<BoundTarget> boundTargets, boolean cannonMountsOnly) {
+        java.util.LinkedHashSet<BindingSessionPayload.Candidate> candidates=new java.util.LinkedHashSet<>();
+        for(BoundTarget bound:boundTargets)
+            candidates.add(new BindingSessionPayload.Candidate(bound.pos(),bound.subLevelId(),true));
+        Vec3 observer=BINDING_OBSERVER.get();
+        if(observer==null)observer=Sable.HELPER.projectOutOfSubLevel(level,Vec3.atCenterOf(sourcePos));
+        BindingCandidateCollector.collect(level,sourcePos,observer,(pos,body)->{
+            if(cannonMountsOnly?!MzLoaderAutomation.isSupportedMount(level,pos):detectBindingSlot(level,pos)==null)return;
+            candidates.add(new BindingSessionPayload.Candidate(pos,body,boundTargets.contains(new BoundTarget(pos,body))));
+        });
+        return java.util.List.copyOf(candidates);
     }
     private static void consume(PlayerInteractEvent.RightClickBlock event) {
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.SUCCESS);
     }
 
-    private static void cancelBinding(ServerPlayer player, boolean notify) {
-        PENDING.remove(player.getUUID());
+    static void cancelBinding(ServerPlayer player, boolean notify) {
+        PendingBinding pending=PENDING.remove(player.getUUID());
+        if(pending==null)return;
+        pending.lease().close();
         PacketDistributor.sendToPlayer(player, BindingSessionPayload.inactive());
         if (notify) {
             player.displayClientMessage(Component.translatable(
-                    "message.stabilized_turret.binding.cancelled"), true);
+                    "message.create_fire_control.binding.cancelled"), true);
         }
     }
 
@@ -408,6 +442,14 @@ public final class StabilizerBindingHandler {
         private BoundTarget {
             pos = pos.immutable();
         }
+    }
+
+    private enum BindingKind {
+        FIRE_CONTROL,
+        CANNON_LOADER
+    }
+
+    private record PendingBinding(BindingKind kind, BindingRef source, long expiresAt,BindingSourceLease lease) {
     }
 
     private StabilizerBindingHandler() {

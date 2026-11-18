@@ -1,0 +1,157 @@
+[
+  {
+    "rpm": 0,
+    "sample": "idle_load",
+    "pitch": 0.9550000429153442
+  },
+  {
+    "rpm": 2,
+    "sample": "slow_not_load",
+    "pitch": 0.8159999847412109
+  },
+  {
+    "rpm": 2,
+    "sample": "idle_load",
+    "pitch": 0.9612069129943848
+  },
+  {
+    "rpm": 2,
+    "sample": "slow_load",
+    "pitch": 0.8159999847412109
+  },
+  {
+    "rpm": 14.5,
+    "sample": "slow_not_load",
+    "pitch": 0.9160000085830688
+  },
+  {
+    "rpm": 14.5,
+    "sample": "idle_load",
+    "pitch": 1.0
+  },
+  {
+    "rpm": 14.5,
+    "sample": "slow_load",
+    "pitch": 0.9160000085830688
+  },
+  {
+    "rpm": 20,
+    "sample": "slow_not_load",
+    "pitch": 0.9600000381469727
+  },
+  {
+    "rpm": 20,
+    "sample": "slow_load",
+    "pitch": 0.9600000381469727
+  },
+  {
+    "rpm": 25,
+    "sample": "slow_not_load",
+    "pitch": 1.0
+  },
+  {
+    "rpm": 25,
+    "sample": "med_load",
+    "pitch": 0.7490909099578857
+  },
+  {
+    "rpm": 25,
+    "sample": "slow_load",
+    "pitch": 1.0
+  },
+  {
+    "rpm": 33,
+    "sample": "slow_not_load",
+    "pitch": 1.0640000104904175
+  },
+  {
+    "rpm": 33,
+    "sample": "med_load",
+    "pitch": 0.8159999847412109
+  },
+  {
+    "rpm": 33,
+    "sample": "slow_load",
+    "pitch": 1.0640000104904175
+  },
+  {
+    "rpm": 50,
+    "sample": "med_not_load",
+    "pitch": 1.0
+  },
+  {
+    "rpm": 50,
+    "sample": "slow_not_load",
+    "pitch": 1.2000000476837158
+  },
+  {
+    "rpm": 50,
+    "sample": "med_load",
+    "pitch": 0.9581818580627441
+  },
+  {
+    "rpm": 55,
+    "sample": "med_not_load",
+    "pitch": 1.0399999618530273
+  },
+  {
+    "rpm": 55,
+    "sample": "slow_not_load",
+    "pitch": 1.2400000095367432
+  },
+  {
+    "rpm": 55,
+    "sample": "med_load",
+    "pitch": 1.0
+  },
+  {
+    "rpm": 60,
+    "sample": "med_not_load",
+    "pitch": 1.0800000429153442
+  },
+  {
+    "rpm": 60,
+    "sample": "fast_load",
+    "pitch": 0.8320000171661377
+  },
+  {
+    "rpm": 60,
+    "sample": "med_load",
+    "pitch": 1.0418181419372559
+  },
+  {
+    "rpm": 75,
+    "sample": "fast_not_load",
+    "pitch": 1.0
+  },
+  {
+    "rpm": 75,
+    "sample": "med_not_load",
+    "pitch": 1.2000000476837158
+  },
+  {
+    "rpm": 75,
+    "sample": "fast_load",
+    "pitch": 0.8949999809265137
+  },
+  {
+    "rpm": 90,
+    "sample": "fast_not_load",
+    "pitch": 1.059999942779541
+  },
+  {
+    "rpm": 90,
+    "sample": "fast_load",
+    "pitch": 0.9579999446868896
+  },
+  {
+    "rpm": 100,
+    "sample": "fast_not_load",
+    "pitch": 1.100000023841858
+  },
+  {
+    "rpm": 100,
+    "sample": "fast_load",
+    "pitch": 1.0
+  }
+]

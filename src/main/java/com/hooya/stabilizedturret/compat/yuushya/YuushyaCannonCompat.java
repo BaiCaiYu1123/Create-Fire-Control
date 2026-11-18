@@ -1,10 +1,12 @@
 package com.hooya.stabilizedturret.compat.yuushya;
 
 import com.hooya.stabilizedturret.content.cannon.compat.YuushyaMediumCannonBarrelBlock;
+import com.hooya.stabilizedturret.content.cannon.compat.YuushyaShowMediumCannonBarrelBlock;
 import com.hooya.stabilizedturret.mixin.BlockEntityTypeAccessor;
 import com.hooya.stabilizedturret.registry.ModCbcContent;
 import com.yuushya.modelling.blockentity.AbstractTransformBlock;
 import com.yuushya.modelling.blockentity.itemblock.ItemBlockEntity;
+import com.yuushya.modelling.blockentity.showblock.ShowBlockEntity;
 import com.yuushya.modelling.registries.BlockEntityRegistry;
 import com.yuushya.modelling.registries.BlockRegistry;
 import net.minecraft.core.BlockPos;
@@ -28,47 +30,61 @@ public final class YuushyaCannonCompat {
         if (ModCbcContent.YUUSHYA_MEDIUM_CANNON_BARREL == null) {
             return;
         }
-        BlockEntityType<?> type = BlockEntityRegistry.ITEM_BLOCK_ENTITY.get();
-        Set<Block> validBlocks = new HashSet<>(type.getValidBlocks());
-        validBlocks.add(ModCbcContent.YUUSHYA_MEDIUM_CANNON_BARREL.get());
-        ((BlockEntityTypeAccessor) (Object) type).stabilizedTurret$setValidBlocks(validBlocks);
+        addValidBlock(
+                BlockEntityRegistry.ITEM_BLOCK_ENTITY.get(),
+                ModCbcContent.YUUSHYA_MEDIUM_CANNON_BARREL.get()
+        );
+        addValidBlock(
+                BlockEntityRegistry.SHOW_BLOCK_ENTITY.get(),
+                ModCbcContent.YUUSHYA_SHOW_MEDIUM_CANNON_BARREL.get()
+        );
     }
 
     public static boolean isBarrel(BlockState state) {
         return ModCbcContent.YUUSHYA_MEDIUM_CANNON_BARREL != null
-                && state.is(ModCbcContent.YUUSHYA_MEDIUM_CANNON_BARREL.get());
+                && (state.is(ModCbcContent.YUUSHYA_MEDIUM_CANNON_BARREL.get())
+                || state.is(ModCbcContent.YUUSHYA_SHOW_MEDIUM_CANNON_BARREL.get()));
     }
 
     public static void setBarrel(ServerLevel level, BlockPos pos, boolean enabled) {
         BlockState sourceState = level.getBlockState(pos);
         BlockEntity sourceEntity = level.getBlockEntity(pos);
-        if (!(sourceEntity instanceof ItemBlockEntity)) {
+        boolean itemBlock = sourceEntity instanceof ItemBlockEntity;
+        boolean showBlock = sourceEntity instanceof ShowBlockEntity;
+        if (!itemBlock && !showBlock) {
             return;
         }
         boolean alreadyEnabled = isBarrel(sourceState);
         if (enabled == alreadyEnabled) {
             return;
         }
-        if (enabled && !sourceState.is(BlockRegistry.ITEM_BLOCK.get())) {
+        if (enabled && !(itemBlock && sourceState.is(BlockRegistry.ITEM_BLOCK.get()))
+                && !(showBlock && sourceState.is(BlockRegistry.SHOW_BLOCK.get()))) {
             return;
         }
 
         CompoundTag data = sourceEntity.saveWithoutMetadata(level.registryAccess());
         BlockState targetState;
         if (enabled) {
-            targetState = copySharedProperties(sourceState, ModCbcContent.YUUSHYA_MEDIUM_CANNON_BARREL.get().defaultBlockState());
-            targetState = targetState.setValue(
-                    YuushyaMediumCannonBarrelBlock.CANNON_AXIS,
-                    inferCannonAxis(level, pos, sourceState)
-            );
+            Block targetBlock = itemBlock
+                    ? ModCbcContent.YUUSHYA_MEDIUM_CANNON_BARREL.get()
+                    : ModCbcContent.YUUSHYA_SHOW_MEDIUM_CANNON_BARREL.get();
+            targetState = copySharedProperties(sourceState, targetBlock.defaultBlockState());
+            Direction.Axis cannonAxis = inferCannonAxis(level, pos, sourceState);
+            targetState = itemBlock
+                    ? targetState.setValue(YuushyaMediumCannonBarrelBlock.CANNON_AXIS, cannonAxis)
+                    : targetState.setValue(YuushyaShowMediumCannonBarrelBlock.CANNON_AXIS, cannonAxis);
         } else {
             data.remove(CANNON_BEHAVIOR_TAG);
-            targetState = copySharedProperties(sourceState, BlockRegistry.ITEM_BLOCK.get().defaultBlockState());
+            Block targetBlock = itemBlock
+                    ? BlockRegistry.ITEM_BLOCK.get()
+                    : BlockRegistry.SHOW_BLOCK.get();
+            targetState = copySharedProperties(sourceState, targetBlock.defaultBlockState());
         }
 
         level.setBlock(pos, targetState, Block.UPDATE_ALL);
         BlockEntity targetEntity = level.getBlockEntity(pos);
-        if (targetEntity instanceof ItemBlockEntity) {
+        if (targetEntity instanceof ItemBlockEntity || targetEntity instanceof ShowBlockEntity) {
             targetEntity.loadWithComponents(data, level.registryAccess());
             targetEntity.setChanged();
             level.sendBlockUpdated(pos, targetState, targetState, Block.UPDATE_ALL);
@@ -76,6 +92,12 @@ public final class YuushyaCannonCompat {
                 MediumcannonBlock.onPlace(level, pos);
             }
         }
+    }
+
+    private static void addValidBlock(BlockEntityType<?> type, Block block) {
+        Set<Block> validBlocks = new HashSet<>(type.getValidBlocks());
+        validBlocks.add(block);
+        ((BlockEntityTypeAccessor) (Object) type).stabilizedTurret$setValidBlocks(validBlocks);
     }
 
     private static Direction.Axis inferCannonAxis(ServerLevel level, BlockPos pos, BlockState sourceState) {

@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": true,
+  "textures": {
+    "layer0": "create_fire_control:block/az_cannon_breech",
+    "particle": "create_fire_control:block/az_cannon_breech"
+  },
+  "loader": "neoforge:obj",
+  "flip_v": true,
+  "automatic_culling": false,
+  "shade_quads": true,
+  "model": "create_fire_control:models/block/az_cannon_breech/opening_frame_00.obj"
+}

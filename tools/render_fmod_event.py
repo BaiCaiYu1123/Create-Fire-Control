@@ -47,11 +47,16 @@ def main() -> int:
     parser.add_argument("event_bank")
     parser.add_argument("event")
     parser.add_argument("output")
+    parser.add_argument("--extra-bank", action="append", default=[])
     parser.add_argument(
-        "--profile", choices=("start", "run", "stop"), default="run"
+        "--profile", choices=("start", "run", "stop", "one-shot"), default="run"
     )
     parser.add_argument("--start-rpm", type=float, default=0.0)
     parser.add_argument("--end-rpm", type=float, default=15.0)
+    parser.add_argument("--duration", type=float, default=2.0)
+    parser.add_argument(
+        "--parameter", action="append", default=[], metavar="NAME=VALUE"
+    )
     args = parser.parse_args()
 
     dll_directory = os.path.dirname(os.path.abspath(args.studio_dll))
@@ -210,6 +215,7 @@ def main() -> int:
             args.strings_bank,
             args.master_bank,
             args.event_bank,
+            *args.extra_bank,
         ):
             bank = ctypes.c_void_p()
             check(
@@ -301,7 +307,9 @@ def main() -> int:
             if result not in (FMOD_OK, 19):
                 check(result, f"SetParameterByName({name})")
 
-        if args.profile == "run":
+        if args.profile == "one-shot":
+            check(instance_set_volume(instance, 1.0), "EventInstance_SetVolume")
+        elif args.profile == "run":
             check(instance_set_volume(instance, 0.5), "EventInstance_SetVolume")
             set_parameter("rpm", 15)
             set_parameter("load", 0)
@@ -310,6 +318,15 @@ def main() -> int:
             set_parameter("rpm", args.start_rpm)
             set_parameter("climb", 0)
         check(instance_start(instance), "EventInstance_Start")
+
+        if args.profile == "one-shot":
+            for _ in range(5):
+                check(system_update(system), "System_Update")
+            for assignment in args.parameter:
+                name, separator, raw_value = assignment.partition("=")
+                if not separator or not name:
+                    raise ValueError(f"Invalid parameter assignment: {assignment}")
+                set_parameter(name, float(raw_value))
 
         if args.profile == "start":
             duration = 8.0
@@ -324,6 +341,10 @@ def main() -> int:
                 check(system_update(system), "System_Update")
         elif args.profile == "stop":
             duration = 7.0
+            for _ in range(math.ceil(duration * updates_per_second)):
+                check(system_update(system), "System_Update")
+        elif args.profile == "one-shot":
+            duration = max(0.05, args.duration)
             for _ in range(math.ceil(duration * updates_per_second)):
                 check(system_update(system), "System_Update")
         else:

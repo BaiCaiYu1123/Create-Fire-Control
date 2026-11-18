@@ -1,0 +1,16 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": true,
+  "textures": {
+    "df_26_green": "create_fire_control:block/df_26/df_26_green",
+    "df_26_red": "create_fire_control:block/df_26/df_26_red",
+    "df_26_black": "create_fire_control:block/df_26/df_26_black",
+    "df_26_basalt": "create_fire_control:block/df_26/df_26_basalt",
+    "particle": "create_fire_control:block/df_26/df_26_green"
+  },
+  "loader": "neoforge:obj",
+  "flip_v": true,
+  "automatic_culling": false,
+  "shade_quads": true,
+  "model": "create_fire_control:models/block/df_26/df_26.obj"
+}

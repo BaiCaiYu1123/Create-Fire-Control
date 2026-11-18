@@ -1,0 +1,394 @@
+{
+  "commit": "07fd12efffbf20b2053d630ed5cf7ca3ddfa54a6",
+  "event_id": "{2503c204-9bba-4a87-ab7a-8c04fc67ac34}",
+  "load_bus": {
+    "cls": "EventMixerGroup",
+    "props": {
+      "volume": "-6.01999998",
+      "name": "load"
+    },
+    "rels": {
+      "automators": [
+        "{7c0aaa95-8cd8-4243-9d42-50cb058b9b2a}"
+      ],
+      "effectChain": [
+        "{320d7952-5135-4908-81e2-4913eb2ebc3d}"
+      ],
+      "panner": [
+        "{703c0d48-ad02-4fb4-b6fa-c7f50daa28d9}"
+      ],
+      "output": [
+        "{9fe402d1-64ce-4b36-b675-c719fa9c4b06}"
+      ]
+    }
+  },
+  "load_gain": {
+    "cls": "GainEffect",
+    "props": {
+      "gain": "2"
+    },
+    "rels": {
+      "automators": [
+        "{c7989f75-3c57-4518-85f4-1b4d74ae6d91}"
+      ]
+    }
+  },
+  "load_points": [
+    {
+      "cls": "AutomationPoint",
+      "props": {
+        "position": "0.0042372881355932203",
+        "value": "-10"
+      },
+      "rels": {}
+    },
+    {
+      "cls": "AutomationPoint",
+      "props": {
+        "position": "1",
+        "value": "-4"
+      },
+      "rels": {}
+    }
+  ],
+  "sounds": [
+    {
+      "id": "{94236a68-8f9b-4977-b474-bb5f650abe7f}",
+      "asset": "tanks/engines/abrams/update/engine_00.wav",
+      "cls": "SingleSound",
+      "props": {
+        "isCutoff": "true",
+        "length": "10",
+        "volume": "4",
+        "looping": "true"
+      },
+      "rels": {
+        "automators": [
+          "{48e6984f-018c-442c-a73d-548f61d652ba}"
+        ],
+        "modulators": [
+          "{2be46613-adf2-49f3-a0d8-469e8c5c113d}"
+        ],
+        "fadeOutCurve": [
+          "{c2361095-bbba-4478-8d15-29eb375ce9cc}"
+        ],
+        "audioFile": [
+          "{b33be01e-e9f6-48c7-83bf-718a54e19ecb}"
+        ]
+      }
+    },
+    {
+      "id": "{9927f4dc-60c4-43ae-85bf-0c40bd9f23fe}",
+      "asset": "tanks/engines/abrams/update/engine_33.wav",
+      "cls": "SingleSound",
+      "props": {
+        "isCutoff": "true",
+        "start": "1",
+        "length": "44",
+        "volume": "2",
+        "looping": "true"
+      },
+      "rels": {
+        "automators": [
+          "{f2073913-542a-4dad-a632-3e7d4a7b29e1}"
+        ],
+        "modulators": [
+          "{94626052-6ef8-42b2-b8f7-0797bc8932dc}"
+        ],
+        "fadeInCurve": [
+          "{54942791-4e2f-4b53-ad97-2038b0680c57}"
+        ],
+        "fadeOutCurve": [
+          "{b9d1edc5-be98-473f-aa6e-e521ef651c35}"
+        ],
+        "audioFile": [
+          "{7419c6ce-21eb-487c-ae07-847aca55e73f}"
+        ]
+      }
+    },
+    {
+      "id": "{1a7b476b-2c85-44bc-b0cf-eaa3a5745146}",
+      "asset": "tanks/engines/abrams/update/engine_66.wav",
+      "cls": "SingleSound",
+      "props": {
+        "isCutoff": "true",
+        "start": "30",
+        "length": "50",
+        "volume": "2",
+        "looping": "true"
+      },
+      "rels": {
+        "automators": [
+          "{c6b3d5d4-818a-434d-9ceb-e5de248ae19d}"
+        ],
+        "modulators": [
+          "{6dde2d72-0743-4265-9afb-2d4747505142}"
+        ],
+        "fadeInCurve": [
+          "{da50fd25-18c3-46bb-814f-d91e11988588}"
+        ],
+        "fadeOutCurve": [
+          "{8a035776-ea64-4389-81b9-99d8bccd7a80}"
+        ],
+        "audioFile": [
+          "{b8474321-7bfd-4db0-a638-803b82c6e95d}"
+        ]
+      }
+    },
+    {
+      "id": "{399ce13a-7e0a-4b58-aae9-76f3baa50553}",
+      "asset": "tanks/engines/abrams/update/engine_99.wav",
+      "cls": "SingleSound",
+      "props": {
+        "isCutoff": "true",
+        "start": "65",
+        "length": "35",
+        "volume": "2",
+        "looping": "true"
+      },
+      "rels": {
+        "automators": [
+          "{12dadefc-58fd-49d1-886a-f5f171392cf9}"
+        ],
+        "modulators": [
+          "{40fe685e-eb1e-4309-a123-e46775ab0907}"
+        ],
+        "fadeInCurve": [
+          "{24d99ad9-7e3f-4151-933a-be8bb8d1cc2a}"
+        ],
+        "audioFile": [
+          "{accad240-6ddb-40b2-8841-b27a2e702b6c}"
+        ]
+      }
+    },
+    {
+      "id": "{950070d2-4e9a-4c05-8bcf-9cb489284ac7}",
+      "asset": "tanks/engines/abrams/update/engine_66_load.wav",
+      "cls": "SingleSound",
+      "props": {
+        "isCutoff": "true",
+        "start": "0.29999999999999999",
+        "length": "0.5",
+        "looping": "true"
+      },
+      "rels": {
+        "automators": [
+          "{c1d60377-1ce5-4b57-a30e-f016a9f353fa}"
+        ],
+        "modulators": [
+          "{20c694d0-ae89-4e09-a3a3-2c1aff87b6cf}",
+          "{8d2564b0-5e47-4c2b-bfd8-c6271eea7b70}"
+        ],
+        "fadeInCurve": [
+          "{4e16cea0-4a70-455a-9551-1f37650ddf99}"
+        ],
+        "fadeOutCurve": [
+          "{6c59f895-b2b2-472a-b33c-4b282f1cf693}"
+        ],
+        "audioFile": [
+          "{562869e0-bdde-4cc4-97b4-9a296b7a229c}"
+        ]
+      }
+    },
+    {
+      "id": "{5159e555-a632-40ae-ab16-91f1bfb766a8}",
+      "asset": "tanks/engines/abrams/update/engine_99_load.wav",
+      "cls": "SingleSound",
+      "props": {
+        "isCutoff": "true",
+        "start": "0.65000000000000002",
+        "length": "0.34999999999999998",
+        "looping": "true"
+      },
+      "rels": {
+        "automators": [
+          "{e6d2e9d8-c323-416a-8538-2e38d1de4db0}"
+        ],
+        "modulators": [
+          "{babf91d1-139d-4f5a-ba15-2548fc6cbc5c}",
+          "{6847b02b-ec88-4d4f-a343-4a3628c1a068}"
+        ],
+        "fadeInCurve": [
+          "{aa5fa9eb-2f3d-4c89-85fc-bafe383a489f}"
+        ],
+        "audioFile": [
+          "{1bdae790-f9ce-4804-b84e-6ff830d270a2}"
+        ]
+      }
+    },
+    {
+      "id": "{3770a594-76dd-462b-9296-3c87ab42565a}",
+      "asset": "tanks/engines/abrams/update/engine_33_load.wav",
+      "cls": "SingleSound",
+      "props": {
+        "isCutoff": "true",
+        "start": "0.01",
+        "length": "0.44",
+        "looping": "true"
+      },
+      "rels": {
+        "automators": [
+          "{320e7f8a-bbcd-436c-b675-5473a789d72a}"
+        ],
+        "modulators": [
+          "{a698f4c7-de56-465f-9337-45d2228abf2e}",
+          "{4014bc00-8835-45fc-9c37-5b1cb37f2254}"
+        ],
+        "fadeInCurve": [
+          "{0334a5f6-10c8-4d84-9a29-88523423505c}"
+        ],
+        "fadeOutCurve": [
+          "{624d569a-05c5-47c3-8c46-767f4b0fe265}"
+        ],
+        "audioFile": [
+          "{cb14f5c7-f81d-4cd7-8330-402903dabcd9}"
+        ]
+      }
+    },
+    {
+      "id": "{a88c1820-f8e1-4a3d-9285-5b0b8d284a2b}",
+      "asset": "tanks/engines/abrams/update/engine_00_load.wav",
+      "cls": "SingleSound",
+      "props": {
+        "isCutoff": "true",
+        "length": "0.10000000000000001",
+        "looping": "true"
+      },
+      "rels": {
+        "automators": [
+          "{59bc17c6-c02d-485c-bb51-6bdd58926626}"
+        ],
+        "modulators": [
+          "{736146f2-476d-4327-8f41-c728570bf107}",
+          "{3e31197b-dcc3-49ef-bbee-9ef105be65a7}"
+        ],
+        "fadeOutCurve": [
+          "{92024f53-64ed-4688-b6f4-c58cd661e64a}"
+        ],
+        "audioFile": [
+          "{72ecaa0f-290e-4403-8b9e-fdaad95d5624}"
+        ]
+      }
+    },
+    {
+      "id": "{650566f4-ef71-49f0-bf46-e14326015d27}",
+      "asset": "tanks/engines/turbine_damage_layer.wav",
+      "cls": "SingleSound",
+      "props": {
+        "triggerProbabilityEnabled": "true",
+        "isCutoff": "true",
+        "start": "0.050000000000000003",
+        "length": "0.95000000000000007",
+        "voiceStealing": "3",
+        "name": "/engines_tanks/turbine_broken",
+        "looping": "true"
+      },
+      "rels": {
+        "automators": [
+          "{04f65de1-4b0d-4d1f-8104-94f6ff1c8ab2}"
+        ],
+        "audioFile": [
+          "{96610ebf-1ea5-41ab-903d-3d19ee17b262}"
+        ]
+      }
+    },
+    {
+      "id": "{7d7e53da-414b-4bf9-8e4c-15d7d94f97a9}",
+      "asset": "tanks/engines/abrams/update/gear_grind_load-001.wav",
+      "cls": "SingleSound",
+      "props": {},
+      "rels": {
+        "audioFile": [
+          "{04c4b4f7-2cad-4fbc-81f9-d4b746688892}"
+        ]
+      }
+    },
+    {
+      "id": "{c03ad964-f59a-4e3f-8658-1dba1b37b4be}",
+      "asset": "tanks/engines/abrams/update/gear_grind_load-002.wav",
+      "cls": "SingleSound",
+      "props": {},
+      "rels": {
+        "audioFile": [
+          "{49bccbe9-aab4-4117-a0ac-3e9dde46cdc6}"
+        ]
+      }
+    },
+    {
+      "id": "{ea1b4186-c127-4caa-ba5e-cf1dce109737}",
+      "asset": "tanks/engines/abrams/update/gear_grind_load-003.wav",
+      "cls": "SingleSound",
+      "props": {},
+      "rels": {
+        "audioFile": [
+          "{37da9ef3-0e53-4bc2-8e9d-92d0a81ad74d}"
+        ]
+      }
+    },
+    {
+      "id": "{42f3d1eb-5568-41b6-bff9-ce3c5b9ee86b}",
+      "asset": "tanks/engines/abrams/update/gear_grind_load-004.wav",
+      "cls": "SingleSound",
+      "props": {},
+      "rels": {
+        "audioFile": [
+          "{79f93e1d-1733-4b8d-b3dd-eecda1f12b21}"
+        ]
+      }
+    }
+  ],
+  "load_seek_speed": 0.3999999761581421,
+  "climb_seek_speed": 0.8899999856948853,
+  "sha_verified_official_files": [
+    {
+      "name": "engine_00.wav",
+      "sha": "0f5d17654749f2a119812968ca7c1fab30cdfcdd",
+      "size": 170193
+    },
+    {
+      "name": "engine_00_load.wav",
+      "sha": "333af039b98e086dc716415be9f4ccf02ada1f38",
+      "size": 162104
+    },
+    {
+      "name": "engine_33.wav",
+      "sha": "14bfadd8151e8e4d615ea313ec22c7d02dbe5548",
+      "size": 187687
+    },
+    {
+      "name": "engine_33_load.wav",
+      "sha": "2773d1500c2781741fbb074282636ec2484cd24b",
+      "size": 180923
+    },
+    {
+      "name": "engine_66.wav",
+      "sha": "971dfce7c82be4cdc96a39ef6af1e9c9ffab09f6",
+      "size": 145945
+    },
+    {
+      "name": "engine_66_load.wav",
+      "sha": "3df90bdaee181db3e4478e3d4cb7e662fdb94eb8",
+      "size": 138760
+    },
+    {
+      "name": "engine_99.wav",
+      "sha": "f4ee7fb2bbe82f72b5525d9f4e06e66dbf676c25",
+      "size": 181432
+    },
+    {
+      "name": "engine_99_load.wav",
+      "sha": "d5207b430fe5804830126fdae6b960bb2f7345fb",
+      "size": 172760
+    },
+    {
+      "name": "engine_start_load.wav",
+      "sha": "043483696afac3a6006b452323090c3e6d33e28f",
+      "size": 289571
+    },
+    {
+      "name": "engine_stop_load.wav",
+      "sha": "713f97c2c18481f0d112e8aaa71f4514415a8464",
+      "size": 251330
+    }
+  ]
+}

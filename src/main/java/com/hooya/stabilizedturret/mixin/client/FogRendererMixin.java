@@ -1,10 +1,14 @@
 package com.hooya.stabilizedturret.mixin.client;
 
 import com.hooya.stabilizedturret.client.ClientAimState;
+import com.hooya.stabilizedturret.client.RemoteImpactRenderManager;
+import com.hooya.stabilizedturret.client.MathematicalMissileVisuals;
+import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.world.level.material.FogType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -46,5 +50,24 @@ public abstract class FogRendererMixin {
                 THERMAL_BACKGROUND,
                 0.0F
         );
+    }
+
+    @Inject(method = "setupFog", at = @At("RETURN"))
+    private static void stabilizedTurret$extendRemoteImpactFog(
+            Camera camera,
+            FogRenderer.FogMode mode,
+            float viewDistance,
+            boolean thickFog,
+            float partialTick,
+            CallbackInfo ci
+    ) {
+        if (camera.getFluidInCamera() != FogType.NONE) return;
+        float far = Math.max(RemoteImpactRenderManager.requiredFarDistance(),
+                Math.max(MathematicalMissileVisuals.antiRadiationFarDistance(),
+                        com.hooya.stabilizedturret.client.ClientWeaponViewState.requiredTrailFarDistance()));
+        if (far <= 0.0F) return;
+        RenderSystem.setShaderFogStart(Math.max(viewDistance, far - 768.0F));
+        RenderSystem.setShaderFogEnd(far);
+        RenderSystem.setShaderFogShape(FogShape.CYLINDER);
     }
 }

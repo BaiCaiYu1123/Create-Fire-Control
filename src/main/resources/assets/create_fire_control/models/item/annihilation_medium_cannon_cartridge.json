@@ -1,0 +1,121 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "layer0": "create_fire_control:item/annihilation_cartridge",
+    "particle": "create_fire_control:item/annihilation_cartridge"
+  },
+  "loader": "neoforge:obj",
+  "flip_v": true,
+  "automatic_culling": false,
+  "shade_quads": true,
+  "model": "create_fire_control:models/item/annihilation_medium_cannon_cartridge.obj",
+  "display": {
+    "ground": {
+      "rotation": [
+        -90,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        2.5
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "gui": {
+      "rotation": [
+        -50,
+        0,
+        30
+      ],
+      "translation": [
+        1.25,
+        -1.25,
+        0
+      ],
+      "scale": [
+        1.27,
+        1.27,
+        1.27
+      ]
+    },
+    "fixed": {
+      "translation": [
+        0,
+        -4,
+        0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        -7.03,
+        34.01,
+        85.08
+      ],
+      "translation": [
+        -5.5,
+        0.5,
+        5
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        -7,
+        34,
+        85
+      ],
+      "translation": [
+        -5.5,
+        0.5,
+        5
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        -4.05,
+        14.65,
+        74.83
+      ],
+      "translation": [
+        -2,
+        0,
+        0.25
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        -4,
+        14,
+        74
+      ],
+      "translation": [
+        -2,
+        0,
+        0.25
+      ]
+    },
+    "head": {
+      "rotation": [
+        -43.5,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        4.5,
+        -5.25
+      ]
+    }
+  }
+}

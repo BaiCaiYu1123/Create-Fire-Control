@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "create_fire_control:block/type_10_loader" },
+    "facing=south": { "model": "create_fire_control:block/type_10_loader", "y": 180 },
+    "facing=west": { "model": "create_fire_control:block/type_10_loader", "y": 270 },
+    "facing=east": { "model": "create_fire_control:block/type_10_loader", "y": 90 }
+  }
+}

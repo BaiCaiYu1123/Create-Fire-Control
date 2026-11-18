@@ -1,0 +1,11 @@
+gradle.projectsEvaluated {
+    def project = rootProject
+    project.tasks.register('testCannonLead', JavaExec) {
+        dependsOn project.tasks.named('testClasses')
+        classpath = project.sourceSets.test.runtimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.content.controller.CannonLeadChecks'
+        def runDir = project.layout.buildDirectory.dir('test-runs/cannon-lead').get().asFile
+        doFirst { runDir.mkdirs() }
+        workingDir runDir
+    }
+}

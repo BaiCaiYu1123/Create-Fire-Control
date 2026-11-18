@@ -1,0 +1,9 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "create_fire_control:block/yuushya_medium_cannon_barrel"
+      }
+    }
+  ]
+}

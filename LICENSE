@@ -1,21 +1,59 @@
-MIT License
+Create: Fire Control
+Copyright (c) 2026 BaiCaiYu1123. All rights reserved.
 
-Copyright (c) 2026 BaiCaiYu1123
+This is a mixed-license distribution. All rights reserved applies ONLY to
+original work owned by BaiCaiYu1123. No permission is granted to copy, modify,
+merge, publish, distribute, sublicense, or sell copies of that original work,
+in whole or in part, without prior written permission from the copyright
+holder. Public availability of the source code does not by itself grant any
+such permission.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Third-party components and MIT exceptions
+-----------------------------------------
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Third-party code, adapted code, models, textures, sounds and other assets
+retain their original licenses and copyright notices, including when stored
+inside the Fire Control package or resource namespace. Location in
+src/main, the create_fire_control namespace, or the shipped JAR does not make
+third-party material proprietary. The exceptions below are not an exhaustive
+claim of third-party ownership.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+1. CopyPoly 1.9.1
+   Copyright (c) 2026 caca
+   License: MIT
+
+   Source and resources are kept separately in third_party/copypoly/. The full
+   MIT text is third_party/copypoly/LICENSE and, in the mod JAR,
+   META-INF/licenses/copypoly-MIT.txt. Classes in the com.caca.copypoly
+   package and the CopyPoly resources identified in the accompanying notice
+   remain covered by that MIT license.
+
+   The adapted material renderer and editor-view facade in
+   third_party/copypoly/fire_control_adapter/ also remain MIT; this includes
+   PolyArmorModel and com.caca.copypoly.client.ArmorEditorView in the JAR.
+   The adapter's blockstate, item model and loot-table JSON for
+   create_fire_control:camouflaged_polyhedral_armor also remain MIT; see the
+   CopyPoly notice for their exact paths inside the host resource namespace.
+
+2. Drive-By-Wire code and assets
+   Copyright (c) 2023 endalion
+   License: MIT
+
+   Code copied or adapted from Drive-By-Wire, together with the models,
+   textures and sounds identified in
+   src/main/resources/META-INF/notices/drivebywire-model.txt, retain their MIT
+   license. The full MIT text is
+   src/main/resources/META-INF/licenses/drivebywire-model-MIT.txt, and the
+   broader code attribution is in
+   src/main/resources/META-INF/notices/drivebywire.txt. This file does not
+   override their MIT rights.
+
+3. Other third-party components
+   Other third-party components retain their respective licenses and
+   ownership. See THIRD_PARTY_NOTICES.md for the detailed notice.
+
+The MIT license applies only to the components identified above. It does not
+apply to Create: Fire Control's original code, models, textures, sounds or
+documentation, even when distributed in the same JAR or resource namespace.
+The reservation of rights above does not override any MIT rights in the
+identified components.

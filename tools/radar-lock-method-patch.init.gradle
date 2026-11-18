@@ -1,0 +1,10 @@
+gradle.projectsEvaluated {
+    rootProject.tasks.register('patchRadarMissileLocks', JavaExec) {
+        dependsOn rootProject.tasks.named('testClasses'), rootProject.tasks.named('shadowJar')
+        classpath = rootProject.sourceSets.test.runtimeClasspath
+        mainClass = 'com.hooya.stabilizedturret.content.controller.RadarLockMethodPatch'
+        args rootProject.providers.gradleProperty('radarBaselineJar').get(),
+                rootProject.tasks.named('shadowJar').get().archiveFile.get().asFile.absolutePath,
+                rootProject.layout.projectDirectory.dir('analysis/radar-motion-matrix-20261114/method-patches').asFile.absolutePath
+    }
+}

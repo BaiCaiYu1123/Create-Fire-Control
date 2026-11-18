@@ -2,6 +2,8 @@ package com.hooya.stabilizedturret.mixin;
 
 import com.hooya.stabilizedturret.content.controller.MianbaoMissileCompat;
 import com.hooya.stabilizedturret.content.controller.MianbaoAirDefenseCompat;
+import com.hooya.stabilizedturret.content.controller.MianbaoCountermeasureCompat;
+import com.hooya.stabilizedturret.content.display.BallisticMissileGuidance;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerPlayerConnection;
@@ -43,10 +45,24 @@ public abstract class GuidedMissileTrackedEntityMixin {
             ServerPlayer player,
             CallbackInfo ci
     ) {
-        if (!MianbaoAirDefenseCompat.isAnyFireControlMissile(entity)
+        boolean countermeasure = MianbaoCountermeasureCompat.isCountermeasure(entity)
+                && entity.getPersistentData().getBoolean(
+                MianbaoCountermeasureCompat.TRACKED_TAG);
+        if (countermeasure) {
+            // The batched flare channel supplies its only client visual. Do
+            // not also pair a ticking native arrow, even near the launcher.
+            ci.cancel();
+            if (seenBy.remove(player.connection)) serverEntity.removePairing(player);
+            return;
+        }
+        if (!countermeasure && (!MianbaoAirDefenseCompat.isAnyFireControlMissile(entity)
                 || (!entity.getPersistentData().getBoolean("CreateFireControlGuided")
                 && !entity.getPersistentData().getBoolean("CreateFireControlAaGuided")
-                && !entity.getPersistentData().getBoolean("CreateFireControlAircraftGuided"))) {
+                && !entity.getPersistentData().getBoolean("CreateFireControlAircraftGuided")
+                && !entity.getPersistentData().getBoolean("CreateFireControlCruiseGuided")
+                && !entity.getPersistentData().getBoolean(
+                BallisticMissileGuidance.GUIDED_TAG)
+                && !entity.getPersistentData().getBoolean("CreateFireControlRocket")))) {
             return;
         }
         ci.cancel();

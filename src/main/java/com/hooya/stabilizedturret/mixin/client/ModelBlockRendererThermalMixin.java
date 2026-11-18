@@ -1,9 +1,7 @@
 package com.hooya.stabilizedturret.mixin.client;
 
-import com.hooya.stabilizedturret.client.ClientAimState;
+import com.hooya.stabilizedturret.client.ThermalEmissionLightmap;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,9 +9,8 @@ import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 /**
- * Makes thermal terrain independent of the visible-light renderer.  The
- * lightmap mixin alone cannot do this: Minecraft bakes AO and face shading
- * directly into block vertices before the lightmap is sampled.
+ * Stores source-block emission in packed light coordinates. It never changes
+ * color, alpha, geometry, AO, depth or render type.
  */
 @Mixin(ModelBlockRenderer.class)
 public abstract class ModelBlockRendererThermalMixin {
@@ -25,12 +22,12 @@ public abstract class ModelBlockRendererThermalMixin {
                     target = "Lnet/minecraft/client/Minecraft;useAmbientOcclusion()Z"
             )
     )
-    private boolean stabilizedTurret$disableThermalAmbientOcclusion(boolean original) {
-        return ClientAimState.isThermal() ? false : original;
+    private boolean createFireControl$useBackedUpAmbientOcclusion(boolean original) {
+        return original;
     }
 
     @ModifyArgs(
-            method = "renderModelFaceFlat",
+            method = {"renderModelFaceFlat", "renderModelFaceAO"},
             require = 0,
             at = @At(
                     value = "INVOKE",
@@ -43,15 +40,14 @@ public abstract class ModelBlockRendererThermalMixin {
                             + "Lnet/minecraft/client/renderer/block/model/BakedQuad;FFFFIIIII)V"
             )
     )
-    private void stabilizedTurret$useFlatThermalBlockLight(Args args) {
-        if (!ClientAimState.isThermal()) {
-            return;
-        }
-        for (int index = 6; index <= 9; index++) {
-            args.set(index, 1.0F);
-        }
+    private void createFireControl$encodeSourceEmission(Args args) {
+        var level = (net.minecraft.world.level.BlockAndTintGetter) args.get(0);
+        var state = (net.minecraft.world.level.block.state.BlockState) args.get(1);
+        var pos = (net.minecraft.core.BlockPos) args.get(2);
+        int emission = state.getLightEmission(level, pos);
         for (int index = 10; index <= 13; index++) {
-            args.set(index, LightTexture.FULL_BRIGHT);
+            args.set(index, ThermalEmissionLightmap.encodeBlock(
+                    args.get(index), emission));
         }
     }
 }

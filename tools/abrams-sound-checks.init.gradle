@@ -1,0 +1,23 @@
+allprojects {
+    afterEvaluate {
+        sourceSets.test.java.srcDir(providers.gradleProperty('abramsBaselineSource').get())
+        sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+        sourceSets.test.runtimeClasspath += sourceSets.main.compileClasspath
+        tasks.register('checkAbramsMix', JavaExec) {
+            dependsOn tasks.named('testClasses')
+            classpath = sourceSets.test.runtimeClasspath
+            if (providers.gradleProperty('abramsPackagedJar').isPresent()) {
+                def packagedJar = file(providers.gradleProperty('abramsPackagedJar').get())
+                classpath = sourceSets.test.output + files(packagedJar) +
+                        (sourceSets.test.runtimeClasspath - sourceSets.main.output)
+                systemProperty 'create_fire_control.abrams.packaged_jar', packagedJar.absolutePath
+            }
+            mainClass = 'com.hooya.stabilizedturret.client.AbramsSoundMixChecks'
+            if (providers.gradleProperty('abramsMix').isPresent()) {
+                systemProperty 'create_fire_control.abrams.mix', providers.gradleProperty('abramsMix').get()
+            }
+            systemProperty 'create_fire_control.abrams.expected_mix', providers.gradleProperty('abramsExpectedMix').getOrElse('fmod_reference')
+            args file(providers.gradleProperty('abramsMixOutput').get()).absolutePath
+        }
+    }
+}

@@ -10,6 +10,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import org.lwjgl.glfw.GLFW;
 
 /** Resolves a captured keyboard key through the controller's live client profile. */
 public final class ControllerKeyMappingCompat {
@@ -21,6 +24,7 @@ public final class ControllerKeyMappingCompat {
             int keyCode,
             int scanCode
     ) {
+        if(type==RemoteControllerCompat.Type.WIRELESS) {String channel=com.hooya.stabilizedturret.content.remote.ControllerInput.channel(false,keyCode);return channel.isEmpty()?null:channel;}
         return type == RemoteControllerCompat.Type.ADVANCED
                 ? advancedSignalForInput("KEYBOARD_KEY", keyCode)
                 : normalSignalForKeyboardKey(keyCode, scanCode);
@@ -30,30 +34,134 @@ public final class ControllerKeyMappingCompat {
             RemoteControllerCompat.Type type,
             int button
     ) {
+        if(type==RemoteControllerCompat.Type.WIRELESS) {String channel=com.hooya.stabilizedturret.content.remote.ControllerInput.channel(true,button);return channel.isEmpty()?null:channel;}
         return type == RemoteControllerCompat.Type.ADVANCED
                 ? advancedSignalForInput("MOUSE_BUTTON", button)
                 : normalSignalForMouseButton(button);
+    }
+
+    /** Resolves the advanced-controller slot driven by this vertical wheel pulse. */
+    public static @Nullable String signalForMouseScroll(
+            RemoteControllerCompat.Type type,
+            double scrollY
+    ) {
+        return signalsForMouseScroll(type, scrollY).stream().findFirst().orElse(null);
+    }
+
+    /**
+     * A wheel binding has no GLFW key code: Tweaked Controllers stores its
+     * direction in the input's lower/upper bounds instead. Return every slot
+     * activated by this pulse so duplicate custom mappings keep working.
+     */
+    public static Set<String> signalsForMouseScroll(
+            RemoteControllerCompat.Type type,
+            double scrollY
+    ) {
+        if(type==RemoteControllerCompat.Type.WIRELESS) {
+            String channel=com.hooya.stabilizedturret.content.remote.ControllerInput.scrollChannel(scrollY);
+            return channel.isEmpty()?Set.of():Set.of(channel);
+        }
+        if (type != RemoteControllerCompat.Type.ADVANCED
+                || Math.abs(scrollY) < 1.0e-6) {
+            return Set.of();
+        }
+        Object[] layout = advancedLayout();
+        if (layout == null) return Set.of();
+        String[] signals = DriveByWireCompat.keys(type);
+        Set<String> matched = new LinkedHashSet<>();
+        for (int index = 0; index < Math.min(layout.length, signals.length); index++) {
+            InputBinding binding = layout[index] == null ? null : inputBinding(layout[index]);
+            if (binding != null && "MOUSE_WHEEL".equals(binding.type())
+                    && MouseWheelBindingMath.isActive(
+                    binding.minimum(), binding.maximum(), scrollY)) {
+                matched.add(signals[index]);
+            }
+        }
+        return Set.copyOf(matched);
     }
 
     public static Component displayKey(
             RemoteControllerCompat.Type type,
             String signal
     ) {
+        if(type==RemoteControllerCompat.Type.WIRELESS) {
+            Component result=Component.empty();
+            for(String key:com.hooya.stabilizedturret.content.remote.ControllerInput.chordInputs(signal)) {
+                if(!result.getString().isEmpty())result=result.copy().append(" + ");
+                result=result.copy().append(com.hooya.stabilizedturret.client.remote.WirelessControllerClient.name(key));
+            }
+            return result;
+        }
         if (type == RemoteControllerCompat.Type.NORMAL) {
             KeyMapping mapping = normalMappingForSignal(signal);
             if (mapping != null) return mapping.getTranslatedKeyMessage();
         } else {
             InputBinding binding = advancedBindingForSignal(signal);
             if (binding != null) {
-                return "MOUSE_BUTTON".equals(binding.type())
-                        ? InputConstants.Type.MOUSE.getOrCreate(binding.value()).getDisplayName()
-                        : InputConstants.getKey(binding.value(), 0).getDisplayName();
+                return switch (binding.type()) {
+                    case "MOUSE_BUTTON" -> InputConstants.Type.MOUSE
+                            .getOrCreate(binding.value()).getDisplayName();
+                    case "MOUSE_WHEEL" -> Component.translatable(
+                            "remote.create_fire_control."+(binding.maximum() >= binding.minimum() ? "scroll_up" : "scroll_down"));
+                    default -> InputConstants.getKey(binding.value(), 0).getDisplayName();
+                };
             }
         }
         {
-            String translation = DriveByWireCompat.translationKey(type, signal);
+            String translation = DriveByWireCompat.displayTranslationKey(type, signal);
             return translation.isEmpty() ? Component.literal("-") : Component.translatable(translation);
         }
+    }
+
+    /** Reads physical input directly, so another mod consuming the key cannot suppress fire-control input. */
+    public static Set<String> pressedSignals(RemoteControllerCompat.Type type) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.screen != null || !minecraft.isWindowActive()) return Set.of();
+        Set<String> pressed = new LinkedHashSet<>();
+        String[] signals = DriveByWireCompat.keys(type);
+        if (type == RemoteControllerCompat.Type.NORMAL) {
+            KeyMapping[] mappings = normalMappings(minecraft);
+            for (int index = 0; index < mappings.length; index++) if (physicalDown(minecraft, mappings[index])) pressed.add(signals[index]);
+            return Set.copyOf(pressed);
+        }
+        Object[] layout = advancedLayout();
+        if (layout == null) return Set.of();
+        long window = minecraft.getWindow().getWindow();
+        for (int index = 0; index < Math.min(layout.length, signals.length); index++) {
+            InputBinding binding = layout[index] == null ? null : inputBinding(layout[index]);
+            if (binding != null && !com.hooya.stabilizedturret.client.remote.WirelessControllerClient.blocks(
+                    "MOUSE_BUTTON".equals(binding.type()), binding.value())
+                    && (("KEYBOARD_KEY".equals(binding.type()) && InputConstants.isKeyDown(window, binding.value()))
+                    || ("MOUSE_BUTTON".equals(binding.type()) && GLFW.glfwGetMouseButton(window, binding.value()) == GLFW.GLFW_PRESS))) pressed.add(signals[index]);
+        }
+        return Set.copyOf(pressed);
+    }
+
+    /** Only locally observable inputs participate in self-checks; gamepad axes keep their wire path. */
+    public static Set<String> observedSignals(RemoteControllerCompat.Type type) {
+        if (type == RemoteControllerCompat.Type.NORMAL) return Set.copyOf(DriveByWireCompat.keyList(type));
+        Object[] layout = advancedLayout();
+        if (layout == null) return Set.of();
+        String[] signals = DriveByWireCompat.keys(type);
+        Set<String> observed = new LinkedHashSet<>();
+        for (int i = 0; i < Math.min(layout.length, signals.length); i++)
+            if (layout[i] != null && inputBinding(layout[i]) != null) observed.add(signals[i]);
+        return Set.copyOf(observed);
+    }
+
+    private static boolean physicalDown(Minecraft minecraft, KeyMapping mapping) {
+        InputConstants.Key key = mapping.getKey();
+        long window = minecraft.getWindow().getWindow();
+        if (com.hooya.stabilizedturret.client.remote.WirelessControllerClient.blocks(
+                key.getType() == InputConstants.Type.MOUSE, key.getValue())) return false;
+        if (key.getType() == InputConstants.Type.MOUSE)
+            return key.getValue() >= 0 && GLFW.glfwGetMouseButton(window, key.getValue()) == GLFW.GLFW_PRESS;
+        if (key.getType() == InputConstants.Type.KEYSYM)
+            return key.getValue() >= 0 && InputConstants.isKeyDown(window, key.getValue());
+        for (var input : com.hooya.stabilizedturret.content.remote.ControllerInput.ALL)
+            if (!input.mouse() && GLFW.glfwGetKeyScancode(input.code()) == key.getValue()
+                    && InputConstants.isKeyDown(window, input.code())) return true;
+        return false;
     }
 
     private static @Nullable String normalSignalForKeyboardKey(int keyCode, int scanCode) {
@@ -129,17 +237,40 @@ public final class ControllerKeyMappingCompat {
 
     private static @Nullable InputBinding inputBinding(Object input) {
         try {
+            try {
+                if (Boolean.FALSE.equals(input.getClass().getMethod("IsInputValid").invoke(input))) return null;
+            } catch (NoSuchMethodException ignored) { }
             Method getType = input.getClass().getMethod("GetType");
             String type = String.valueOf(getType.invoke(input));
-            if (!"KEYBOARD_KEY".equals(type) && !"MOUSE_BUTTON".equals(type)) return null;
+            if (!"KEYBOARD_KEY".equals(type)
+                    && !"MOUSE_BUTTON".equals(type)
+                    && !"MOUSE_WHEEL".equals(type)) {
+                return null;
+            }
             Object value = input.getClass().getMethod("GetValue").invoke(input);
-            return value instanceof Number number ? new InputBinding(type, number.intValue()) : null;
+            if (!(value instanceof Number number)) return null;
+            if (!"MOUSE_WHEEL".equals(type) && number.intValue() < 0) return null;
+            if (!"MOUSE_WHEEL".equals(type)) {
+                return new InputBinding(type, number.intValue(), Double.NaN, Double.NaN);
+            }
+            Object minimum = input.getClass().getField("minBound").get(input);
+            Object maximum = input.getClass().getField("maxBound").get(input);
+            return minimum instanceof Number minimumNumber
+                    && maximum instanceof Number maximumNumber
+                    ? new InputBinding(type, number.intValue(),
+                    minimumNumber.doubleValue(), maximumNumber.doubleValue())
+                    : null;
         } catch (ReflectiveOperationException | RuntimeException | LinkageError ignored) {
             return null;
         }
     }
 
-    private record InputBinding(String type, int value) {
+    private record InputBinding(
+            String type,
+            int value,
+            double minimum,
+            double maximum
+    ) {
     }
 
     private static @Nullable Object[] advancedLayout() {

@@ -9,7 +9,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$assetRoot = Join-Path $projectRoot 'src/main/resources/assets/stabilized_turret'
+$assetRoot = Join-Path $projectRoot 'src/main/resources/assets/create_fire_control'
 $blockModelDirectory = Join-Path $assetRoot 'models/block/medium_cannon_breech'
 $textureDirectory = Join-Path $assetRoot 'textures/block'
 $source = Get-Content -Raw -Encoding UTF8 -LiteralPath $SourceModel | ConvertFrom-Json
@@ -46,7 +46,7 @@ for ($index = 0; $index -lt $source.textures.Count; $index++) {
     $textureName = if ($index -eq 0) { 'medium_cannon_breech' } else { "medium_cannon_breech_$index" }
     $texturePath = Join-Path $textureDirectory ($textureName + '.png')
     [System.IO.File]::WriteAllBytes($texturePath, [Convert]::FromBase64String($Matches[1]))
-    $textureTable[[string]$index] = "stabilized_turret:block/$textureName"
+    $textureTable[[string]$index] = "create_fire_control:block/$textureName"
 }
 $textureTable['particle'] = $textureTable['0']
 
@@ -74,42 +74,39 @@ function Get-RootElementIds([object] $model) {
 
 $sourceIds = Get-RootElementIds $source
 $bodyIds = [System.Collections.Generic.List[string]]::new()
-$bodyElementsById = @{}
-if ($bodySource) {
-    foreach ($element in $bodySource.elements) {
-        $bodyElementsById[$element.uuid] = $element
-    }
-    foreach ($id in (Get-RootElementIds $bodySource)) {
-        if (-not $sourceElementsById.ContainsKey($id)) {
-            throw "Body cube $id is not present in the closed model"
-        }
-        $bodyIds.Add($id)
-    }
-} else {
-    $groupIndex = 0
-    foreach ($entry in $source.outliner) {
-        if ($entry -is [string]) {
-            $bodyIds.Add($entry)
-            continue
-        }
-        $groupIndex++
-        if ($groupIndex -eq 1) {
-            foreach ($child in $entry.children) { $bodyIds.Add($child) }
-        }
-    }
-    $bodyElementsById = $sourceElementsById
-}
-
-$bodyIdSet = [System.Collections.Generic.HashSet[string]]::new()
-foreach ($id in $bodyIds) { [void] $bodyIdSet.Add($id) }
+$recoilIds = [System.Collections.Generic.List[string]]::new()
 $movingIds = [System.Collections.Generic.List[string]]::new()
-foreach ($id in $sourceIds) {
-    if (-not $bodyIdSet.Contains($id)) {
-        $movingIds.Add($id)
+$groupsById = @{}
+foreach ($group in $source.groups) {
+    $groupsById[$group.uuid] = $group
+}
+$recoilGroupName = -join @([char]0x70AE, [char]0x95E9, [char]0x5236, [char]0x9000, [char]0x90E8, [char]0x5206)
+$movingGroupName = -join @([char]0x70AE, [char]0x95E9, [char]0x79FB, [char]0x52A8, [char]0x90E8, [char]0x5206)
+foreach ($entry in $source.outliner) {
+    if ($entry -is [string] -or -not $groupsById.ContainsKey($entry.uuid)) {
+        throw "Expected every breech cube to be inside a named root group"
+    }
+    $groupName = $groupsById[$entry.uuid].name
+    if ($groupName -eq 'group') {
+        $target = $bodyIds
+    } elseif ($groupName -eq $recoilGroupName) {
+        $target = $recoilIds
+    } elseif ($groupName -eq $movingGroupName) {
+        $target = $movingIds
+    } else {
+        throw "Unexpected breech root group '$groupName'"
+    }
+    foreach ($child in $entry.children) {
+        if ($child -isnot [string]) {
+            throw "Nested groups are not supported by this converter"
+        }
+        $target.Add($child)
     }
 }
-if ($sourceIds.Count -ne 43 -or $bodyIds.Count -ne 34 -or $movingIds.Count -ne 9) {
-    throw "Unexpected breech model layout: $($sourceIds.Count) total cubes, $($bodyIds.Count) fixed cubes, $($movingIds.Count) moving cubes"
+$bodyElementsById = $sourceElementsById
+if ($sourceIds.Count -ne 43 -or $bodyIds.Count -ne 7 -or
+    $recoilIds.Count -ne 27 -or $movingIds.Count -ne 9) {
+    throw "Unexpected breech model layout: $($sourceIds.Count) total cubes, $($bodyIds.Count) fixed cubes, $($recoilIds.Count) recoil cubes, $($movingIds.Count) opening cubes"
 }
 
 function Convert-Element([object] $sourceElement, [object] $modelSource) {
@@ -226,5 +223,6 @@ if ($openSource) {
 
 Write-Model (Join-Path $blockModelDirectory 'closed.json') $closedIds $sourceElementsById $source
 Write-Model (Join-Path $blockModelDirectory 'body.json') $bodyIds $bodyElementsById $(if ($bodySource) { $bodySource } else { $source })
+Write-Model (Join-Path $blockModelDirectory 'recoil.json') $recoilIds $sourceElementsById $source
 Write-Model (Join-Path $blockModelDirectory 'moving.json') $movingIds $sourceElementsById $source
-Write-Output "Converted $($closedIds.Count) cubes: $($bodyIds.Count) fixed and $($movingIds.Count) moving."
+Write-Output "Converted $($closedIds.Count) cubes: $($bodyIds.Count) fixed, $($recoilIds.Count) recoil, and $($movingIds.Count) opening."

@@ -1,0 +1,35 @@
+gradle.beforeProject { p ->
+    p.layout.buildDirectory.set(p.layout.projectDirectory.dir('build-config-trajectory-verify'))
+}
+gradle.projectsEvaluated {
+    def p = rootProject
+    def fixture = p.sourceSets.create('configTrajectoryIntegration') {
+        java.srcDirs = ['src/configTrajectoryIntegration/java', 'src/aaExplosionIntegration/java']
+        java.include '**/FireControlTrajectoryChecks.java', '**/GuidedMissileModeIntegration.java'
+        compileClasspath += p.sourceSets.main.output + p.sourceSets.main.compileClasspath
+        runtimeClasspath += p.sourceSets.main.output + p.sourceSets.main.runtimeClasspath
+    }
+    p.dependencies.add('localRuntime', p.files('libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+            'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar'))
+    def reload = p.providers.gradleProperty('trajectoryReload').getOrElse('false').toBoolean()
+    p.runs.server {
+        modSource fixture
+        systemProperty 'create_fire_control.modePolicyReload', reload.toString()
+    }
+    def runDir = p.layout.projectDirectory.dir(p.providers.gradleProperty('runRoot')
+            .getOrElse('analysis/config-trajectory-20261114')).dir('server').asFile
+    p.tasks.named('runServer').configure {
+        doFirst {
+            runDir.mkdirs()
+            new File(runDir, 'config-trajectory-result.txt').text = 'RUNNING'
+            new File(runDir, 'eula.txt').text = 'eula=true\n'
+            new File(runDir, 'server.properties').text = 'level-name=' + (reload ? 'world-b' : 'world-a') +
+                    '\nonline-mode=false\nview-distance=2\nsimulation-distance=2\nspawn-protection=0\nserver-port=25586\n'
+        }
+        doLast {
+            def result = new File(runDir, 'config-trajectory-result.txt')
+            if (!result.isFile() || !result.text.startsWith('PASS'))
+                throw new GradleException('Trajectory config checks failed: ' + (result.isFile() ? result.text : 'missing result'))
+        }
+    }
+}

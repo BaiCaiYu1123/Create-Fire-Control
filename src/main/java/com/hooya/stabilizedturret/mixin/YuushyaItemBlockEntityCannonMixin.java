@@ -4,6 +4,7 @@ import com.hooya.stabilizedturret.compat.yuushya.YuushyaCannonCompat;
 import com.hooya.stabilizedturret.compat.yuushya.YuushyaCannonRecoilAnimation;
 import com.hooya.stabilizedturret.content.cannon.compat.YuushyaCannonBehaviorHost;
 import com.yuushya.modelling.blockentity.itemblock.ItemBlockEntity;
+import com.yuushya.modelling.blockentity.showblock.ShowBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -21,7 +22,7 @@ import rbasamoyai.createbigcannons.cannons.ItemCannonBehavior;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.IMediumcannonBlockEntity;
 import rbasamoyai.createbigcannons.cannon_control.contraption.PitchOrientedContraptionEntity;
 
-@Mixin(ItemBlockEntity.class)
+@Mixin({ItemBlockEntity.class, ShowBlockEntity.class})
 public abstract class YuushyaItemBlockEntityCannonMixin extends BlockEntity
         implements IMediumcannonBlockEntity, YuushyaCannonRecoilAnimation {
     @Unique

@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "facing=north,part=center": {
+      "model": "create_fire_control:block/tiger_i_engine/center",
+      "y": 0,
+      "uvlock": true
+    },
+    "facing=north,part=left": {
+      "model": "create_fire_control:block/tiger_i_engine/left",
+      "y": 0,
+      "uvlock": true
+    },
+    "facing=north,part=right": {
+      "model": "create_fire_control:block/tiger_i_engine/right",
+      "y": 0,
+      "uvlock": true
+    },
+    "facing=east,part=center": {
+      "model": "create_fire_control:block/tiger_i_engine/center",
+      "y": 90,
+      "uvlock": true
+    },
+    "facing=east,part=left": {
+      "model": "create_fire_control:block/tiger_i_engine/left",
+      "y": 90,
+      "uvlock": true
+    },
+    "facing=east,part=right": {
+      "model": "create_fire_control:block/tiger_i_engine/right",
+      "y": 90,
+      "uvlock": true
+    },
+    "facing=south,part=center": {
+      "model": "create_fire_control:block/tiger_i_engine/center",
+      "y": 180,
+      "uvlock": true
+    },
+    "facing=south,part=left": {
+      "model": "create_fire_control:block/tiger_i_engine/left",
+      "y": 180,
+      "uvlock": true
+    },
+    "facing=south,part=right": {
+      "model": "create_fire_control:block/tiger_i_engine/right",
+      "y": 180,
+      "uvlock": true
+    },
+    "facing=west,part=center": {
+      "model": "create_fire_control:block/tiger_i_engine/center",
+      "y": 270,
+      "uvlock": true
+    },
+    "facing=west,part=left": {
+      "model": "create_fire_control:block/tiger_i_engine/left",
+      "y": 270,
+      "uvlock": true
+    },
+    "facing=west,part=right": {
+      "model": "create_fire_control:block/tiger_i_engine/right",
+      "y": 270,
+      "uvlock": true
+    }
+  }
+}

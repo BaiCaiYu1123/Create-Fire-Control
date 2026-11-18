@@ -1,0 +1,713 @@
+{
+  "controller.plug_in": {
+    "subtitle": "subtitles.create_fire_control.controller_plug_in",
+    "sounds": [{"name": "create_fire_control:controller/plug_in"}]
+  },
+  "controller.plug_out": {
+    "subtitle": "subtitles.create_fire_control.controller_plug_out",
+    "sounds": [{"name": "create_fire_control:controller/plug_out"}]
+  },
+  "type_10_loader": {
+    "subtitle": "subtitles.create_fire_control.type_10_loader",
+    "sounds": [{"name": "create_fire_control:type_10_loader", "attenuation_distance": 16}]
+  },
+  "engine.abrams.engine_00": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_00",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_33": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_33",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_66": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_66",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_99": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_99",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_00_load": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_00_load",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_33_load": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_33_load",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_66_load": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_66_load",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_99_load": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_99_load",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "engine.abrams.engine_start": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_start_load",
+        "attenuation_distance": 192
+      }
+    ]
+  },
+  "engine.abrams.engine_stop": {
+    "subtitle": "subtitles.create_fire_control.gas_turbine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/abrams/engine_stop_load",
+        "attenuation_distance": 192
+      }
+    ]
+  },
+  "mz_loader": {
+    "subtitle": "subtitles.create_fire_control.mz_loader",
+    "sounds": [
+      "create_fire_control:mz_loader"
+    ]
+  },
+  "az_loader": {
+    "subtitle": "subtitles.create_fire_control.az_loader",
+    "sounds": [
+      "create_fire_control:az_loader"
+    ]
+  },
+  "rwr_scan": {
+    "subtitle": "subtitles.create_fire_control.rwr_scan",
+    "sounds": [
+      "create_fire_control:rwr_scan"
+    ]
+  },
+  "connected_display_god_mode": {
+    "subtitle": "subtitles.create_fire_control.connected_display_god_mode",
+    "sounds": [
+      {
+        "name": "create_fire_control:connected_display/god_mode",
+        "stream": true,
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "maid_loading_complete": {
+    "subtitle": "subtitles.create_fire_control.maid_loading_complete",
+    "sounds": [
+      "create_fire_control:maid/loading_complete_1",
+      "create_fire_control:maid/loading_complete_2"
+    ]
+  },
+  "mianbao_autocannon_fire_half": {
+    "sounds": [
+      {
+        "name": "mianbaos_modernwarfare:xin_ji_pao_kai_huo_",
+        "volume": 0.5,
+        "attenuation_distance": 64,
+        "stream": false
+      }
+    ]
+  },
+  "mianbao_autocannon_fire_far_half": {
+    "sounds": [
+      {
+        "name": "mianbaos_modernwarfare:ji_pao_yuan_chu_kai_huo_",
+        "volume": 0.5,
+        "attenuation_distance": 512,
+        "stream": false
+      }
+    ]
+  },
+  "mianbao_machine_gun_fire_half": {
+    "sounds": [
+      {
+        "name": "mianbaos_modernwarfare:xin_ji_qiang_kai_huo_",
+        "volume": 0.5,
+        "attenuation_distance": 128,
+        "stream": false
+      }
+    ]
+  },
+  "mianbao_machine_gun_fire_far_half": {
+    "sounds": [
+      {
+        "name": "mianbaos_modernwarfare:ji_pao_yuan_chu_",
+        "volume": 0.5,
+        "attenuation_distance": 512,
+        "stream": false
+      }
+    ]
+  },
+  "engine.ztz99a.engine_00": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_00",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_33_load": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_33_load",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_66_load": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_66_load",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_99_load": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_99_load",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-001": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_blips-001",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-002": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_blips-002",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-003": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_blips-003",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-004": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_blips-004",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-005": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_blips-005",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-006": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_blips-006",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-007": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_blips-007",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_blips-008": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_blips-008",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-001": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_release-001",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-002": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_release-002",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-003": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_release-003",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-004": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_release-004",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-005": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_release-005",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-006": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_release-006",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_release-007": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_release-007",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_revv-001": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_revv-001",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_revv-002": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_revv-002",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_revv-003": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_revv-003",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_revv-004": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_revv-004",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_revv-005": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_revv-005",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_start": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_start",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.ztz99a.engine_stop": {
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/ztz99a/spatial/engine_stop",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.blips-001": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/blips-001",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.blips-002": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/blips-002",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.blips-003": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/blips-003",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.blips-004": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/blips-004",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.blips-005": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/blips-005",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.blips-006": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/blips-006",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.blips-007": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/blips-007",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.blips-008": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/blips-008",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.blips-009": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/blips-009",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.fast_load": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/fast_load",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.fast_not_load": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/fast_not_load",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.idle_load": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/idle_load",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.med_load": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/med_load",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.med_not_load": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/med_not_load",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.release-001": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/release-001",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.release-002": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/release-002",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.release-003": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/release-003",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.release-004": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/release-004",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.release-005": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/release-005",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.release-006": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/release-006",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.release-007": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/release-007",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.revv-001": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/revv-001",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.revv-002": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/revv-002",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.revv-003": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/revv-003",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.revv-004": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/revv-004",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.revv-005": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/revv-005",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.slow_load": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/slow_load",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.slow_not_load": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/slow_not_load",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.start": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/start",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "engine.tiger_i.stop": {
+    "subtitle": "subtitles.create_fire_control.tiger_i_engine",
+    "sounds": [
+      {
+        "name": "create_fire_control:engine/tiger_i/stop",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  }
+}

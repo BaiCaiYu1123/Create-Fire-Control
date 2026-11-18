@@ -1,0 +1,41 @@
+CopyPoly 1.9.1
+Copyright (c) 2026 caca
+License: MIT; full original text: META-INF/licenses/copypoly-MIT.txt
+
+Source: a user-provided CopyPoly 1.9.1 source snapshot.
+No upstream repository URL or Git revision was supplied with it.
+Source is kept separately in third_party/copypoly in the Fire Control project.
+
+MIT-covered JAR entries:
+  com/caca/copypoly/**
+  assets/copypoly/**
+  data/copypoly/**
+  copypoly.mixins.json
+  com/hooya/stabilizedturret/client/armor/PolyArmorModel*.class
+  data/create/tags/block/copycat_deny.json
+  assets/create_fire_control/blockstates/camouflaged_polyhedral_armor.json
+  assets/create_fire_control/models/item/camouflaged_polyhedral_armor.json
+  data/create_fire_control/loot_table/blocks/camouflaged_polyhedral_armor.json
+  The create_fire_control:camouflaged_polyhedral_armor entry in the shared pickaxe tag.
+
+The editor, geometry, API, blocks, menus, packets, rendering and Sable physics
+are the original CopyPoly implementations. Imported Java files have explicit
+MIT/copyright headers. Copypoly.java and PolyClient.java adapt registration,
+legacy aliases and the model ID. Names now read Camouflaged Polyhedral Armor.
+The separate MIT renderer adapter, migrated JSON resources and ArmorEditorView camera/projection
+facade in fire_control_adapter retain the original and adaptation copyright
+notices. The original host armor simulation, mesh subtraction, editable mesh
+screen, menu, payloads, ballistics and mixins retain Fire Control's own license.
+Integration uses host build configuration, metadata,
+the shared pickaxe tag and a Fire Control creative-tab reference.
+Original source hashes and import details are in the separate source tree.
+
+The bundled component retains mod ID copypoly. Its block, item and block entity
+use create_fire_control:camouflaged_polyhedral_armor; registry aliases preserve
+copypoly:copycat_polyhedron palettes, saved block entities, items and schematics.
+Do not install another standalone CopyPoly JAR alongside this distribution.
+
+Only the identified CopyPoly component is licensed under MIT. This statement
+does not apply MIT to Create: Fire Control's own code or other assets.
+Fire Control's own license is META-INF/licenses/create-fire-control.txt;
+other third-party exceptions are identified in THIRD_PARTY_NOTICES.md.

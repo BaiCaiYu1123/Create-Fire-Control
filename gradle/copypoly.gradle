@@ -1,0 +1,267 @@
+// Host integration only. Vendored implementations remain in third_party/copypoly (MIT).
+def copypolyRoot = file('third_party/copypoly')
+def copypolyResources = new File(copypolyRoot, 'src/main/resources')
+def sharedPickaxeTag = 'data/minecraft/tags/block/mineable/pickaxe.json'
+
+sourceSets {
+    main.java.srcDir new File(copypolyRoot, 'src/main/java')
+    main.java.srcDir new File(copypolyRoot, 'fire_control_adapter/java')
+    copypolyTest {
+        java.srcDirs = [new File(copypolyRoot, 'src/test/java')]
+        java.srcDir 'src/copypolyArmorTest/java'
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    copypolyGameTest {
+        java.srcDirs = [new File(copypolyRoot, 'src/gametest/java')]
+        java.srcDir 'src/armorIntegration/java'
+        resources.srcDirs = [new File(copypolyRoot, 'src/gametest/resources')]
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
+dependencies {
+    if (providers.gradleProperty('effortlessJar').isPresent()) {
+        localRuntime files(providers.gradleProperty('effortlessJar').get())
+    }
+    def terminalBallisticsJar = providers.gradleProperty('terminalBallisticsJar')
+            .map { file(it) }.getOrElse(file('libs/cbc_terminal_ballistics-0.3.5-neoforge.jar'))
+    compileOnly files(terminalBallisticsJar)
+    if (providers.gradleProperty('terminalBallisticsRuntime').getOrElse('false').toBoolean()) {
+        localRuntime files(terminalBallisticsJar)
+        localRuntime files(providers.gradleProperty('copycatsJar')
+                .getOrElse('libs/copycats-3.0.11+mc.1.21.1-neoforge.jar'))
+    }
+    // Optional local JUnit distribution for machines with an offline dependency cache.
+    if (providers.gradleProperty('copypolyJUnitDir').isPresent()) {
+        copypolyTestImplementation fileTree(providers.gradleProperty('copypolyJUnitDir').get()) { include '*.jar' }
+    } else {
+        copypolyTestImplementation platform('org.junit:junit-bom:5.11.4')
+        copypolyTestImplementation 'org.junit.jupiter:junit-jupiter'
+        copypolyTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+}
+
+tasks.named('processResources', ProcessResources) {
+    // Only this shared tag is merged into the host resource; preserve the upstream file.
+    from(copypolyResources) { exclude sharedPickaxeTag }
+    from(new File(copypolyRoot, 'fire_control_adapter/resources'))
+    from(new File(copypolyRoot, 'LICENSE')) {
+        into 'META-INF/licenses'
+        rename { 'copypoly-MIT.txt' }
+    }
+    from('LICENSE') { into 'META-INF/licenses'; rename { 'create-fire-control.txt' } }
+    from('THIRD_PARTY_NOTICES.md') { into 'META-INF/notices' }
+}
+
+tasks.register('testCopypoly', Test) {
+    description = 'Runs the isolated upstream CopyPoly JUnit suite.'
+    group = 'verification'
+    testClassesDirs = sourceSets.copypolyTest.output.classesDirs
+    classpath = sourceSets.copypolyTest.runtimeClasspath
+    useJUnitPlatform()
+}
+tasks.named('check') { dependsOn 'testCopypoly' }
+
+tasks.register('copypolySourcesJar', Jar) {
+    description = 'Packages only the separately MIT-licensed CopyPoly source component.'
+    archiveBaseName = 'copypoly'
+    archiveVersion = '1.9.1'
+    archiveClassifier = 'sources'
+    from(copypolyRoot) {
+        exclude '.gradle/**', 'build/**', 'run/**', 'logs/**', 'libs/**'
+    }
+}
+
+if (providers.gradleProperty('copypolyGameTests').getOrElse('false').toBoolean()) {
+    runs {
+        copypolyGameTestServer {
+            runType 'gameTestServer'
+            modSource project.sourceSets.copypolyGameTest
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'copypoly'
+            systemProperty 'copypoly.persistencePhase',
+                    providers.gradleProperty('copypolyPersistencePhase').getOrElse('')
+        }
+    }
+    // The upstream Sable tests exercise real native physics.
+    dependencies {
+        localRuntime files('libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+                'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar')
+    }
+    def gameTestLog = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run'))
+            .file('copypolyGameTestServer/logs/latest.log').asFile
+    tasks.matching { it.name == 'runCopypolyGameTestServer' }.configureEach {
+        doFirst {
+            gameTestLog.parentFile.mkdirs()
+            gameTestLog.text = ''
+        }
+        doLast {
+            def log = gameTestLog.isFile() ? gameTestLog.getText('UTF-8') : ''
+            if (!(log =~ /All [1-9][0-9]* required tests passed/).find())
+                throw new GradleException('CopyPoly GameTest did not report a nonzero passing test suite. See ' + gameTestLog)
+        }
+    }
+}
+if (providers.gradleProperty('copypolyClientSmoke').getOrElse('false').toBoolean()) {
+    dependencies {
+        localRuntime files('libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+                'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar')
+    }
+    runs.client {
+        modSource project.sourceSets.copypolyGameTest
+        systemProperty 'create_fire_control.armorClientSmoke',
+                providers.gradleProperty('polyArmorClientSmoke').getOrElse('false')
+        systemProperty 'create_fire_control.armorFlightSmoke',
+                providers.gradleProperty('polyArmorFlightSmoke').getOrElse('false')
+        systemProperty 'create_fire_control.apfsdsStopSmoke',
+                providers.gradleProperty('apfsdsStopSmoke').getOrElse('false')
+        systemProperty 'create_fire_control.armorRicochetSmoke',
+                providers.gradleProperty('polyArmorRicochetSmoke').getOrElse('false')
+        systemProperty 'create_fire_control.armorParticleSmoke',
+                providers.gradleProperty('polyArmorParticleSmoke').getOrElse('false')
+        systemProperty 'create_fire_control.armorInspectionSmoke',
+                providers.gradleProperty('polyArmorInspectionSmoke').getOrElse('false')
+        argument '--width'
+        argument '1280'
+        argument '--height'
+        argument '800'
+        ['clientSmoke', 'editorSmoke', 'collisionSmoke', 'collisionControl', 'sableEditorSmoke',
+         'vertexClipboardSmoke', 'freeformSmoke', 'customVertexSmoke', 'topologySmoke', 'lineSmoke'].each { key ->
+            systemProperty "copypoly.${key}", providers.gradleProperty("copypoly.${key}").getOrElse('false')
+        }
+    }
+    if (providers.gradleProperty('polyArmorInspectionSmoke').getOrElse('false').toBoolean()) {
+        def log = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run'))
+                .file('client/logs/latest.log').asFile
+        tasks.matching { it.name == 'runClient' }.configureEach {
+            doFirst { log.parentFile.mkdirs(); log.text = '' }
+            doLast {
+                if (!log.isFile() || !log.getText('UTF-8').contains('ARMOR_INSPECTION_CLIENT_PASS:'))
+                    throw new GradleException('Armor inspection probe did not pass. See ' + log)
+            }
+        }
+    }
+    if (providers.gradleProperty('polyArmorClientSmoke').getOrElse('false').toBoolean()) {
+        def armorClientLog = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run'))
+                .file('client/logs/latest.log').asFile
+        tasks.matching { it.name == 'runClient' }.configureEach {
+            doFirst { armorClientLog.parentFile.mkdirs(); armorClientLog.text = '' }
+            doLast {
+                if (!armorClientLog.isFile() || !armorClientLog.getText('UTF-8').contains('ARMOR_CLIENT_PASS:'))
+                    throw new GradleException('Armor client probe did not pass. See ' + armorClientLog)
+            }
+        }
+    }
+    if (providers.gradleProperty('polyArmorFlightSmoke').getOrElse('false').toBoolean()) {
+        def flightLog = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run')).file('client/logs/latest.log').asFile
+        tasks.matching { it.name == 'runClient' }.configureEach {
+            doFirst { flightLog.parentFile.mkdirs(); flightLog.text = '' }
+            doLast { if (!flightLog.isFile() || !flightLog.getText('UTF-8').contains('ARMOR_FLIGHT_CLIENT_PASS:')) throw new GradleException('Armor flight client probe did not pass. See ' + flightLog) }
+        }
+    }
+    if (providers.gradleProperty('apfsdsStopSmoke').getOrElse('false').toBoolean()) {
+        def stopLog = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run')).file('client/logs/latest.log').asFile
+        tasks.matching { it.name == 'runClient' }.configureEach {
+            doFirst { stopLog.parentFile.mkdirs(); stopLog.text = '' }
+            doLast { if (!stopLog.isFile() || !stopLog.getText('UTF-8').contains('APFSDS_STOP_CLIENT_PASS:')) throw new GradleException('APFSDS stop client probe did not pass. See ' + stopLog) }
+        }
+    }
+    if (providers.gradleProperty('polyArmorRicochetSmoke').getOrElse('false').toBoolean()) {
+        def ricochetLog = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run')).file('client/logs/latest.log').asFile
+        tasks.matching { it.name == 'runClient' }.configureEach {
+            doFirst { ricochetLog.parentFile.mkdirs(); ricochetLog.text = '' }
+            doLast { if (!ricochetLog.isFile() || !ricochetLog.getText('UTF-8').contains('ARMOR_RICOCHET_CLIENT_PASS:')) throw new GradleException('Armor ricochet client probe did not pass. See ' + ricochetLog) }
+        }
+    }
+    if (providers.gradleProperty('polyArmorParticleSmoke').getOrElse('false').toBoolean()) {
+        def particleLog = layout.projectDirectory.dir(providers.gradleProperty('runRoot').getOrElse('run')).file('client/logs/latest.log').asFile
+        tasks.matching { it.name == 'runClient' }.configureEach {
+            doFirst { particleLog.parentFile.mkdirs(); particleLog.text = '' }
+            doLast { if (!particleLog.isFile() || !particleLog.getText('UTF-8').contains('ARMOR_PARTICLE_CLIENT_PASS:')) throw new GradleException('Armor placement particle probe did not pass. See ' + particleLog) }
+        }
+    }
+}
+
+tasks.register('verifyCopypolyJar') {
+    group = 'verification'
+    description = 'Verifies the full CopyPoly component and distinct licenses in the shipped JAR.'
+    dependsOn 'shadowJar'
+    def archive = tasks.named('shadowJar').flatMap { it.archiveFile }
+    inputs.file archive
+    inputs.dir copypolyResources
+    inputs.file new File(copypolyRoot, 'LICENSE')
+    def productionSourceRoot = new File(copypolyRoot, 'src/main/java')
+    def productionSources = fileTree(productionSourceRoot).matching { include '**/*.java' }
+    def packagedResources = fileTree(copypolyResources)
+    def fixtures = fileTree(new File(copypolyRoot, 'src')).matching {
+        include 'test/java/**/*.java', 'gametest/java/**/*.java'
+    }
+    def hostFixtures = fileTree('src/armorIntegration/java').matching { include '**/*.java' }
+    def hostFixtureRoot = file('src/armorIntegration/java')
+    def adapterRoot = new File(copypolyRoot, 'fire_control_adapter/java')
+    def adapters = fileTree(adapterRoot).matching { include '**/*.java' }
+    def adapterResourcesRoot = new File(copypolyRoot, 'fire_control_adapter/resources')
+    def adapterResources = fileTree(adapterResourcesRoot)
+    inputs.files productionSources, fixtures
+    inputs.files hostFixtures, adapters, adapterResources
+    doLast {
+        def zip = new java.util.zip.ZipFile(archive.get().asFile)
+        try {
+            def read = { String path ->
+                def entry = zip.getEntry(path)
+                if (entry == null) throw new GradleException("Missing CopyPoly distribution entry: ${path}")
+                zip.getInputStream(entry).withCloseable { it.getText('UTF-8') }
+            }
+            productionSources.each { source ->
+                def relative = productionSourceRoot.toPath().relativize(source.toPath()).toString()
+                def classPath = relative.replace('\\', '/').replaceAll(/\.java$/, '.class')
+                if (zip.getEntry(classPath) == null) throw new GradleException("Missing CopyPoly class: ${classPath}")
+            }
+            adapters.each { source ->
+                def path = adapterRoot.toPath().relativize(source.toPath()).toString().replace('\\', '/').replaceAll(/\.java$/, '.class')
+                if (zip.getEntry(path) == null) throw new GradleException("Missing MIT renderer adapter: ${path}")
+            }
+            adapterResources.each { resource ->
+                def path = adapterResourcesRoot.toPath().relativize(resource.toPath()).toString().replace('\\', '/')
+                if (read(path) != resource.getText('UTF-8')) throw new GradleException("Missing migrated MIT armor resource: ${path}")
+            }
+            hostFixtures.each { source ->
+                def path = hostFixtureRoot.toPath().relativize(source.toPath()).toString().replace('\\', '/').replaceAll(/\.java$/, '.class')
+                if (zip.getEntry(path) != null) throw new GradleException("Armor integration fixture leaked into the mod: ${path}")
+            }
+            for (def prefix : ['com/cbc_terminal_ballistics/', 'com/copycatsplus/', 'dev/huskuraft/effortless/']) {
+                if (zip.entries().any { it.name.startsWith(prefix) })
+                    throw new GradleException("An optional external mod was accidentally bundled: ${prefix}")
+            }
+            packagedResources.each { resource ->
+                def path = copypolyResources.toPath().relativize(resource.toPath()).toString().replace('\\', '/')
+                if (path != sharedPickaxeTag && read(path) != resource.getText('UTF-8'))
+                    throw new GradleException("CopyPoly resource changed during packaging: ${path}")
+            }
+            if (read('META-INF/licenses/copypoly-MIT.txt') != new File(copypolyRoot, 'LICENSE').getText('UTF-8'))
+                throw new GradleException('The full original CopyPoly MIT license must be shipped unchanged.')
+            if (!read('META-INF/licenses/create-fire-control.txt').contains('All rights reserved.'))
+                throw new GradleException('Fire Control must retain its own license.')
+            read('META-INF/notices/copypoly.txt')
+            read('META-INF/notices/drivebywire.txt')
+            read('META-INF/notices/drivebywire-model.txt')
+            read('META-INF/licenses/drivebywire-model-MIT.txt')
+            def metadata = read('META-INF/neoforge.mods.toml')
+            if (!metadata.contains('modId="copypoly"') || !metadata.contains('modId="create_fire_control"')
+                    || !metadata.contains('config="copypoly.mixins.json"')
+                    || !metadata.contains('license="Mixed: original Fire Control work All Rights Reserved;'))
+                throw new GradleException('Missing bundled mod identity, mixin configuration or distinct license declaration.')
+            def tag = new groovy.json.JsonSlurper().parseText(read(sharedPickaxeTag))
+            if (!tag.values.containsAll(['create_fire_control:camouflaged_polyhedral_armor', 'create_fire_control:tiger_i_engine']))
+                throw new GradleException('The shared pickaxe tag must include both components.')
+            fixtures.each { source ->
+                def path = source.path.replace('\\', '/').replaceFirst(/^.*\/(?:test|gametest)\/java\//, '').replaceAll(/\.java$/, '.class')
+                if (zip.getEntry(path) != null) throw new GradleException("CopyPoly test fixture leaked into the mod: ${path}")
+            }
+        } finally {
+            zip.close()
+        }
+    }
+}
+tasks.named('assemble') { dependsOn 'verifyCopypolyJar', 'copypolySourcesJar' }

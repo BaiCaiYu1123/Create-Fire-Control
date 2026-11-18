@@ -1,0 +1,46 @@
+// Keep all compiler output private to this verification, including from AA-container builds.
+gradle.beforeProject { project ->
+    project.layout.buildDirectory.set(project.layout.projectDirectory.dir('build-ordinary-aa-verify'))
+}
+
+gradle.projectsEvaluated {
+    def project = rootProject
+    if (project.providers.gradleProperty('ordinaryAaRegressionOnly').getOrElse('false').toBoolean()) return
+    def fixture = project.sourceSets.create('ordinaryAaIntegration') {
+        java.srcDirs = ['src/ordinaryAaIntegration/java']
+        compileClasspath += project.sourceSets.main.output + project.sourceSets.main.compileClasspath
+        runtimeClasspath += project.sourceSets.main.output + project.sourceSets.main.runtimeClasspath
+    }
+    project.dependencies.add('localRuntime', project.files(
+            'libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar',
+            'libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar'))
+    project.runs.configureEach { modSource fixture }
+    def clientChecks = project.providers.gradleProperty('ordinaryAaClientChecks').getOrElse('false').toBoolean()
+    project.runs.client {
+        systemProperty 'create_fire_control.ordinaryAaClientChecks', clientChecks.toString()
+        argument '--width'; argument '1280'
+        argument '--height'; argument '720'
+    }
+    def runDir = project.layout.projectDirectory.dir(project.providers.gradleProperty('runRoot').get()).dir('server').asFile
+    project.tasks.named('runServer').configure {
+        doFirst { runDir.mkdirs(); new File(runDir, 'ordinary-aa-result.txt').text = 'RUNNING' }
+        doLast {
+            def result = new File(runDir, 'ordinary-aa-result.txt')
+            if (!result.isFile() || !result.text.startsWith('PASS')) {
+                throw new GradleException('Ordinary AA integration failed: ' + (result.isFile() ? result.text : 'missing result'))
+            }
+        }
+    }
+    if (clientChecks) {
+        def clientDir = project.layout.projectDirectory.dir(project.providers.gradleProperty('runRoot').get()).dir('client').asFile
+        project.tasks.named('runClient').configure {
+            doFirst { clientDir.mkdirs(); new File(clientDir, 'ordinary-aa-client-result.txt').text = 'RUNNING' }
+            doLast {
+                def result = new File(clientDir, 'ordinary-aa-client-result.txt')
+                if (!result.isFile() || !result.text.startsWith('PASS')) {
+                    throw new GradleException('Ordinary AA client check failed: ' + (result.isFile() ? result.text : 'missing result'))
+                }
+            }
+        }
+    }
+}

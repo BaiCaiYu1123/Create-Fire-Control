@@ -17,8 +17,6 @@ Create: Fire Control 为 Create、Sable 与 Create Aeronautics 生态提供一�
 
 *Create: Fire Control is a vehicle fire-control and weapon-systems mod for Minecraft 1.21.1 / NeoForge, built around Create, Sable and Create Aeronautics.*
 
-模组 ID 为 `create_fire_control`，旧版 `stabilized_turret:*` 存档与蓝图通过注册表别名自动兼容。
-
 > **运行环境**：Minecraft 1.21.1 / NeoForge 21.1.230+。必需前置：Create 6.0.10.x、Sable 2.0.6.x、Create Aeronautics / Simulated 1.2.1.x 或 1.3.0–1.3.2、GeckoLib 4.7+、面包军火库 2.7.1+。完整版本、可选前置、专项兼容与推荐光影见[版本与依赖](#版本与依赖)。
 
 ## 主要功能
@@ -66,7 +64,17 @@ Create: Fire Control 为 Create、Sable 与 Create Aeronautics 生态提供一�
 - [多面体装甲](docs/POLYHEDRAL_ARMOR.md)按实际体积继承伪装材质的硬度与韧性，生成可编辑的真实弹孔
 - 可选全局等效装甲：按命中位置与弹道换算穿透距离，默认关闭
 
-## 界面预览
+## 预览
+
+### 模型与设备
+
+| 主要设备与显示器 | 火炮与装填机 |
+| --- | --- |
+| ![主要设备与显示器](docs/previews/main.png) | ![火炮与装填机](docs/previews/cannons.png) |
+| 弹药箱与控制器 | 动力与弹药 |
+| ![弹药箱与控制器](docs/previews/items.png) | ![动力与弹药](docs/previews/engines.png) |
+
+### 界面
 
 | 火控按键配置 | 全键盘无线控制器 |
 | --- | --- |

@@ -10,7 +10,7 @@ supplied source SHA-256 and the actual local SHA-256, including these changes.
 
 `fire_control_adapter/java/.../PolyArmorModel.java` adapts the original material
 projection renderer for exact damage meshes. It is explicitly MIT, credits
-caca and BaiCaiYu1123, and is packaged in the separate CopyPoly sources archive.
+caca and BaiCaiYu, and is packaged in the separate CopyPoly sources archive.
 `fire_control_adapter/java/com/caca/copypoly/client/ArmorEditorView.java` is an
 explicitly MIT facade over the original free camera, Sable-aware projection and
 overlay. It also aims the camera at the edited block when opening/resetting.

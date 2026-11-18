@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 caca
-// Copyright (c) 2026 BaiCaiYu1123
+// Copyright (c) 2026 BaiCaiYu
 package com.caca.copypoly.client;
 
 import com.caca.copypoly.api.PolyShape;

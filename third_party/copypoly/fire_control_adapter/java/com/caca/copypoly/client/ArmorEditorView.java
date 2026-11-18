@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 caca
-// Copyright (c) 2026 BaiCaiYu1123 (Fire Control adapter)
+// Copyright (c) 2026 BaiCaiYu (Fire Control adapter)
 // Bridges the existing MIT camera, projection and overlay controls without copying them into the host.
 package com.caca.copypoly.client;
 

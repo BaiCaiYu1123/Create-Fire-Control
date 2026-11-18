@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 caca
-// Copyright (c) 2026 BaiCaiYu1123 (Fire Control adapter)
+// Copyright (c) 2026 BaiCaiYu (Fire Control adapter)
 // Antialiased primitives adapted from CopyPoly's SmoothOverlay; depth-aware armor editing.
 package com.caca.copypoly.client;
 

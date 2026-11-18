@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 caca
-// Copyright (c) 2026 BaiCaiYu1123 (Fire Control adaptation)
+// Copyright (c) 2026 BaiCaiYu (Fire Control adaptation)
 // Material projection adapted from CopyPoly's PolyModel; see third_party/copypoly/LICENSE.
 package com.hooya.stabilizedturret.client.armor;
 

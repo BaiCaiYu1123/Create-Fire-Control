@@ -947,7 +947,7 @@ public static void renderAfterIris(RenderGuiEvent.Pre event) {
 | `create` | required | `[6.0.10, 6.0.11)` | 红石链接网络、扳手、座椅 |
 | `sable` | required | `[2.0.3, 2.0.6)` | Rapier 物理引擎、子层级；不接受 Sable 1.x |
 | `aeronautics_bundled` | required | `[1.2.1, 1.2.2), [1.3.0, 1.3.3)` | Create Aeronautics 物理载具 |
-| `simulated` | required | `[1.2.1, 1.2.2), [1.3.0, 1.3.3)` | swivel bearing 等机械部件 |
+| `simulated` | required | `[1.2.1, 1.2.2), [1.3.0, 1.3.3)` | swivel bearing 等机械部件；由航空学 bundled JAR 内置提供，无需单独安装 |
 | `interiors` | optional | `[0.6.1, 0.6.2)` | 内饰座椅（额外座椅类型） |
 | `createbigcannons` | optional | `[5.11.6, 5.11.8)` | CBC 火炮 + 火炮底座 |
 | `cbcmodernwarfare` | optional | `[0.0.6v+mc.1.21.1-neoforge]` | CBC 现代战争扩展（compact_mount） |

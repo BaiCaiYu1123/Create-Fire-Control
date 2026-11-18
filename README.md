@@ -17,7 +17,7 @@ Create: Fire Control 为 Create、Sable 与 Create Aeronautics 生态提供一�
 
 *Create: Fire Control is a vehicle fire-control and weapon-systems mod for Minecraft 1.21.1 / NeoForge, built around Create, Sable and Create Aeronautics.*
 
-> **运行环境**：Minecraft 1.21.1 / NeoForge 21.1.230+。必需前置：Create 6.0.10.x、Sable 2.0.6.x、Create Aeronautics / Simulated 1.2.1.x 或 1.3.0–1.3.2、GeckoLib 4.7+、面包军火库 2.7.1+。完整版本、可选前置、专项兼容与推荐光影见[版本与依赖](#版本与依赖)。
+> **运行环境**：Minecraft 1.21.1 / NeoForge 21.1.230+。必需前置：Create 6.0.10.x、Sable 2.0.6.x、Create Aeronautics 1.2.1.x 或 1.3.0–1.3.2（内含 Simulated）、GeckoLib 4.7+、面包军火库 2.7.1+。完整版本、可选前置、专项兼容与推荐光影见[版本与依赖](#版本与依赖)。
 
 ## 主要功能
 
@@ -94,8 +94,7 @@ Create: Fire Control 为 Create、Sable 与 Create Aeronautics 生态提供一�
 | NeoForge | **21.1.230+** | 构建与验收版本为 21.1.230 |
 | Create | **6.0.10.x** | 要求 `[6.0.10, 6.0.11)` |
 | Sable | **2.0.6.x** | 要求 `[2.0.6, 2.0.7)` |
-| Create Aeronautics | **1.2.1.x 或 1.3.0–1.3.2** | 要求 `[1.2.1,1.2.2)` 或 `[1.3.0,1.3.3)` |
-| Simulated | **1.2.1.x 或 1.3.0–1.3.2** | 与 Create Aeronautics 使用同一版本范围 |
+| Create Aeronautics | **1.2.1.x 或 1.3.0–1.3.2** | 要求 `[1.2.1,1.2.2)` 或 `[1.3.0,1.3.3)`；已内置 Simulated，无需单独安装 |
 | GeckoLib | **4.7+** | 构建使用 4.9.1 |
 | 面包军火库（Mianbao's Modern Warfare） | **2.7.1+** | 导弹、炸弹、火箭弹、挂架与发射器；1.21.1 NeoForge 移植版由 BaiCaiYu 维护 |
 
@@ -147,7 +146,7 @@ Create: Fire Control 为 Create、Sable 与 Create Aeronautics 生态提供一�
 ## 安装
 
 1. 安装 Minecraft 1.21.1 与 NeoForge 21.1.230（或更高版本）。
-2. 将 Create 6.0.10.x、Sable 2.0.6.x、Create Aeronautics / Simulated（1.2.1.x 或 1.3.0–1.3.2）、GeckoLib 4.7+ 与面包军火库 2.7.1+ 放入 `mods/`。
+2. 将 Create 6.0.10.x、Sable 2.0.6.x、Create Aeronautics（1.2.1.x 或 1.3.0–1.3.2，内含 Simulated）、GeckoLib 4.7+ 与面包军火库 2.7.1+ 放入 `mods/`。
 3. 将 `create-fire-control-1.0.4.jar` 放入 `mods/`。
 4. 按“可选前置”与“专项兼容”表加入需要的模组；未安装的可选模组不会阻止启动。
 
@@ -192,7 +191,7 @@ Create: Fire Control 为 Create、Sable 与 Create Aeronautics 生态提供一�
 
 - [CopyPoly](third_party/copypoly) — caca（MIT）
 - Drive-By-Wire — endalion（MIT 部分）
-- Create、Sable、Create Aeronautics、Simulated、GeckoLib、Create Big Cannons 的作者与社区
+- Create、Sable、Create Aeronautics（含 Simulated）、GeckoLib、Create Big Cannons 的作者与社区
 - 面包军火库原版作者：jhfn2233223_88364（B站：jhfn13）；1.21.1 NeoForge 移植与维护：BaiCaiYu
 
 ## 链接

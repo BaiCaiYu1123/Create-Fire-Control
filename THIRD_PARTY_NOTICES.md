@@ -92,11 +92,11 @@ relicense external mods that are not bundled with this project.
 ## Other dependencies
 
 Create, Sable, Create Aeronautics, Simulated, GeckoLib, Create Big Cannons,
-面包军火库 (Mianbao's Modern Warfare) and other optional integrations are not
+面包军火库 (Mianbao's NewModernWarfare) and other optional integrations are not
 bundled by this repository. They retain their respective licenses and are not
 relicensed by this notice. CopyPoly's MIT license does not cover the Fire
 Control codebase.
 
-面包军火库 original author: jhfn2233223_88364 (Bilibili: jhfn13). The 1.21.1
-NeoForge port used with Fire Control is maintained by BaiCaiYu and is not
-bundled by this repository.
+Mianbao's Modern Warfare original author: jhfn2233223_88364 (Bilibili: jhfn13).
+The 1.21.1 NeoForge port, Mianbao's NewModernWarfare, is maintained by
+BaiCaiYu and is not bundled by this repository.

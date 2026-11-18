@@ -20,7 +20,7 @@ Effortless 3.4.0（LGPLv3）作为测试运行依赖。省略此参数即可验�
 - `libs/compat-latest/simulated-neoforge-1.21.1-1.3.2.jar`（从 Aeronautics bundled JAR 中提取，仅供编译；运行时由航空学内置，无需单独安装）
 - `libs/compat-latest/sable-rapier-1.21.1-2.0.6.jar`（从 Sable 主 JAR 的 `META-INF/jarjar/` 中提取，仅供编译）
 
-面包军火库是模组发行运行时的必需依赖，版本必须大于等于 2.7.1，对应 NeoForge 版本范围 `[2.7.1,)`。由于本仓库不分发其 JAR，请在需要本地启动或编译其公开类型时传入符合此版本要求的 JAR：
+面包军火库（Mianbao's NewModernWarfare）是模组发行运行时的必需依赖，版本必须大于等于 2.7.1，对应 NeoForge 版本范围 `[2.7.1,)`。由于本仓库不分发其 JAR，请在需要本地启动或编译其公开类型时传入符合此版本要求的 JAR：
 
 ```powershell
 .\gradlew.bat runClient -PmianbaoJar='D:\mods\mianbaos-modernwarfare.jar'

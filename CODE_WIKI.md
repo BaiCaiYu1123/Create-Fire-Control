@@ -951,7 +951,7 @@ public static void renderAfterIris(RenderGuiEvent.Pre event) {
 | `interiors` | optional | `[0.6.1, 0.6.2)` | 内饰座椅（额外座椅类型） |
 | `createbigcannons` | optional | `[5.11.6, 5.11.8)` | CBC 火炮 + 火炮底座 |
 | `cbcmodernwarfare` | optional | `[0.0.6v+mc.1.21.1-neoforge]` | CBC 现代战争扩展（compact_mount） |
-| `mianbaos_modernwarfare` | required | `[2.7.1,)` | 面包军火库（发射器/挂架/弹药 ID 来源） |
+| `mianbaos_modernwarfare` | required | `[2.7.1,)` | 面包军火库（Mianbao's NewModernWarfare，发射器/挂架/弹药 ID 来源） |
 | `sable_schematic_api` | optional | `[0.4.0, 0.5.0)` | 蓝图保存/放置时迁移绑定 |
 
 ### 9.2 编译时 Jar 依赖（来自 `build.gradle`）

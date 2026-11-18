@@ -2,7 +2,7 @@
 
 # Create: Fire Control
 
-**机械动力：综合火控**
+**机械动力:先进火控**
 
 面向 Minecraft 1.21.1 / NeoForge 的载具火控与武器系统模组
 

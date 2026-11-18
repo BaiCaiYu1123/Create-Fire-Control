@@ -97,7 +97,9 @@ Create: Fire Control 为 Create、Sable 与 Create Aeronautics 生态提供一�
 | Create Aeronautics | **1.2.1.x 或 1.3.0–1.3.2** | 要求 `[1.2.1,1.2.2)` 或 `[1.3.0,1.3.3)` |
 | Simulated | **1.2.1.x 或 1.3.0–1.3.2** | 与 Create Aeronautics 使用同一版本范围 |
 | GeckoLib | **4.7+** | 构建使用 4.9.1 |
-| 面包军火库（Mianbao's Modern Warfare） | **2.7.1+** | 导弹、炸弹、火箭弹、挂架与发射器 |
+| 面包军火库（Mianbao's Modern Warfare） | **2.7.1+** | 导弹、炸弹、火箭弹、挂架与发射器；1.21.1 NeoForge 移植版由 BaiCaiYu 维护 |
+
+> 面包军火库原版作者为 **jhfn2233223_88364（B站：jhfn13）**，原版面向 1.20.1 Forge；本模组使用的是 BaiCaiYu 维护的 1.21.1 NeoForge 移植版。
 
 ### 可选前置（不装可启动，对应功能关闭）
 
@@ -182,15 +184,16 @@ Create: Fire Control 为 Create、Sable 与 Create Aeronautics 生态提供一�
 - **火控原创部分**：保留所有权利（All Rights Reserved）。源码公开用于查阅与构建，不授予复制、修改、再分发或商业使用许可。详见 [LICENSE](LICENSE)。
 - **CopyPoly 1.9.1**：MIT，Copyright (c) 2026 caca。源码位于 [third_party/copypoly](third_party/copypoly)，完整许可证为 [third_party/copypoly/LICENSE](third_party/copypoly/LICENSE)。
 - **Drive-By-Wire 派生代码与材质**：MIT，Copyright (c) 2023 endalion。完整许可证与适用范围见 [META-INF/licenses/drivebywire-model-MIT.txt](src/main/resources/META-INF/licenses/drivebywire-model-MIT.txt)。
-- **其他第三方内容**：保留各自许可，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+- **其他第三方内容**：MIT（虎式 I 发动机音效除外，见下方音效说明）。详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
-MIT 例外仅适用于上述明确标识的组件，不会因为与火控代码打包在同一 JAR 或资源命名空间中而改变。虎式 I 发动机音效另有独立来源说明，不属于上述许可范围，详见 [音效 NOTICE](src/main/resources/assets/create_fire_control/sounds/engine/tiger_i/NOTICE.md)。
+除虎式 I 发动机音效外，仓库内第三方内容均以 MIT 提供；该例外不会因为与火控代码打包在同一 JAR 或资源命名空间中而改变。虎式 I 发动机音效另有独立来源说明，不属于上述许可范围，详见 [音效 NOTICE](src/main/resources/assets/create_fire_control/sounds/engine/tiger_i/NOTICE.md)。
 
 ## 致谢
 
 - [CopyPoly](third_party/copypoly) — caca（MIT）
 - Drive-By-Wire — endalion（MIT 部分）
-- Create、Sable、Create Aeronautics、Simulated、GeckoLib、Create Big Cannons、面包军火库及其附属模组的作者与社区
+- Create、Sable、Create Aeronautics、Simulated、GeckoLib、Create Big Cannons 的作者与社区
+- 面包军火库原版作者：jhfn2233223_88364（B站：jhfn13）；1.21.1 NeoForge 移植与维护：BaiCaiYu
 
 ## 链接
 

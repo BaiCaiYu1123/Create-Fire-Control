@@ -250,7 +250,7 @@ tasks.register('verifyCopypolyJar') {
             def metadata = read('META-INF/neoforge.mods.toml')
             if (!metadata.contains('modId="copypoly"') || !metadata.contains('modId="create_fire_control"')
                     || !metadata.contains('config="copypoly.mixins.json"')
-                    || !metadata.contains('license="Mixed: original Fire Control work All Rights Reserved;'))
+                    || !metadata.contains('license="Original Fire Control work All Rights Reserved;'))
                 throw new GradleException('Missing bundled mod identity, mixin configuration or distinct license declaration.')
             def tag = new groovy.json.JsonSlurper().parseText(read(sharedPickaxeTag))
             if (!tag.values.containsAll(['create_fire_control:camouflaged_polyhedral_armor', 'create_fire_control:tiger_i_engine']))

@@ -1,8 +1,9 @@
 # Third-party components
 
 This is a **mixed-license** project. The root [LICENSE](LICENSE) reserves rights
-only in original Fire Control work. Third-party code and assets retain their
-licenses even inside the Fire Control package or resource namespace. The list
+only in original Fire Control work. Unless a separate notice says otherwise,
+third-party code and assets included in this repository are provided under the
+MIT License. The Tiger I audio notice below is the explicit exception. The list
 below does not override any additional third-party copyright or license notice.
 
 ## CopyPoly 1.9.1
@@ -82,6 +83,12 @@ grant rights to those recordings, and independent Minecraft redistribution
 permission has not been established there. Review that notice before publicly
 redistributing the corresponding `.ogg` files.
 
+## Other bundled third-party content
+
+Except for the Tiger I audio notice above, other third-party code and assets
+included in this repository are provided under the MIT License. This does not
+relicense external mods that are not bundled with this project.
+
 ## Other dependencies
 
 Create, Sable, Create Aeronautics, Simulated, GeckoLib, Create Big Cannons,
@@ -89,3 +96,7 @@ Create, Sable, Create Aeronautics, Simulated, GeckoLib, Create Big Cannons,
 bundled by this repository. They retain their respective licenses and are not
 relicensed by this notice. CopyPoly's MIT license does not cover the Fire
 Control codebase.
+
+面包军火库 original author: jhfn2233223_88364 (Bilibili: jhfn13). The 1.21.1
+NeoForge port used with Fire Control is maintained by BaiCaiYu and is not
+bundled by this repository.

@@ -35,7 +35,7 @@ use create_fire_control:camouflaged_polyhedral_armor; registry aliases preserve
 copypoly:copycat_polyhedron palettes, saved block entities, items and schematics.
 Do not install another standalone CopyPoly JAR alongside this distribution.
 
-Only the identified CopyPoly component is licensed under MIT. This statement
-does not apply MIT to Create: Fire Control's own code or other assets.
-Fire Control's own license is META-INF/licenses/create-fire-control.txt;
-other third-party exceptions are identified in THIRD_PARTY_NOTICES.md.
+CopyPoly remains MIT. This statement does not apply MIT to Create: Fire
+Control's own code or assets. Fire Control's own license is
+META-INF/licenses/create-fire-control.txt; other bundled third-party content
+is MIT except for the Tiger I audio notice in THIRD_PARTY_NOTICES.md.

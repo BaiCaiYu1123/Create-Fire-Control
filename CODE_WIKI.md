@@ -4,7 +4,7 @@
 > 显示名：**Create: Fire Control**（坦克火控系统）
 > 作者：BaiCaiYu
 > 适用平台：Minecraft 1.21.1 / NeoForge 21.1.230 / Java 21
-> 许可证：混合许可。仅火控原创部分保留所有权利；CopyPoly 与 Drive-By-Wire 来源的代码及材质保留 MIT；其他第三方内容保留原许可。详见 LICENSE 与 THIRD_PARTY_NOTICES.md。
+> 许可证：混合许可。火控原创部分保留所有权利；仓库内其他第三方内容为 MIT（虎式 I 音效见独立声明）。详见 LICENSE 与 THIRD_PARTY_NOTICES.md。
 
 ---
 

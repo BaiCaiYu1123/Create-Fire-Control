@@ -29,9 +29,9 @@ Aeronautics/Simulated 1.3.2，未将未测试的旧 Sable 版本继续标为支�
 通过注册表别名读取旧 `copypoly:copycat_polyhedron` 世界、方块实体和物品数据；
 玩家只需安装火控 JAR，不能重复安装独立 CopyPoly。
 
-NeoForge 的顶层 `license` 是整个模组文件的描述，因此写明混合许可、火控原创
-部分保留所有权利以及 CopyPoly/Drive-By-Wire 的 MIT 例外；独立条目、版权声明及许可证
-全文也明确标识 MIT。该例外不将火控其他代码授权为 MIT。
+NeoForge 的顶层 `license` 是整个模组文件的描述，因此写明火控原创部分保留
+所有权利、仓库内其他第三方内容为 MIT（虎式 I 音效除外）；独立条目、版权声明及许可证
+全文也明确标识 MIT。该声明不将火控原创代码授权为 MIT。
 
 ## 构建与验证
 

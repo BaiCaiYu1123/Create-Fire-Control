@@ -49,11 +49,15 @@ claim of third-party ownership.
    override their MIT rights.
 
 3. Other third-party components
-   Other third-party components retain their respective licenses and
-   ownership. See THIRD_PARTY_NOTICES.md for the detailed notice.
+   Other third-party code and assets included in this repository are
+   licensed under the MIT License, except for the Tiger I exterior engine
+   audio recordings identified in THIRD_PARTY_NOTICES.md, which retain their
+   separate source notice. This does not relicense external mods that are
+   not bundled with this project.
 
-The MIT license applies only to the components identified above. It does not
-apply to Create: Fire Control's original code, models, textures, sounds or
-documentation, even when distributed in the same JAR or resource namespace.
-The reservation of rights above does not override any MIT rights in the
-identified components.
+The MIT license applies to all third-party components included in this
+repository, except for the Tiger I audio recordings identified in
+THIRD_PARTY_NOTICES.md. It does not apply to Create: Fire Control's original
+code, models, textures, sounds or documentation, even when distributed in the
+same JAR or resource namespace. The reservation of rights above does not
+override any MIT rights in the identified components.

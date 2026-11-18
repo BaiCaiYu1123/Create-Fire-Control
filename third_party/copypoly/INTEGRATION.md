@@ -3,7 +3,7 @@
 本目录是 caca 的 CopyPoly 1.9.1 完整源码快照，来源为用户提供的
 CopyPoly 1.9.1 源码快照。本目录的代码、资源、测试及文档使用本目录的
 [MIT LICENSE](LICENSE)，Copyright (c) 2026 caca。原 Gradle 启动脚本等构建工具
-保留其自身 Apache-2.0 声明。火控原创部分不使用 MIT；既有第三方部分保留原许可。
+保留其自身 Apache-2.0 声明。火控原创部分不使用 MIT；其他第三方内容为 MIT（虎式 I 音效除外）。
 
 保留原 `com.caca.copypoly` 包及 `copypoly` 菜单/网络标识，没有将上游实现
 迁入火控包。39 个生产 Java 文件中，37 个只添加 MIT/版权注释；
